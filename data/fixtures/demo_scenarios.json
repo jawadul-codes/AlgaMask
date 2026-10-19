@@ -1,0 +1,6 @@
+[
+  {"algae":"blend","inclusion_pct":5,"serving_g":45,"flavour":"cocoa-spice","exclusions":[]},
+  {"algae":"blend","inclusion_pct":5,"serving_g":45,"flavour":"cocoa-spice","exclusions":["peanut","tree_nut"]},
+  {"algae":"chlorella","inclusion_pct":10,"serving_g":45,"flavour":"citrus","exclusions":[]},
+  {"algae":"blend","inclusion_pct":5,"serving_g":45,"flavour":"vanilla","exclusions":["oats"]}
+]

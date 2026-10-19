@@ -1,109 +1,73 @@
 # AlgaMask
 
-AlgaMask is an AI-native formulation assistant that retrieves food and sensory evidence, maps algae molecules to perceived off-notes, and generates constrained masking recipes. Built as a seven-day experimental-decision MVP, it enables higher inclusion rates of nutrient-dense microalgae (spirulina and chlorella) in products like protein bars by outputting mass-balanced, food-grade formulations optimized for both sensory acceptance and nutritional density.
+A runnable Flutter + FastAPI skeleton for an algae protein-bar formulation assistant. The current release runs entirely with deterministic mock data and requires no API keys.
 
-> **Note:** AlgaMask proposes food-grade ingredient combinations and screening ranges based on retrieved evidence. It does not invent novel molecules, claim physical binding without evidence, or represent an untested dose as clinically proven.
-> 
-> 
+Choose spirulina, chlorella or a blend, inclusion percentage, serving mass, exclusions and flavour direction. Submit a run to see six agent roles, a sensory-profile placeholder, three mass-balanced concept recipes, B0/A0 controls, evidence placeholders and a printable report.
 
-## Core Capabilities
+## Run locally
 
-* **Multimodal Sensory Mapping:** Fuses molecular structures (Morgan fingerprints and descriptors), chemical observations, sensory text embeddings, and human panel scores using a late-fusion scoring method to map volatile organic compounds (VOCs) to specific off-notes.
+Requirements: Python 3.11+, [uv](https://docs.astral.sh/uv/) and Flutter stable. Flutter web is the configured target. First setup downloads packages; subsequent mock runs need no external services.
 
+From the repository root, start the backend:
 
-* **RAG-Powered Recipe Optimizer:** Uses a hybrid retrieval index (metadata filtering plus vector search) built from reviewed evidence chunks to ensure every proposed ingredient references at least one cited source.
-
-
-* **Autonomous Agent Workflow:** A deterministic supervisor state machine orchestrates six specific agent roles: Profile, Retrieval, Chemistry, Recipe, Critic, and Impact.
-
-
-* **Generative Formulation Engine:** Generates candidate recipes by selecting aroma, taste-balancing, and matrix-support strategies while strictly enforcing mass balance, caloric limits, and allergen constraints.
-
-
-* **Measurable Impact Reporting:** Automatically outputs a data-backed report comparing a baseline bar (B0), an unmasked algae control (A0), and the optimized formulation (A1) across nutritional density and measured sensory changes.
-
-
-
-## System Architecture
-
-The project relies on a lightweight, locally runnable stack optimized for a seven-day sprint:
-
-* **Interface:** Flutter application for demonstrating live inputs, molecular-sensory maps, and impact reports.
-
-
-* **API & Logic:** Python FastAPI serving as the boundary for retrieval, generation, and deterministic safety filters.
-
-
-* **Data Storage:** Versioned CSV files (algae species, compounds, sensory descriptors, evidence chunks, ingredients, nutrition) and validated JSON.
-
-
-* **Molecular Features:** PubChem PUG REST and RDKit.
-
-
-* **Vector Index:** Local FAISS or Chroma index for offline semantic retrieval.
-
-
-
-## Project Structure
-
-```text
-data/
-  raw/
-  reviewed/
-    algae_species.csv
-    compounds.csv
-    algae_compound_observations.csv
-    sensory_descriptors.csv
-    compound_sensory_links.csv
-    ingredients.csv
-    nutrition.csv
-    evidence_chunks.csv
-    sources.csv
-    formulations.csv
-    sensory_trials.csv
-fixtures/
-  baseline_bar.json
-  unmasked_bar.json
-  demo_scenarios.json
-services/algamask/
-  schemas.py
-  validation.py
-  molecular.py
-  embeddings.py
-  retrieval.py
-  optimizer.py
-  nutrition.py
-  impact.py
-  report.py
-  api.py
-  agents/
-    supervisor.py
-    profile.py
-    retrieve.py
-    chemistry.py
-    recipe.py
-    critic.py
-    impact_agent.py
-indexes/
-  reviewed_evidence/
-tests/algamask/
-lib/src/algamask/
-
+```sh
+uv sync --extra dev --locked
+uv run uvicorn algamask.api:app --host 127.0.0.1 --port 8000
 ```
 
-(Directory structure adapted from the suggested sprint layout.)
+In a second terminal:
 
-## Data Provenance & Safety Constraints
+```sh
+cd apps/flutter
+flutter pub get
+flutter run -d chrome --web-port 3000
+```
 
-AlgaMask relies on a tightly controlled dataset rather than uncontrolled scraping. Every record published to the MVP index must have a `review_status=approved` flag. The system enforces strict guardrails during generation:
+Alternatively use `flutter run -d web-server --web-port 3000` and open http://localhost:3000 yourself. The app calls `http://127.0.0.1:8000` by default. Override with `--dart-define=API_BASE_URL=http://127.0.0.1:8000` when starting or building Flutter. Use HTTP localhost origins for local development; CORS is restricted to localhost and 127.0.0.1.
 
-* Only ingredients from the allowed food-grade library are proposed.
+API documentation: http://127.0.0.1:8000/docs
 
+## Try it
 
-* Hard allergen exclusions cannot be overridden by any agent.
+1. Run the default blend at 5% inclusion and 45 g serving mass.
+2. Inspect Profile → Retrieval → Chemistry → Recipe → Critic → Impact in the returned trace.
+3. Open A1 to inspect ingredients, then expand evidence and impact sections.
+4. Copy the complete run JSON, or open the print-ready report and use Print / Save as PDF.
+5. Exclude oats and run again to see the explicit no-feasible-recipe path.
 
+The loading indicator covers the API request. The completed trace is returned together; per-agent streaming is a future integration.
 
-* Total recipe mass must perfectly equal the selected batch mass, repaired by deterministic code if necessary.
+## What is real, and what is mocked?
 
+The HTTP workflow, request validation, IDs, timestamps, mass arithmetic, ingredient exclusions, report rendering and JSON export are functional. Three concepts are generated deterministically from request inputs. The mock base recipe contains oats and date paste, plus selected algae and a flavour ingredient. It is not a validated protein-bar recipe.
 
-* The Critic Agent rejects any recipe that includes unsupported mechanistic claims or missing citations.
+Evidence, sensory risk bars and ingredient proportions are **assumed for demo**. There is no live LLM, molecular calculation or vector index. Nutrition and measured sensory improvements are **unknown**, not invented or zero-filled. Screening bounds, calorie/sugar limits and scientific claim validation have not been implemented. The Critic currently checks ingredient membership, exclusions and positive mass/mass balance only.
+
+The report is a print-ready HTML page with browser PDF printing. Copy JSON preserves the full trace and fixture evidence. Runs are kept in memory (up to 100), and disappear on restart or eviction. The skeleton has no authentication and is intended for local use.
+
+## Project map
+
+```text
+apps/flutter/             Flutter web application and widget tests
+services/algamask/        FastAPI, schemas, mock services and report rendering
+  agents/                Six role modules and deterministic supervisor
+data/reviewed/           Eleven empty CSV templates ready for curation
+data/fixtures/           Reproducible request scenarios
+indexes/reviewed_evidence/  Future vector-index integration
+tests/algamask/          API, constraint, report and data-boundary tests
+docs/TASKS.md            Task-based backlog without timeline commitments
+```
+
+Data rules and fixture separation are documented in [data/README.md](data/README.md). The next implementation tasks are in [docs/TASKS.md](docs/TASKS.md).
+
+## Checks
+
+```sh
+uv run pytest -q
+cd apps/flutter
+flutter analyze
+flutter test
+flutter build web
+```
+
+Both dependency lockfiles are checked in. No credentials are required or stored.
