@@ -1,0 +1,136 @@
+enum,value,description
+review_status,discovered,Source candidate noted; no row data verified
+review_status,extracted,Candidate row created with exact source location
+review_status,verified,"Identity, numbers, source match and licence checked"
+review_status,approved,Scientific review done; eligible for publication/runtime/index
+review_status,rejected,Reviewed and not usable
+review_status,superseded,Replaced by a newer record/version
+evidence_status,database_derived,"From a curated database (e.g. PubChem, USDA)"
+evidence_status,literature_derived,Extracted from a peer-reviewed source
+evidence_status,calculated,Computed by project code from other records
+evidence_status,ai_predicted,Predicted by a model; never headline evidence
+evidence_status,assumed_for_demo,Placeholder for demo only
+evidence_status,experimentally_measured,Original project measurement
+evidence_type,direct_same_matrix,Direct sensory/formulation evidence in the same food matrix
+evidence_type,related_food_matrix,Evidence from a related food matrix
+evidence_type,analytical_detection,Analytical detection (e.g. GC-MS) only
+evidence_type,review,Review article evidence
+evidence_type,in_vitro,In-vitro or receptor evidence; not proof of bar performance
+evidence_type,database_identity,Identity/property from a database
+evidence_type,supplier_specification,"Supplier spec, label or CoA"
+evidence_type,project_measurement,Original project measurement
+evidence_strength,strong,"Direct, well-matched evidence"
+evidence_strength,moderate,Indirect or partly matched evidence
+evidence_strength,weak,Limited or loosely related evidence
+evidence_strength,hypothesis,"Proposed, not demonstrated"
+confidence_band,high,
+confidence_band,medium,
+confidence_band,low,
+support_class,direct,Direct evidence for the claim
+support_class,indirect,Indirect evidence
+support_class,hypothesis,Hypothesis only
+relationship_type,associated_with,Reported association
+relationship_type,odor_active,Odor-active compound
+relationship_type,taste_active,Taste-active compound
+relationship_type,suppresses,Suppresses a note
+relationship_type,complements,Complements a note
+relationship_type,hypothesized,"Hypothesized, not demonstrated"
+species_material,spirulina,
+species_material,chlorella,
+ingredient_form_type,powder,
+ingredient_form_type,extract,
+ingredient_form_type,oil,
+ingredient_form_type,paste,
+ingredient_form_type,isolate,
+ingredient_form_type,whole,
+ingredient_form_type,other,
+ingredient_role,algae_base,DRAFT - team to confirm role list
+ingredient_role,protein_base,
+ingredient_role,binder,
+ingredient_role,sweetener,
+ingredient_role,masking_agent,
+ingredient_role,flavour_modulator,
+ingredient_role,fat_source,
+ingredient_role,filler,
+ingredient_role,other,
+sensory_modality,odor,Orthonasal smell
+sensory_modality,taste,Basic taste
+sensory_modality,flavour_retronasal,Retronasal flavour
+sensory_modality,mouthfeel,
+sensory_modality,aftertaste,
+sensory_modality,appearance,
+observation_type,detection,"Compound detected, no level"
+observation_type,relative_abundance,Relative abundance (%)
+observation_type,peak_area,Instrument peak area - NOT concentration
+observation_type,concentration,Quantified concentration
+observation_type,qualitative,Figure/category only; do not invent a number
+bound_type,hard_regulatory_max,Safety/regulatory maximum
+bound_type,experimental_screening,Experimental screening range
+regulatory_region,BD,
+regulatory_region,US,
+regulatory_region,EU,
+regulatory_region,UK,
+regulatory_region,other,Name it in notes
+allergen_relationship,contains,
+allergen_relationship,may_contain,
+allergen_relationship,free_from,Explicit statement that none apply
+nutrition_source_type,supplier_label,
+nutrition_source_type,coa,Certificate of analysis
+nutrition_source_type,usda_fdc,USDA FoodData Central fallback
+nutrition_source_type,other_reviewed,
+value_precision,label_rounded,Rounded label value
+value_precision,laboratory,Lab value
+value_precision,database_value,Database value
+identity_verification_status,unverified,
+identity_verification_status,pubchem_matched,Matched by name/CAS only
+identity_verification_status,verified,Reviewer confirmed
+identity_verification_status,conflict,Identity conflict; blocks publication
+source_type,peer_reviewed,
+source_type,database,
+source_type,supplier_spec,
+source_type,coa,
+source_type,regulatory,
+source_type,project_data,
+source_type,other,
+discovered_via,pubchem,
+discovered_via,europepmc,
+discovered_via,openalex,
+discovered_via,crossref,
+discovered_via,usda_fdc,
+discovered_via,manual,
+chunk_tag,diagnosis,Explains why an off-note arises
+chunk_tag,intervention,Supports a masking/formulation intervention
+formulation_type,B0,Baseline without algae
+formulation_type,A0,"Algae, unmasked"
+formulation_type,generated_variant,Engine-generated variant
+formulation_type,A1,Selected masked formulation
+formulation_status,draft,
+formulation_status,generated,
+formulation_status,selected,
+formulation_status,prototyped,
+formulation_status,superseded,
+unit,pct_ww,% w/w
+unit,g_per_batch,
+unit,g_per_100g,
+unit,kcal_per_100g,
+unit,mg_per_100g,
+unit,mg_per_kg,
+unit,ug_per_g,
+unit,ng_per_g,
+unit,ppm,
+unit,ppb,
+unit,peak_area,
+unit,relative_percent,
+unit,rating_1_9,
+unit,celsius,
+unit,count,
+unit,none,
+comparator,higher_better,
+comparator,lower_better,
+comparator,none,
+spread_type,sd,
+spread_type,sem,
+spread_type,iqr,
+spread_type,range,
+bool,true,
+bool,false,

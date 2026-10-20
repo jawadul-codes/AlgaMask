@@ -51,14 +51,14 @@ The report is a print-ready HTML page with browser PDF printing. Copy JSON prese
 apps/flutter/             Flutter web application and widget tests
 services/algamask/        FastAPI, schemas, mock services and report rendering
   agents/                Six role modules and deterministic supervisor
-data/reviewed/           Eleven empty CSV templates ready for curation
+data/reviewed/           21-table reviewed schema; extracted rows, none approved
 data/fixtures/           Reproducible request scenarios
 indexes/reviewed_evidence/  Future vector-index integration
 tests/algamask/          API, constraint, report and data-boundary tests
 docs/TASKS.md            Task-based backlog without timeline commitments
 ```
 
-Data rules and fixture separation are documented in [data/README.md](data/README.md). The next implementation tasks are in [docs/TASKS.md](docs/TASKS.md).
+Data rules, the extracted rows, and what is still missing are documented in [data/README.md](data/README.md). The next implementation tasks are in [docs/TASKS.md](docs/TASKS.md). The running app still uses synthetic fixtures and does not load `data/reviewed/`.
 
 ## Checks
 

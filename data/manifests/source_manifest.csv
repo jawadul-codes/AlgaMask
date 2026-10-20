@@ -1,0 +1,51 @@
+file_path,source_id,sha256,bytes,retrieved_at,licence,origin_url,committed_to_git
+data/raw/pubchem/CMP-2MBUTANAL.json,SRC-PUBCHEM,ce56686ff7ba338425e4f00e2e00bd435a370cd5cd6ae9227a14fd637774bcd2,362,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-3MBUTANAL.json,SRC-PUBCHEM,d2f75daf2806d2eb382eca76359c846eb5cd535c3ab0e137ecac6f1a0fde0e6e,361,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-A-IONONE.json,SRC-PUBCHEM,79a9f28371e32566fbd395fef64075e6832a28d1e65ed93fffacd68ee3800371,396,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-ACETIC.json,SRC-PUBCHEM,6cbdcd347650ea48d90ec4f3db7290c74e7863e7625537b1fa5bbad0e06dc43b,354,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-B-CYCLO.json,SRC-PUBCHEM,e725cf30457c4f6ffb6cdd944277844f1f94b2e524fe7e784a4c831b37bd3413,389,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-B-IONONE.json,SRC-PUBCHEM,55bbb41aa02be83e98e5a38a03cdeb78d76c26f83d7f6c76e1a5f81955ba179e,398,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-BENZAL.json,SRC-PUBCHEM,16a71e2e501ce409421728252753a638ae072eddc4e2651840c1e3439ac105a5,372,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-DECADIENAL.json,SRC-PUBCHEM,53c89a7a3faa8886bc7abbad80dc5cbe2fdc52832b55160944848dd23ba648ba,379,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-DECANAL.json,SRC-PUBCHEM,ef278220ba1648c23d0f97185c9951505a61052f0eb88efbc82f46d33d2021e7,362,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-DMPYRAZ.json,SRC-PUBCHEM,c80f77930357a8acf0c5990118bb3d3ea4330dd08649dafd7c243f41359bec9a,381,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-EDMPYRAZ.json,SRC-PUBCHEM,fd78bfc7ea5cacef412398e2cc6544687d2ef2e037014e1326d0cf39667293d1,394,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-GEOSMIN.json,SRC-PUBCHEM,4aefdf426ea749b32ce9636310174b4a681874d8811019c7e0e428fc5b4eb8ff,393,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-HEPTADEC.json,SRC-PUBCHEM,ef49c95c3cac7a5c812b589181c41790361c773f039c88e308d95eea9657f435,375,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-HEPTANAL.json,SRC-PUBCHEM,1905daed9cb1ab0485903b28e82c3de26015f46af963c6f3f13298113361e5e9,356,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-HEPTANOL.json,SRC-PUBCHEM,7fbe67b60021534aa2249ad8acfb615296efaba4a9d7852c100d2bb01e37d0dc,354,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-HEXADEC.json,SRC-PUBCHEM,fbf40c11896b550f1092dfa037bfbb6b08fe7db9ab15c3d8fd2b313e57bcc6bd,373,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-HEXANAL.json,SRC-PUBCHEM,ac8b8fedab534ff7767b5ca615714c5ff2185b588fbf6a44c69f01870a328035,353,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-HEXANOL.json,SRC-PUBCHEM,b7ba59b4eadd81bde167b961601d47ed31e4dd4e80d2bca655dcfaae928b03f9,351,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-LIMONENE.json,SRC-PUBCHEM,3010d713326e988da1bff224634cdbff7910adda1c1957ac11a2d19f382e42ed,385,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-METHANETHIOL.json,SRC-PUBCHEM,e2420404be41cc2c7fc6e3705fc88984fc53e007fbba7f1ff16ebfe29a2b0b92,342,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-MIB.json,SRC-PUBCHEM,5fe93fa1fc60fccaa49f42726d5641ba7660c95f7f144d70567c8c0445beffa0,412,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-NONADEC.json,SRC-PUBCHEM,63d589f9d54b0c240660232a5e079e7a11a0123664c024ce8985789849e159eb,378,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-OCTANOL.json,SRC-PUBCHEM,04f8546d8a130b0ddafaec852e7755eaf4ab1529b0e6e9038d5b1832cb6c449b,354,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-OCTEN2OL.json,SRC-PUBCHEM,2003c99c3b702db20d147a5a6edaf4e45a09d23e1a068e5cfaf80ec822a7f97c,367,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-OCTENOL.json,SRC-PUBCHEM,4068b2c15a5e306043fabe71c8400e3dd88917ac09e54833a0c5aedd25f6b34b,367,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-OCTENONE.json,SRC-PUBCHEM,25b2be568b5dc786f85af45865b225ee124bdb8b3fb1c545c1f3c320b6f8a587,370,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-PENTADEC.json,SRC-PUBCHEM,b49587f0b2c769f1648a14b35c93bf3e2a91f363b0c0d1e426c10b6dade5ba92,372,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-PENTANAL.json,SRC-PUBCHEM,3731f32936d3b915206da096e0bf3e101af51fff481c334487cc5b49147e5040,351,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-PENTANOL.json,SRC-PUBCHEM,eac14560e9fb4cb0f9332c79502feaaa156a0410befba31e03e7b7d77f89061b,351,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/pubchem/CMP-SAFRANAL.json,SRC-PUBCHEM,6bfabe5f0d014416efed66dd3a0cf5cabe868ad977d1cee2cd698b913bfcbb26,384,2026-10-21,PubChem PUG REST property JSON,https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest,false
+data/raw/usda/IF-ALMOND-BUTTER.json,SRC-USDA-FDC,10dbef7a25900f5125d8f1a9168860cb82bcd307b4cbe835ce1984cfedd96626,1920,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-CINN-PWD.json,SRC-USDA-FDC,773ac14b742fd1bf75301433c174b6ac4a3bd29f9b01a2c8e38b4832b582ee69,2297,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-COCO-OIL.json,SRC-USDA-FDC,bdf0789683e4bc64475281b58bc44004c53b8ff764f571cfc0a1fa6a81c8e6e6,2148,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-COCOA-PWD.json,SRC-USDA-FDC,1b76ebfa02ef1ade8f02f48d96ce14288f347c11fa1fd636723d220d7b16904d,1962,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-DATE-DRIED.json,SRC-USDA-FDC,6dc4c44c5a2fdaf1f459a91411b372b6ed53d741edf8c32ecdb4f278a77ad325,1894,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-HONEY.json,SRC-USDA-FDC,96fc1ea638f54d4813bf31c2a5f0d2585d24e779def34f29db448472d2861f37,1833,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-MAPLE.json,SRC-USDA-FDC,109cbd33f1c4811ab2779048a949a6f5e499727d12f7f79ce5a4a542c7166418,1977,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-OAT-DRY.json,SRC-USDA-FDC,0bb3c82fa29aa08f7546c4d8e95772424b4203d598b2a712abdf4b3eca5a37c1,1925,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-ORANGE-PEEL.json,SRC-USDA-FDC,dfb0cec638f42b85ad775946271baf0a410c8eedc33cca4013f31ad5ce560799,1840,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-PEANUT-BUTTER.json,SRC-USDA-FDC,c3cbbce3e3f8e2af078df89bc9d641df3c6fc8c55425b6151556cf5fbe128557,2208,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-PUMPKIN.json,SRC-USDA-FDC,ba27659fb50c572f4714cae9e1aac03b67890d2b58be3968194058ddd7608fb9,2207,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-RICE-PUFF.json,SRC-USDA-FDC,1e65a93905ad61adab02767d0eecb1e3eeac109e04966ec2f39e096b388a71cb,1872,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-SALT.json,SRC-USDA-FDC,19d9d5ffe86f45ccb97e3457f4b48ed1a18b490e0c17fb0006a766ed4ebb434f,1821,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-SOY-ISO.json,SRC-USDA-FDC,77ca647215db89dabb3b1d1fe20236ff61e330844f363cf8187899d9fe1b2e56,1948,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-SPI-PWD.json,SRC-USDA-FDC,294d22de7558e9b4ff4cd7e08d623760d6dfe9333fae19cfb8061aa6c70133b2,1853,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-SUNFLOWER.json,SRC-USDA-FDC,38ee5469aa1aeb84ed0adfb75ca7a91b6337de50885fc5b37440e5c6f24789d5,1909,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-TAHINI.json,SRC-USDA-FDC,5fabfeb33688d7d44c0b3d3b0ac7d580bf6e9fef7e1a8ef6899a77a2c717da1a,1910,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-VAN-EXT.json,SRC-USDA-FDC,8ddb9a844767856ded4925d5a4bdfeba451e5e7f4d2dd5993f30e1dbeaf8d583,1843,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/IF-WHEY-PWD.json,SRC-USDA-FDC,f87cdf1c96a4a5ede63dbf1522b7f64607a1b117f280d5ffd1ca83fbcc16210b,2370,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false
+data/raw/usda/sr_legacy_2018-04.zip,SRC-USDA-FDC,b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0,6074592,2026-10-21,USDA FoodData Central CC0 food detail,https://fdc.nal.usda.gov/,false

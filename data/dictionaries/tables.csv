@@ -1,0 +1,22 @@
+table,primary_key,provenance_mode,description
+sources,source_id,self,Decisive sources with licence/provenance
+algae_materials,material_id,full,Purchasable algae material/batch (distinct from species)
+compounds,compound_id,full,Chemical identity from PubChem (database provenance only)
+compound_features,feature_id,light,Locally computed RDKit features (separate provenance from PubChem)
+algae_compound_observations,observation_id,full,Reported detection/level of a compound in a material/process
+sensory_descriptors,descriptor_id,full,Controlled sensory vocabulary
+compound_sensory_links,link_id,full,Compound-to-descriptor relationships with evidence class
+ingredient_forms,ingredient_form_id,full,Non-interchangeable ingredient forms (cocoa powder vs extract etc.)
+screening_bounds,bound_id,full,"One bound per ingredient form, matrix, role, region and source"
+allergens,allergen_id,full,Controlled allergen list
+ingredient_allergens,ingredient_allergen_id,full,Allergen relationships per ingredient form
+ingredient_nutrition,nutrition_id,full,Per-100 g nutrition; empty = unknown (never 0 for missing)
+evidence_chunks,chunk_id,full,Reviewer-written evidence notes for retrieval (1-4 sentences)
+formulations,formulation_id,light,"B0, A0, generated variants, selected A1"
+formulation_ingredients,row_id,light,Normalized recipe lines
+metric_definitions,metric_id,light,Impact metric formulas and rules
+prototype_processes,process_id,light,Batch/mixing/storage/serving records for B0/A0/A1
+sensory_trials,observation_id,light,One row per panelist-sample observation. Pseudonymous codes only; never overwrite - amend
+sensory_summaries,summary_id,light,Calculated trial summaries
+dataset_versions,dataset_version,none,Published immutable versions
+retrieval_evaluations,eval_id,light,Reviewer-authored golden retrieval questions

@@ -1,0 +1,371 @@
+table,column,type,required,references_or_enum,description
+sources,source_id,id,always,,"Stable ID, e.g. SRC-0001"
+sources,source_type,enum,approved,source_type,
+sources,title,str,approved,,
+sources,authors,str,no,,
+sources,year,int,no,,
+sources,doi,str,no,,DOI without URL prefix
+sources,url,str,no,,
+sources,database_name,str,no,,
+sources,discovered_via,enum,no,discovered_via,
+sources,retrieved_at,date,approved,,
+sources,licence,str,approved,,Licence/redistribution note
+sources,redistribution_allowed,enum,approved,bool,
+sources,full_text_stored,enum,approved,bool,Only true if licence permits
+sources,why_it_matters,str,no,,
+sources,record_version,int,always,,Increment on each correction; old versions stay reproducible
+sources,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+sources,reviewer,str,approved,,Person who approved
+sources,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+sources,evidence_status,enum,approved,evidence_status,How the value was obtained
+sources,notes,str,no,,"Reviewer notes, limitations"
+algae_materials,material_id,id,always,,
+algae_materials,species_material,enum,approved,species_material,
+algae_materials,species_name,str,approved,,
+algae_materials,strain,str,no,,
+algae_materials,material_form,str,approved,,
+algae_materials,processing,str,approved,,
+algae_materials,supplier,str,approved,,
+algae_materials,batch_lot,str,no,,
+algae_materials,inclusion_default_pct_ww,float,no,,"Default inclusion, % w/w"
+algae_materials,composition_source_id,fk,no,sources.source_id,
+algae_materials,record_version,int,always,,Increment on each correction; old versions stay reproducible
+algae_materials,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+algae_materials,reviewer,str,approved,,Person who approved
+algae_materials,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+algae_materials,source_id,fk,approved,sources.source_id,Decisive source for this row
+algae_materials,source_location,str,approved,,Exact page/table/figure/section/DB field
+algae_materials,evidence_status,enum,approved,evidence_status,How the value was obtained
+algae_materials,notes,str,no,,"Reviewer notes, limitations"
+compounds,compound_id,id,always,,
+compounds,compound_name,str,always,,
+compounds,pubchem_cid,int,approved,,
+compounds,pubchem_smiles,str,approved,,
+compounds,pubchem_inchikey,str,approved,,
+compounds,molecular_formula,str,approved,,
+compounds,molecular_weight,float,approved,,
+compounds,xlogp,float,no,,
+compounds,pubchem_retrieved_at,date,approved,,
+compounds,raw_response_path,str,no,,Path under data/raw (ignored by Git)
+compounds,identity_verification_status,enum,always,identity_verification_status,
+compounds,record_version,int,always,,Increment on each correction; old versions stay reproducible
+compounds,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+compounds,reviewer,str,approved,,Person who approved
+compounds,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+compounds,source_id,fk,approved,sources.source_id,Decisive source for this row
+compounds,source_location,str,approved,,Exact page/table/figure/section/DB field
+compounds,evidence_status,enum,approved,evidence_status,How the value was obtained
+compounds,notes,str,no,,"Reviewer notes, limitations"
+compound_features,feature_id,id,always,,
+compound_features,compound_id,fk,always,compounds.compound_id,
+compound_features,rdkit_version,str,approved,,
+compound_features,fingerprint_algorithm,str,approved,,
+compound_features,fingerprint_radius,int,no,,
+compound_features,fingerprint_bits,int,approved,,
+compound_features,chirality_included,enum,approved,bool,
+compound_features,standardization_rule,str,approved,,
+compound_features,descriptor_set,str,no,,
+compound_features,computed_at,datetime,approved,,
+compound_features,feature_hash,str,no,,
+compound_features,record_version,int,always,,Increment on each correction; old versions stay reproducible
+compound_features,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+compound_features,reviewer,str,approved,,Person who approved
+compound_features,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+compound_features,source_id,fk,no,sources.source_id,Decisive source for this row
+compound_features,source_location,str,no,,Exact page/table/figure/section/DB field
+compound_features,evidence_status,enum,approved,evidence_status,How the value was obtained
+compound_features,notes,str,no,,"Reviewer notes, limitations"
+algae_compound_observations,observation_id,id,always,,
+algae_compound_observations,material_id,fk,always,algae_materials.material_id,
+algae_compound_observations,compound_id,fk,always,compounds.compound_id,
+algae_compound_observations,observation_type,enum,always,observation_type,
+algae_compound_observations,reported_value,float,no,,Leave empty if study gives only a figure/category
+algae_compound_observations,reported_unit,enum,no,unit,Required when reported_value is set
+algae_compound_observations,measurement_basis,str,no,,Required when reported_value is set (e.g. dry weight)
+algae_compound_observations,qualitative_value,str,no,,
+algae_compound_observations,analytical_method,str,approved,,
+algae_compound_observations,process_context,str,no,,
+algae_compound_observations,record_version,int,always,,Increment on each correction; old versions stay reproducible
+algae_compound_observations,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+algae_compound_observations,reviewer,str,approved,,Person who approved
+algae_compound_observations,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+algae_compound_observations,source_id,fk,approved,sources.source_id,Decisive source for this row
+algae_compound_observations,source_location,str,approved,,Exact page/table/figure/section/DB field
+algae_compound_observations,evidence_status,enum,approved,evidence_status,How the value was obtained
+algae_compound_observations,notes,str,no,,"Reviewer notes, limitations"
+sensory_descriptors,descriptor_id,id,always,,
+sensory_descriptors,term,str,always,,
+sensory_descriptors,normalized_term,str,approved,,
+sensory_descriptors,sensory_modality,enum,approved,sensory_modality,
+sensory_descriptors,category_group,str,approved,,One of the 5 required groups (team to define)
+sensory_descriptors,synonym_of,fk,no,sensory_descriptors.descriptor_id,
+sensory_descriptors,definition,str,no,,
+sensory_descriptors,record_version,int,always,,Increment on each correction; old versions stay reproducible
+sensory_descriptors,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+sensory_descriptors,reviewer,str,approved,,Person who approved
+sensory_descriptors,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+sensory_descriptors,source_id,fk,approved,sources.source_id,Decisive source for this row
+sensory_descriptors,source_location,str,approved,,Exact page/table/figure/section/DB field
+sensory_descriptors,evidence_status,enum,approved,evidence_status,How the value was obtained
+sensory_descriptors,notes,str,no,,"Reviewer notes, limitations"
+compound_sensory_links,link_id,id,always,,
+compound_sensory_links,compound_id,fk,always,compounds.compound_id,
+compound_sensory_links,descriptor_id,fk,always,sensory_descriptors.descriptor_id,
+compound_sensory_links,relationship_type,enum,always,relationship_type,
+compound_sensory_links,evidence_type,enum,approved,evidence_type,
+compound_sensory_links,evidence_strength,enum,approved,evidence_strength,
+compound_sensory_links,confidence_band,enum,approved,confidence_band,
+compound_sensory_links,matrix,str,approved,,
+compound_sensory_links,odor_threshold_value,float,no,,
+compound_sensory_links,threshold_unit,enum,no,unit,
+compound_sensory_links,threshold_medium,str,no,,
+compound_sensory_links,record_version,int,always,,Increment on each correction; old versions stay reproducible
+compound_sensory_links,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+compound_sensory_links,reviewer,str,approved,,Person who approved
+compound_sensory_links,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+compound_sensory_links,source_id,fk,approved,sources.source_id,Decisive source for this row
+compound_sensory_links,source_location,str,approved,,Exact page/table/figure/section/DB field
+compound_sensory_links,evidence_status,enum,approved,evidence_status,How the value was obtained
+compound_sensory_links,notes,str,no,,"Reviewer notes, limitations"
+ingredient_forms,ingredient_form_id,id,always,,
+ingredient_forms,ingredient_name,str,always,,
+ingredient_forms,form_type,enum,approved,ingredient_form_type,
+ingredient_forms,ingredient_role,enum,approved,ingredient_role,
+ingredient_forms,supplier,str,no,,
+ingredient_forms,product_code,str,no,,
+ingredient_forms,material_id,fk,no,algae_materials.material_id,Only for algae ingredient forms
+ingredient_forms,description,str,no,,
+ingredient_forms,record_version,int,always,,Increment on each correction; old versions stay reproducible
+ingredient_forms,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+ingredient_forms,reviewer,str,approved,,Person who approved
+ingredient_forms,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+ingredient_forms,source_id,fk,approved,sources.source_id,Decisive source for this row
+ingredient_forms,source_location,str,approved,,Exact page/table/figure/section/DB field
+ingredient_forms,evidence_status,enum,approved,evidence_status,How the value was obtained
+ingredient_forms,notes,str,no,,"Reviewer notes, limitations"
+screening_bounds,bound_id,id,always,,
+screening_bounds,ingredient_form_id,fk,always,ingredient_forms.ingredient_form_id,
+screening_bounds,product_matrix,str,always,,
+screening_bounds,ingredient_role,enum,approved,ingredient_role,
+screening_bounds,regulatory_region,enum,approved,regulatory_region,
+screening_bounds,bound_type,enum,always,bound_type,
+screening_bounds,min_pct_ww,float,approved,,Normalized % w/w
+screening_bounds,max_pct_ww,float,approved,,Normalized % w/w
+screening_bounds,reported_value_text,str,approved,,Value as in source
+screening_bounds,reported_unit_basis,str,approved,,"Source unit/basis, e.g. g per batch"
+screening_bounds,evidence_type,enum,approved,evidence_type,
+screening_bounds,record_version,int,always,,Increment on each correction; old versions stay reproducible
+screening_bounds,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+screening_bounds,reviewer,str,approved,,Person who approved
+screening_bounds,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+screening_bounds,source_id,fk,approved,sources.source_id,Decisive source for this row
+screening_bounds,source_location,str,approved,,Exact page/table/figure/section/DB field
+screening_bounds,evidence_status,enum,approved,evidence_status,How the value was obtained
+screening_bounds,notes,str,no,,"Reviewer notes, limitations"
+allergens,allergen_id,id,always,,
+allergens,allergen_name,str,always,,
+allergens,regulatory_list_ref,str,no,,
+allergens,record_version,int,always,,Increment on each correction; old versions stay reproducible
+allergens,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+allergens,reviewer,str,approved,,Person who approved
+allergens,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+allergens,source_id,fk,approved,sources.source_id,Decisive source for this row
+allergens,source_location,str,approved,,Exact page/table/figure/section/DB field
+allergens,evidence_status,enum,approved,evidence_status,How the value was obtained
+allergens,notes,str,no,,"Reviewer notes, limitations"
+ingredient_allergens,ingredient_allergen_id,id,always,,
+ingredient_allergens,ingredient_form_id,fk,always,ingredient_forms.ingredient_form_id,
+ingredient_allergens,allergen_id,fk,always,allergens.allergen_id,
+ingredient_allergens,relationship,enum,always,allergen_relationship,
+ingredient_allergens,record_version,int,always,,Increment on each correction; old versions stay reproducible
+ingredient_allergens,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+ingredient_allergens,reviewer,str,approved,,Person who approved
+ingredient_allergens,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+ingredient_allergens,source_id,fk,approved,sources.source_id,Decisive source for this row
+ingredient_allergens,source_location,str,approved,,Exact page/table/figure/section/DB field
+ingredient_allergens,evidence_status,enum,approved,evidence_status,How the value was obtained
+ingredient_allergens,notes,str,no,,"Reviewer notes, limitations"
+ingredient_nutrition,nutrition_id,id,always,,
+ingredient_nutrition,ingredient_form_id,fk,always,ingredient_forms.ingredient_form_id,
+ingredient_nutrition,basis,str,approved,,e.g. per_100g
+ingredient_nutrition,protein_g,float,no,,
+ingredient_nutrition,energy_kcal,float,no,,
+ingredient_nutrition,carbohydrate_g,float,no,,
+ingredient_nutrition,fat_g,float,no,,
+ingredient_nutrition,fibre_g,float,no,,
+ingredient_nutrition,iron_mg,float,no,,
+ingredient_nutrition,omega3_g,float,no,,Only when supported
+ingredient_nutrition,nutrition_source_type,enum,approved,nutrition_source_type,
+ingredient_nutrition,value_precision,enum,approved,value_precision,
+ingredient_nutrition,fdc_id,int,no,,
+ingredient_nutrition,fdc_food_type,str,no,,
+ingredient_nutrition,fdc_data_release,str,no,,
+ingredient_nutrition,match_rationale,str,no,,
+ingredient_nutrition,transformation_record,str,no,,
+ingredient_nutrition,record_version,int,always,,Increment on each correction; old versions stay reproducible
+ingredient_nutrition,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+ingredient_nutrition,reviewer,str,approved,,Person who approved
+ingredient_nutrition,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+ingredient_nutrition,source_id,fk,approved,sources.source_id,Decisive source for this row
+ingredient_nutrition,source_location,str,approved,,Exact page/table/figure/section/DB field
+ingredient_nutrition,evidence_status,enum,approved,evidence_status,How the value was obtained
+ingredient_nutrition,notes,str,no,,"Reviewer notes, limitations"
+evidence_chunks,chunk_id,id,always,,
+evidence_chunks,chunk_tag,enum,always,chunk_tag,
+evidence_chunks,claim_summary,str,approved,,Reviewer-written note
+evidence_chunks,support_class,enum,approved,support_class,
+evidence_chunks,evidence_type,enum,approved,evidence_type,
+evidence_chunks,matrix,str,approved,,
+evidence_chunks,related_material_ids,fklist,no,algae_materials.material_id,semicolon-separated
+evidence_chunks,related_compound_ids,fklist,no,compounds.compound_id,
+evidence_chunks,related_ingredient_form_ids,fklist,no,ingredient_forms.ingredient_form_id,
+evidence_chunks,related_descriptor_ids,fklist,no,sensory_descriptors.descriptor_id,
+evidence_chunks,verbatim_text,str,no,,Only if licence permits
+evidence_chunks,verbatim_permitted,enum,approved,bool,
+evidence_chunks,record_version,int,always,,Increment on each correction; old versions stay reproducible
+evidence_chunks,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+evidence_chunks,reviewer,str,approved,,Person who approved
+evidence_chunks,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+evidence_chunks,source_id,fk,approved,sources.source_id,Decisive source for this row
+evidence_chunks,source_location,str,approved,,Exact page/table/figure/section/DB field
+evidence_chunks,evidence_status,enum,approved,evidence_status,How the value was obtained
+evidence_chunks,notes,str,no,,"Reviewer notes, limitations"
+formulations,formulation_id,id,always,,
+formulations,formulation_code,str,always,,
+formulations,formulation_type,enum,always,formulation_type,
+formulations,parent_formulation_id,fk,no,formulations.formulation_id,
+formulations,formulation_status,enum,always,formulation_status,
+formulations,serving_size_g,float,no,,
+formulations,engine_version,str,no,,
+formulations,run_id,str,no,,
+formulations,random_seed,int,no,,
+formulations,dataset_version,fk,no,dataset_versions.dataset_version,
+formulations,recipe_json,str,no,,Export/import only; queryable data lives in formulation_ingredients
+formulations,record_version,int,always,,Increment on each correction; old versions stay reproducible
+formulations,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+formulations,reviewer,str,approved,,Person who approved
+formulations,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+formulations,source_id,fk,no,sources.source_id,Decisive source for this row
+formulations,source_location,str,no,,Exact page/table/figure/section/DB field
+formulations,evidence_status,enum,approved,evidence_status,How the value was obtained
+formulations,notes,str,no,,"Reviewer notes, limitations"
+formulation_ingredients,row_id,id,always,,
+formulation_ingredients,formulation_id,fk,always,formulations.formulation_id,
+formulation_ingredients,ingredient_form_id,fk,always,ingredient_forms.ingredient_form_id,
+formulation_ingredients,amount_pct_ww,float,approved,,
+formulation_ingredients,amount_g_per_batch,float,no,,
+formulation_ingredients,ingredient_role,enum,approved,ingredient_role,
+formulation_ingredients,bound_id,fk,no,screening_bounds.bound_id,
+formulation_ingredients,record_version,int,always,,Increment on each correction; old versions stay reproducible
+formulation_ingredients,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+formulation_ingredients,reviewer,str,approved,,Person who approved
+formulation_ingredients,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+formulation_ingredients,source_id,fk,no,sources.source_id,Decisive source for this row
+formulation_ingredients,source_location,str,no,,Exact page/table/figure/section/DB field
+formulation_ingredients,evidence_status,enum,approved,evidence_status,How the value was obtained
+formulation_ingredients,notes,str,no,,"Reviewer notes, limitations"
+metric_definitions,metric_id,id,always,,
+metric_definitions,metric_name,str,always,,
+metric_definitions,formula,str,approved,,
+metric_definitions,unit,enum,approved,unit,
+metric_definitions,comparator,enum,approved,comparator,
+metric_definitions,precision_decimals,int,no,,
+metric_definitions,allowed_evidence_statuses,str,approved,,semicolon-separated evidence_status values
+metric_definitions,record_version,int,always,,Increment on each correction; old versions stay reproducible
+metric_definitions,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+metric_definitions,reviewer,str,approved,,Person who approved
+metric_definitions,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+metric_definitions,source_id,fk,no,sources.source_id,Decisive source for this row
+metric_definitions,source_location,str,no,,Exact page/table/figure/section/DB field
+metric_definitions,evidence_status,enum,approved,evidence_status,How the value was obtained
+metric_definitions,notes,str,no,,"Reviewer notes, limitations"
+prototype_processes,process_id,id,always,,
+prototype_processes,formulation_id,fk,always,formulations.formulation_id,
+prototype_processes,batch_size_g,float,approved,,
+prototype_processes,mixing_method,str,approved,,
+prototype_processes,process_temperature_c,float,no,,
+prototype_processes,storage_conditions,str,approved,,
+prototype_processes,serving_temperature_c,float,approved,,
+prototype_processes,prepared_at,datetime,no,,
+prototype_processes,deviations,str,no,,
+prototype_processes,record_version,int,always,,Increment on each correction; old versions stay reproducible
+prototype_processes,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+prototype_processes,reviewer,str,approved,,Person who approved
+prototype_processes,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+prototype_processes,source_id,fk,no,sources.source_id,Decisive source for this row
+prototype_processes,source_location,str,no,,Exact page/table/figure/section/DB field
+prototype_processes,evidence_status,enum,approved,evidence_status,How the value was obtained
+prototype_processes,notes,str,no,,"Reviewer notes, limitations"
+sensory_trials,observation_id,id,always,,
+sensory_trials,protocol_version,str,always,,
+sensory_trials,session_id,str,no,,
+sensory_trials,panelist_code,str,always,,Pseudonymous
+sensory_trials,blinding_code,str,always,,Resolves to formulation only in protected mapping outside repo
+sensory_trials,sample_order,int,always,,
+sensory_trials,attribute_descriptor_id,fk,always,sensory_descriptors.descriptor_id,
+sensory_trials,rating_1_9,int,always,,
+sensory_trials,scale_anchor_version,str,always,,
+sensory_trials,serving_temperature_c,float,no,,
+sensory_trials,preparation_deviation,str,no,,
+sensory_trials,amends_observation_id,fk,no,sensory_trials.observation_id,
+sensory_trials,amendment_reason,str,no,,
+sensory_trials,record_version,int,always,,Increment on each correction; old versions stay reproducible
+sensory_trials,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+sensory_trials,reviewer,str,approved,,Person who approved
+sensory_trials,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+sensory_trials,source_id,fk,no,sources.source_id,Decisive source for this row
+sensory_trials,source_location,str,no,,Exact page/table/figure/section/DB field
+sensory_trials,evidence_status,enum,approved,evidence_status,How the value was obtained
+sensory_trials,notes,str,no,,"Reviewer notes, limitations"
+sensory_summaries,summary_id,id,always,,
+sensory_summaries,metric_id,fk,always,metric_definitions.metric_id,
+sensory_summaries,formulation_id,fk,always,formulations.formulation_id,
+sensory_summaries,comparator_formulation_id,fk,no,formulations.formulation_id,
+sensory_summaries,sample_size,int,always,,
+sensory_summaries,exclusions_count,int,always,,
+sensory_summaries,exclusion_reasons,str,no,,
+sensory_summaries,mean,float,always,,
+sensory_summaries,spread,float,always,,
+sensory_summaries,spread_type,enum,always,spread_type,
+sensory_summaries,formula_version,str,always,,
+sensory_summaries,created_at,datetime,always,,
+sensory_summaries,record_version,int,always,,Increment on each correction; old versions stay reproducible
+sensory_summaries,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+sensory_summaries,reviewer,str,approved,,Person who approved
+sensory_summaries,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+sensory_summaries,source_id,fk,no,sources.source_id,Decisive source for this row
+sensory_summaries,source_location,str,no,,Exact page/table/figure/section/DB field
+sensory_summaries,evidence_status,enum,approved,evidence_status,How the value was obtained
+sensory_summaries,notes,str,no,,"Reviewer notes, limitations"
+dataset_versions,dataset_version,id,always,,Semantic version e.g. 0.1.0
+dataset_versions,schema_version,str,always,,
+dataset_versions,content_hash,str,always,,
+dataset_versions,row_counts,str,always,,
+dataset_versions,reviewer,str,always,,
+dataset_versions,published_at,datetime,always,,
+dataset_versions,rdkit_version,str,no,,
+dataset_versions,embedding_model,str,no,,
+dataset_versions,embedding_revision,str,no,,
+dataset_versions,embedding_dims,int,no,,
+dataset_versions,faiss_settings,str,no,,
+dataset_versions,index_hash,str,no,,
+dataset_versions,validation_report_hash,str,always,,
+dataset_versions,code_commit,str,always,,
+dataset_versions,release_notes,str,no,,
+retrieval_evaluations,eval_id,id,always,,
+retrieval_evaluations,question,str,always,,
+retrieval_evaluations,chunk_tag,enum,approved,chunk_tag,
+retrieval_evaluations,filters,str,no,,
+retrieval_evaluations,expected_source_ids,str,approved,,semicolon-separated
+retrieval_evaluations,expected_chunk_ids,str,no,,
+retrieval_evaluations,evidence_family,str,approved,,
+retrieval_evaluations,min_rank,int,approved,,
+retrieval_evaluations,reviewer_rationale,str,approved,,
+retrieval_evaluations,record_version,int,always,,Increment on each correction; old versions stay reproducible
+retrieval_evaluations,review_status,enum,always,review_status,Only 'approved' rows enter runtime tables/index
+retrieval_evaluations,reviewer,str,approved,,Person who approved
+retrieval_evaluations,reviewed_at,datetime,approved,,ISO 8601 timestamp of approval
+retrieval_evaluations,source_id,fk,no,sources.source_id,Decisive source for this row
+retrieval_evaluations,source_location,str,no,,Exact page/table/figure/section/DB field
+retrieval_evaluations,evidence_status,enum,approved,evidence_status,How the value was obtained
+retrieval_evaluations,notes,str,no,,"Reviewer notes, limitations"

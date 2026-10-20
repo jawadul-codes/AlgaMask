@@ -1,7 +1,31 @@
 # Data contract
 
-`reviewed/` contains header-only CSV templates from the project brief. No scientific records have been reviewed or approved yet. Blank numeric cells mean unknown, never zero. Join records by IDs; preserve units, provenance, ingredient form and review status.
+`reviewed/` is the 21-table schema from the dataset plan. Rows currently in those files are `review_status=extracted`. None are approved. An empty numeric cell means unknown, never zero. Join records by IDs. The live app does not read these files yet; `services/algamask/fixtures.py` is still the synthetic demo data.
 
-Synthetic runtime data lives in `services/algamask/fixtures.py` and is never passed off as reviewed data. The future index must load only approved chunks with valid source references. CSV ingestion, cross-table validation and publication are pending tasks.
+`python tools/validate.py` checks headers, enums, types, and foreign keys. It passed on this extract.
 
-`fixtures/demo_scenarios.json` supplies reproducible requests. Baseline and unmasked controls are generated from the same request by `optimizer.build_formula`, keeping serving size and algae inclusion consistent.
+## What was entered
+
+- 9 sources. PubChem identities, two USDA foods, the FDA allergen list, and six papers.
+- 4 algae materials. Commercial spirulina supplements, one spirulina supplement used for GC-O, a Chlorella vulgaris culture, and a separate Chlorella vulgaris biomass. No supplier batch or lot.
+- 30 compounds from PubChem name lookup on 2026-10-21. Status is `pubchem_matched`, not reviewer-verified. Geosmin and 2-methylisoborneol have identities only: no observation row, because the pages checked did not state a measured level for these materials.
+- 44 compound observations. Spirulina supplement values are ranges of relative VOC area, stored as text, not as a single number. Chlorella values are relative peak areas, not concentrations. AEDA values are FD factors and are marked qualitative.
+- 25 sensory terms and 38 compound-sensory links. GC-O links are `odor_active` for the supplement suspension. GC-MS odor words are `associated_with`. No odor threshold was copied. `category_group` is still a draft list: the five product groups are there, and floral, roasted, fatty, sour, and other were kept because the sources use those words.
+- 20 ingredient forms, 10 allergen names, and 5 `contains` links (whey/milk, soy isolate, peanut butter, almond butter, tahini). Nothing is marked `free_from`. Coconut oil is not linked as a tree nut.
+- 1 screening bound: spirulina at 0–5% in a snack bar, from an abstract only. It is an experimental range, not a regulatory maximum. The biscuit paper's 0.5/1/5% figures are a share of rice flour and are an evidence note, not a bound.
+- Nutrition from the SR Legacy CSV archive `FoodData_Central_sr_legacy_food_csv_2018-04.zip` (row publication date 2019-04-01). Assumed-zero derivations were left blank. Omega-3 is stored only when FDC nutrient 1404 (18:3 n-3) is present. There is no chlorella row, no whey-protein row (sweet dried whey was not substituted), and no puffed-rice row (the archive's puffed rice is fortified). Dried dates are not date paste. Dry oats are the combined "regular and quick, not fortified" food.
+- 22 evidence notes and 8 draft retrieval questions. No paper text is stored.
+- Metric definitions only. No formulations, recipe lines, prototypes, trial ratings, summaries, RDKit features, or published dataset version.
+
+## Gaps to verify before approval
+
+- Check every transcribed range and percentage against the cited table. The snack-bar bound was taken from an abstract, not the full paper.
+- Chlorella nutrition is sample A from the 2025 Frontiers comparison (protein, carbohydrate, and FAME lipid only). Whey is the SR Legacy beverage isolate. Puffed rice is the fortified cereal. There is still no date paste, no unfortified puffed rice, and no 2-methylisoborneol observation.
+- Morgan fingerprints and five RDKit descriptors are in `compound_features.csv`. The bit vector itself is not stored; `feature_hash` is the SHA-256 of the 2048-bit string.
+- B0, A0, and one cocoa concept are draft demonstration proportions from the mock optimizer. They are not laboratory recipes. There is still no supplier batch, no prototype process, no tasting scores, and no approved dataset version.
+- Cached PubChem JSON and the SR Legacy zip under `data/raw/` are local and not committed. `python -u tools/build_extracted_dataset.py` rebuilds the CSVs from those files.
+- Dried dates are not date paste. Do not reuse that nutrition row for paste.
+- Do not treat a relative GC-MS area, or an odor word, as proof of a note in a protein bar.
+- Compound features need a local RDKit run. Trials, B0/A0/A1 recipes, and dataset version 0.1 stay empty until there are real prototypes and a human approval pass.
+
+`fixtures/demo_scenarios.json` supplies reproducible requests. Baseline and unmasked controls are still generated by `optimizer.build_formula`.
