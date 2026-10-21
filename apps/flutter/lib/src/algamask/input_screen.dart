@@ -80,7 +80,7 @@ class _InputScreenState extends State<InputScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'Day 1 uses deterministic mock agents and synthetic evidence. No scientific or sensory claim is approved.',
+                    'Placeholder result from the local sprint files. The two cards are hard-coded. Rows are not approved.',
                   ),
                 ),
               ),
@@ -173,7 +173,7 @@ class _InputScreenState extends State<InputScreen> {
                         onPressed: loading ? null : submit,
                         icon: const Icon(Icons.science_outlined),
                         label: Text(
-                          loading ? 'Running sample workflow…' : 'Run Day 1 workflow',
+                          loading ? 'Reading local files…' : 'Show placeholder',
                         ),
                       ),
                       if (loading) ...[
@@ -197,7 +197,15 @@ class _InputScreenState extends State<InputScreen> {
               ),
               if (result != null) ...[
                 const SizedBox(height: 28),
-                _WorkflowResult(result: result!),
+                _ResultCard(
+                  title: result!['sensory_risk']['title'] as String,
+                  child: Text(result!['sensory_risk']['text'] as String),
+                ),
+                const SizedBox(height: 12),
+                _ResultCard(
+                  title: result!['recommendation']['title'] as String,
+                  child: Text(result!['recommendation']['text'] as String),
+                ),
               ],
               const SizedBox(height: 32),
             ],
@@ -206,87 +214,6 @@ class _InputScreenState extends State<InputScreen> {
       ),
     ),
   );
-}
-
-class _WorkflowResult extends StatelessWidget {
-  const _WorkflowResult({required this.result});
-  final Map<String, dynamic> result;
-
-  @override
-  Widget build(BuildContext context) {
-    final trace = (result['trace'] as List<dynamic>? ?? const []);
-    final sensory = (result['sensory_map'] as List<dynamic>? ?? const []);
-    final formulations = (result['formulations'] as List<dynamic>? ?? const []);
-    final controls = (result['controls'] as List<dynamic>? ?? const []);
-    final evidence = (result['evidence'] as List<dynamic>? ?? const []);
-    final impact = result['impact'] as Map<String, dynamic>? ?? const {};
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Mock workflow · ${result['status'] ?? 'unknown'}', style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 12),
-        _ResultCard(title: 'Agent trace', child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [for (final item in trace)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              leading: const Icon(Icons.check_circle_outline),
-              title: Text('${item['agent']} · ${item['state']}'),
-              subtitle: Text('${item['summary']} (${item['status']})'),
-            ),
-          ],
-        )),
-        const SizedBox(height: 12),
-        _ResultCard(title: 'Sensory map · assumed for demo', child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [for (final item in sensory)
-            Chip(label: Text('${item['category']}: ${item['relative_risk']}')),
-          ],
-        )),
-        const SizedBox(height: 12),
-        _ResultCard(title: 'Evidence placeholders', child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [for (final item in evidence)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text('${item['title']} · ${item['status']}'),
-            ),
-          ],
-        )),
-        const SizedBox(height: 12),
-        _ResultCard(title: 'Generated concepts', child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [for (final item in formulations)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Text('${item['name']} · ${item['total_g']} g · ${_ingredients(item)}'),
-            ),
-          ],
-        )),
-        const SizedBox(height: 12),
-        _ResultCard(title: 'Controls and impact', child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Controls: ${controls.map((item) => item['id']).join(', ')}'),
-            Text('Protein change: ${impact['nutrition_change_pct'] ?? 'unknown'}'),
-            Text('Sensory change: ${impact['sensory_change_pct'] ?? 'unknown'}'),
-          ],
-        )),
-        for (final limitation in (result['limitations'] as List<dynamic>? ?? const []))
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text('• $limitation', style: Theme.of(context).textTheme.bodySmall),
-          ),
-      ],
-    );
-  }
-
-  String _ingredients(dynamic formula) {
-    final ingredients = (formula['ingredients'] as List<dynamic>? ?? const []);
-    return ingredients.map((item) => '${item['ingredient_id']} ${item['grams']}g').join(', ');
-  }
 }
 
 class _ResultCard extends StatelessWidget {

@@ -13,24 +13,14 @@ class FailingClient extends ApiClient {
 class SuccessfulClient extends ApiClient {
   @override
   Future<Map<String, dynamic>> run(Map<String, dynamic> input) async => {
-    'status': 'report_ready',
-    'trace': [
-      {'agent': 'Profile', 'state': 'PROFILED', 'summary': 'Profile ready', 'status': 'mock'},
-    ],
-    'sensory_map': [
-      {'category': 'Bitter', 'relative_risk': 0.6},
-    ],
-    'evidence': [
-      {'title': 'Synthetic evidence example', 'status': 'assumed for demo'},
-    ],
-    'formulations': [
-      {'name': 'Cocoa concept', 'total_g': 45, 'ingredients': []},
-    ],
-    'controls': [
-      {'id': 'B0'}, {'id': 'A0'},
-    ],
-    'impact': {'nutrition_change_pct': null, 'sensory_change_pct': null},
-    'limitations': ['Mock run only.'],
+    'sensory_risk': {
+      'title': 'Sensory risk',
+      'text': 'Placeholder card from local data.',
+    },
+    'recommendation': {
+      'title': 'Recommendation',
+      'text': 'Placeholder card from local data.',
+    },
   };
 }
 
@@ -51,7 +41,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: InputScreen(client: FailingClient())),
     );
-    final button = find.text('Run Day 1 workflow');
+    final button = find.text('Show placeholder');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();
@@ -60,18 +50,16 @@ void main() {
     expect(find.byType(LinearProgressIndicator), findsNothing);
   });
 
-  testWidgets('shows the structured mock result after a run', (tester) async {
+  testWidgets('shows the two placeholder cards after a run', (tester) async {
     await tester.pumpWidget(
       MaterialApp(home: InputScreen(client: SuccessfulClient())),
     );
-    final button = find.text('Run Day 1 workflow');
+    final button = find.text('Show placeholder');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();
-    expect(find.text('Agent trace'), findsOneWidget);
-    expect(find.text('Profile · PROFILED'), findsOneWidget);
-    expect(find.text('Evidence placeholders'), findsOneWidget);
-    expect(find.textContaining('Controls: B0, A0'), findsOneWidget);
+    expect(find.text('Sensory risk'), findsOneWidget);
+    expect(find.text('Recommendation'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
