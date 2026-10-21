@@ -4,8 +4,15 @@
   "product": "spirulina protein bar",
   "algae": "food-grade spirulina powder",
   "baseline_recipe": "oats, dried dates, unsweetened cocoa",
+  "proof_statement": "For one 45 g spirulina protein bar, use grounded chemistry and sensory evidence plus constrained formulation concepts to explore whether spirulina can improve protein density while keeping earthy, grassy, marine, sulfurous, and bitter risks visible for physical testing.",
+  "primary_nutrition_metric": "protein_g_per_100_kcal",
   "serving_g": 45,
   "spirulina_levels_pct": [2, 5],
+  "prototypes": {
+    "B0": "45 g baseline bar with no algae: oats, dried dates, and unsweetened cocoa.",
+    "A0": "45 g unmasked algae control: baseline matrix with food-grade spirulina at the selected inclusion level and no added masking intervention.",
+    "A1": "45 g optimized concept: same spirulina inclusion as A0 with a constrained flavour intervention; prototype recipe remains to be physically validated."
+  },
   "sensory_categories": [
     "earthy/muddy",
     "grassy/green",
@@ -18,5 +25,14 @@
     "database-derived",
     "predicted",
     "assumed"
+  ],
+  "claim_status_labels": [
+    "measured",
+    "literature-supported",
+    "database-derived",
+    "predicted",
+    "assumed",
+    "hypothesis",
+    "unknown"
   ]
 }

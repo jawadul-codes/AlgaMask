@@ -1,6 +1,7 @@
 """Check the four Day 1 CSV schemas and their sample rows."""
 
 import csv
+import json
 import sys
 from pathlib import Path
 
@@ -50,6 +51,23 @@ def main() -> int:
                 errors.append(f"{filename} columns {reader.fieldnames}")
     data = load_sprint()
     scope = load_scope()
+    required_scope = ("proof_statement", "primary_nutrition_metric", "prototypes", "claim_status_labels")
+    for key in required_scope:
+        if not scope.get(key):
+            errors.append(f"scope.json missing {key}")
+    if set(scope.get("prototypes", {})) != {"B0", "A0", "A1"}:
+        errors.append("scope.json must define B0, A0, and A1")
+    if not {"measured", "predicted", "assumed", "hypothesis", "unknown"}.issubset(set(scope.get("claim_status_labels", []))):
+        errors.append("scope.json claim_status_labels is missing required statuses")
+
+    # The schemas are the validated Pydantic contracts used for agent traces.
+    sys.path.insert(0, str(ROOT / "services"))
+    try:
+        from algamask.schemas import AgentInput, AgentOutput
+        AgentInput.model_validate({"request": {"algae": "spirulina"}, "evidence": [], "prior_outputs": {}})
+        AgentOutput.model_validate({"agent": "Profile", "state": "PROFILED", "summary": "sample", "output": {}, "status": "mock"})
+    except Exception as exc:
+        errors.append(f"agent input/output schemas: {exc}")
     categories = set(scope["sensory_categories"])
     source_ids = {row["source_id"] for row in data["sources"]}
     if "" in source_ids or len(source_ids) != len(data["sources"]):
@@ -84,6 +102,13 @@ def main() -> int:
                 float(row[field])
             except ValueError:
                 errors.append(f"{row['ingredient_id']} {field}")
+    if data["algae_vocs"] and len({row["voc_id"] for row in data["algae_vocs"]}) != len(data["algae_vocs"]):
+        errors.append("algae_vocs.csv needs unique voc_id values")
+    if data["maskers"] and len({row["masker_id"] for row in data["maskers"]}) != len(data["maskers"]):
+        errors.append("maskers.csv needs unique masker_id values")
+    for row in data["nutrition"]:
+        if not row["ingredient_id"] or not row["source_record_id"]:
+            errors.append("nutrition.csv rows need ingredient_id and source_record_id")
     if errors:
         print("\n".join(errors))
         return 1

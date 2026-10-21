@@ -10,7 +10,7 @@ class InputScreen extends StatefulWidget {
 }
 
 class _InputScreenState extends State<InputScreen> {
-  String flavour = 'cocoa';
+  String flavour = 'cocoa-spice';
   double inclusion = 5;
   final exclusions = <String>{};
   bool loading = false;
@@ -25,7 +25,9 @@ class _InputScreenState extends State<InputScreen> {
     });
     try {
       final response = await (widget.client ?? ApiClient()).run({
+        'algae': 'spirulina',
         'inclusion_pct': inclusion,
+        'serving_g': 45,
         'flavour': flavour,
         'exclusions': exclusions.toList(),
       });
@@ -71,14 +73,14 @@ class _InputScreenState extends State<InputScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Day 1 skeleton. One baseline, serving size 45 g, example spirulina levels 2% and 5%.',
+                'Frozen proof: explore protein density in a 45 g spirulina bar while making sensory risks and evidence visible.',
               ),
               const SizedBox(height: 20),
               const Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'Placeholder result. The cards below are hard-coded. Sample rows are not approved.',
+                    'Day 1 uses deterministic mock agents and synthetic evidence. No scientific or sensory claim is approved.',
                   ),
                 ),
               ),
@@ -131,7 +133,7 @@ class _InputScreenState extends State<InputScreen> {
                         ),
                         items: [
                           for (final value in [
-                            'cocoa',
+                            'cocoa-spice',
                             'vanilla',
                             'citrus',
                           ])
@@ -171,7 +173,7 @@ class _InputScreenState extends State<InputScreen> {
                         onPressed: loading ? null : submit,
                         icon: const Icon(Icons.science_outlined),
                         label: Text(
-                          loading ? 'Loading sample data…' : 'Show placeholder',
+                          loading ? 'Running sample workflow…' : 'Run Day 1 workflow',
                         ),
                       ),
                       if (loading) ...[
@@ -195,15 +197,7 @@ class _InputScreenState extends State<InputScreen> {
               ),
               if (result != null) ...[
                 const SizedBox(height: 28),
-                _PlaceholderCard(
-                  title: result!['sensory_risk']['title'] as String,
-                  body: result!['sensory_risk']['text'] as String,
-                ),
-                const SizedBox(height: 12),
-                _PlaceholderCard(
-                  title: result!['recommendation']['title'] as String,
-                  body: result!['recommendation']['text'] as String,
-                ),
+                _WorkflowResult(result: result!),
               ],
               const SizedBox(height: 32),
             ],
@@ -214,10 +208,91 @@ class _InputScreenState extends State<InputScreen> {
   );
 }
 
-class _PlaceholderCard extends StatelessWidget {
-  const _PlaceholderCard({required this.title, required this.body});
+class _WorkflowResult extends StatelessWidget {
+  const _WorkflowResult({required this.result});
+  final Map<String, dynamic> result;
+
+  @override
+  Widget build(BuildContext context) {
+    final trace = (result['trace'] as List<dynamic>? ?? const []);
+    final sensory = (result['sensory_map'] as List<dynamic>? ?? const []);
+    final formulations = (result['formulations'] as List<dynamic>? ?? const []);
+    final controls = (result['controls'] as List<dynamic>? ?? const []);
+    final evidence = (result['evidence'] as List<dynamic>? ?? const []);
+    final impact = result['impact'] as Map<String, dynamic>? ?? const {};
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Mock workflow · ${result['status'] ?? 'unknown'}', style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 12),
+        _ResultCard(title: 'Agent trace', child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [for (final item in trace)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              leading: const Icon(Icons.check_circle_outline),
+              title: Text('${item['agent']} · ${item['state']}'),
+              subtitle: Text('${item['summary']} (${item['status']})'),
+            ),
+          ],
+        )),
+        const SizedBox(height: 12),
+        _ResultCard(title: 'Sensory map · assumed for demo', child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [for (final item in sensory)
+            Chip(label: Text('${item['category']}: ${item['relative_risk']}')),
+          ],
+        )),
+        const SizedBox(height: 12),
+        _ResultCard(title: 'Evidence placeholders', child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [for (final item in evidence)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text('${item['title']} · ${item['status']}'),
+            ),
+          ],
+        )),
+        const SizedBox(height: 12),
+        _ResultCard(title: 'Generated concepts', child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [for (final item in formulations)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text('${item['name']} · ${item['total_g']} g · ${_ingredients(item)}'),
+            ),
+          ],
+        )),
+        const SizedBox(height: 12),
+        _ResultCard(title: 'Controls and impact', child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Controls: ${controls.map((item) => item['id']).join(', ')}'),
+            Text('Protein change: ${impact['nutrition_change_pct'] ?? 'unknown'}'),
+            Text('Sensory change: ${impact['sensory_change_pct'] ?? 'unknown'}'),
+          ],
+        )),
+        for (final limitation in (result['limitations'] as List<dynamic>? ?? const []))
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text('• $limitation', style: Theme.of(context).textTheme.bodySmall),
+          ),
+      ],
+    );
+  }
+
+  String _ingredients(dynamic formula) {
+    final ingredients = (formula['ingredients'] as List<dynamic>? ?? const []);
+    return ingredients.map((item) => '${item['ingredient_id']} ${item['grams']}g').join(', ');
+  }
+}
+
+class _ResultCard extends StatelessWidget {
+  const _ResultCard({required this.title, required this.child});
   final String title;
-  final String body;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -226,9 +301,9 @@ class _PlaceholderCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(body),
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 10),
+          child,
         ],
       ),
     ),

@@ -2,7 +2,7 @@
 
 A runnable Flutter + FastAPI skeleton for an algae protein-bar formulation assistant. The current release runs entirely with deterministic mock data and requires no API keys.
 
-Choose spirulina, chlorella or a blend, inclusion percentage, serving mass, exclusions and flavour direction. Submit a run to see six agent roles, a sensory-profile placeholder, three mass-balanced concept recipes, B0/A0 controls, evidence placeholders and a printable report.
+Choose spirulina, chlorella or a blend, inclusion percentage, serving mass, exclusions and flavour direction. Submit a run to see six agent roles, a sensory-profile placeholder, three mass-balanced concept recipes, B0/A0 controls, evidence placeholders and a printable report. The frozen Day 1 proof and B0/A0/A1 definitions are in [docs/DAY1_SCOPE.md](docs/DAY1_SCOPE.md) and [data/sprint/scope.json](data/sprint/scope.json).
 
 ## Run locally
 
@@ -39,7 +39,7 @@ The loading indicator covers the API request. The completed trace is returned to
 
 ## What is real, and what is mocked?
 
-The HTTP workflow, request validation, IDs, timestamps, mass arithmetic, ingredient exclusions, report rendering and JSON export are functional. Three concepts are generated deterministically from request inputs. The mock base recipe contains oats and date paste, plus selected algae and a flavour ingredient. It is not a validated protein-bar recipe.
+The HTTP workflow (including the Day 1 Flutter route), request validation, IDs, timestamps, mass arithmetic, ingredient exclusions, report rendering and JSON export are functional. Three concepts are generated deterministically from request inputs. The mock base recipe contains oats and date paste, plus selected algae and a flavour ingredient. It is not a validated protein-bar recipe.
 
 Evidence, sensory risk bars and ingredient proportions are **assumed for demo**. There is no live LLM, molecular calculation or vector index. Nutrition and measured sensory improvements are **unknown**, not invented or zero-filled. Screening bounds, calorie/sugar limits and scientific claim validation have not been implemented. The Critic currently checks ingredient membership, exclusions and positive mass/mass balance only.
 

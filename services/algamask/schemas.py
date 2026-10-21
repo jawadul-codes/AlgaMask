@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -16,6 +16,24 @@ class RunRequest(BaseModel):
     serving_g: float = Field(default=45, ge=40, le=50)
     exclusions: list[Literal["peanut", "tree_nut", "sesame", "oats", "coconut"]] = Field(default_factory=list)
     flavour: Literal["cocoa-spice", "vanilla", "citrus"] = "cocoa-spice"
+
+
+class AgentInput(BaseModel):
+    """Common validated input contract for the structured mock agent roles."""
+
+    request: RunRequest
+    evidence: list[dict[str, Any]] = Field(default_factory=list)
+    prior_outputs: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentOutput(BaseModel):
+    """Structured agent result; role-specific payload is explicit and traceable."""
+
+    agent: Literal["Profile", "Retrieval", "Chemistry", "Recipe", "Critic", "Impact"]
+    state: str
+    summary: str
+    output: dict[str, Any] = Field(default_factory=dict)
+    status: Literal["mock", "assumed", "complete", "blocked"] = "mock"
 
 
 class IngredientAmount(BaseModel):

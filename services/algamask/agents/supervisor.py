@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from ..optimizer import build_formula
-from ..schemas import RunRequest, RunResult, TraceStep
+from ..schemas import AgentOutput, RunRequest, RunResult, TraceStep
 from . import chemistry, critic, impact_agent, profile, recipe, retrieve
 
 
@@ -10,7 +10,8 @@ def run_workflow(request: RunRequest) -> RunResult:
     trace = []
 
     def record(agent, state, summary, output):
-        trace.append(TraceStep(agent=agent, state=state, summary=summary, output=output))
+        validated = AgentOutput(agent=agent, state=state, summary=summary, output=output, status="mock")
+        trace.append(TraceStep(**validated.model_dump()))
 
     sensory = profile.run(request)
     record("Profile", "PROFILED", "Prepared five illustrative sensory categories.", {"sensory_map": sensory})
