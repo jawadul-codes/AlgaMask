@@ -1,0 +1,3 @@
+voc_id,voc_name,pubchem_cid,sensory_category,descriptor,relative_level,spirulina_relevance,evidence_strength,source_id,evidence_note,review_status
+VOC-BETA-IONONE,beta-ionone,638014,earthy/muddy,violet,high,reported among identified volatiles in commercial spirulina supplements,medium,SRC-FOODS-2024-1257,"Table 3 range 7.0-21.1 percent of identified VOC area. Relative area is not a concentration. PENDING HUMAN REVIEW.",extracted
+VOC-HEXANAL,hexanal,6184,grassy/green,green,medium,reported among identified volatiles in commercial spirulina supplements,medium,SRC-FOODS-2024-1257,"Table 3 range 1.2-8.7 percent of identified VOC area. Relative area is not a concentration. PENDING HUMAN REVIEW.",extracted

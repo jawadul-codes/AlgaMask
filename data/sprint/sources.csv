@@ -1,0 +1,4 @@
+source_id,title,doi_or_database_id,url,source_type,publication_year,what_it_supports,accessed_date,reviewer
+SRC-FOODS-2024-1257,Paraskevopoulou et al. Foods 2024 13 1257 volatile profiles of commercial spirulina supplements,10.3390/foods13081257,https://doi.org/10.3390/foods13081257,paper,2024,relative VOC area ranges in commercial spirulina supplements,2026-10-21,
+SRC-USDA-FDC,USDA FoodData Central SR Legacy April 2018 release,SR-Legacy-2018-04,https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip,database,2018,per 100 g nutrition for the sample ingredient rows,2026-10-21,
+SRC-DAY1-SAMPLE,Day 1 skeleton note,day1-sample,,project_note,2026,placeholder masker row only; not a scientific source,2026-10-21,

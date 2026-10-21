@@ -11,7 +11,7 @@ class ApiClient {
   Future<Map<String, dynamic>> run(Map<String, dynamic> input) async {
     final response = await http
         .post(
-          Uri.parse('$apiBase/runs'),
+          Uri.parse('$apiBase/day1/preview'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(input),
         )

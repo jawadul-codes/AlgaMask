@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'api_client.dart';
-import 'report_view.dart';
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key, this.client});
@@ -11,10 +10,8 @@ class InputScreen extends StatefulWidget {
 }
 
 class _InputScreenState extends State<InputScreen> {
-  String algae = 'blend';
-  String flavour = 'cocoa-spice';
+  String flavour = 'cocoa';
   double inclusion = 5;
-  double serving = 45;
   final exclusions = <String>{};
   bool loading = false;
   String? error;
@@ -28,9 +25,7 @@ class _InputScreenState extends State<InputScreen> {
     });
     try {
       final response = await (widget.client ?? ApiClient()).run({
-        'algae': algae,
         'inclusion_pct': inclusion,
-        'serving_g': serving,
         'flavour': flavour,
         'exclusions': exclusions.toList(),
       });
@@ -58,7 +53,7 @@ class _InputScreenState extends State<InputScreen> {
       actions: const [
         Padding(
           padding: EdgeInsets.all(16),
-          child: Chip(label: Text('LOCAL MOCK')),
+          child: Chip(label: Text('DAY 1')),
         ),
       ],
     ),
@@ -71,19 +66,19 @@ class _InputScreenState extends State<InputScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Explore the next algae formulation.',
+                'Spirulina protein bar',
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 12),
               const Text(
-                'A protein-bar concept workspace, from sensory profile to experiment report.',
+                'Day 1 skeleton. One baseline, serving size 45 g, example spirulina levels 2% and 5%.',
               ),
               const SizedBox(height: 20),
               const Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'Demo workspace • Recipes, evidence and risk levels are synthetic. Nutrition and sensory results remain unknown until data is added.',
+                    'Placeholder result. The cards below are hard-coded. Sample rows are not approved.',
                   ),
                 ),
               ),
@@ -99,30 +94,26 @@ class _InputScreenState extends State<InputScreen> {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 20),
-                      DropdownButtonFormField<String>(
-                        initialValue: algae,
-                        isExpanded: true,
-                        decoration: const InputDecoration(labelText: 'Algae'),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'blend',
-                            child: Text('Spirulina + chlorella'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'spirulina',
-                            child: Text('Spirulina'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'chlorella',
-                            child: Text('Chlorella'),
-                          ),
+                      const Text('Product · spirulina protein bar'),
+                      const SizedBox(height: 8),
+                      const Text('Baseline · oats, dried dates, unsweetened cocoa · 45 g'),
+                      const SizedBox(height: 16),
+                      const Text('Example spirulina levels'),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          for (final level in [2.0, 5.0])
+                            ChoiceChip(
+                              label: Text('${level.round()}%'),
+                              selected: inclusion == level,
+                              onSelected: loading
+                                  ? null
+                                  : (_) => setState(() => inclusion = level),
+                            ),
                         ],
-                        onChanged: loading
-                            ? null
-                            : (v) => setState(() => algae = v!),
                       ),
                       const SizedBox(height: 16),
-                      Text('Algae inclusion · ${inclusion.round()}%'),
+                      Text('Spirulina inclusion · ${inclusion.round()}%'),
                       Slider(
                         value: inclusion,
                         min: 1,
@@ -133,17 +124,6 @@ class _InputScreenState extends State<InputScreen> {
                             ? null
                             : (v) => setState(() => inclusion = v),
                       ),
-                      Text('Serving mass · ${serving.round()} g'),
-                      Slider(
-                        value: serving,
-                        min: 40,
-                        max: 50,
-                        divisions: 10,
-                        label: '${serving.round()} g',
-                        onChanged: loading
-                            ? null
-                            : (v) => setState(() => serving = v),
-                      ),
                       DropdownButtonFormField<String>(
                         initialValue: flavour,
                         decoration: const InputDecoration(
@@ -151,7 +131,7 @@ class _InputScreenState extends State<InputScreen> {
                         ),
                         items: [
                           for (final value in [
-                            'cocoa-spice',
+                            'cocoa',
                             'vanilla',
                             'citrus',
                           ])
@@ -191,13 +171,13 @@ class _InputScreenState extends State<InputScreen> {
                         onPressed: loading ? null : submit,
                         icon: const Icon(Icons.science_outlined),
                         label: Text(
-                          loading ? 'Running workflow…' : 'Run mock experiment',
+                          loading ? 'Loading sample data…' : 'Show placeholder',
                         ),
                       ),
                       if (loading) ...[
                         const SizedBox(height: 16),
                         const LinearProgressIndicator(),
-                        const Text('Waiting for the six-agent workflow…'),
+                        const Text('Reading the local sample files…'),
                       ],
                       if (error != null)
                         Padding(
@@ -215,12 +195,41 @@ class _InputScreenState extends State<InputScreen> {
               ),
               if (result != null) ...[
                 const SizedBox(height: 28),
-                ReportView(result: result!),
+                _PlaceholderCard(
+                  title: result!['sensory_risk']['title'] as String,
+                  body: result!['sensory_risk']['text'] as String,
+                ),
+                const SizedBox(height: 12),
+                _PlaceholderCard(
+                  title: result!['recommendation']['title'] as String,
+                  body: result!['recommendation']['text'] as String,
+                ),
               ],
               const SizedBox(height: 32),
             ],
           ),
         ),
+      ),
+    ),
+  );
+}
+
+class _PlaceholderCard extends StatelessWidget {
+  const _PlaceholderCard({required this.title, required this.body});
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(body),
+        ],
       ),
     ),
   );

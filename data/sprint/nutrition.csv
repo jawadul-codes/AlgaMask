@@ -1,0 +1,5 @@
+ingredient_id,ingredient,ingredient_form,source_record_id,protein_g_100g,iron_mg_100g,energy_kcal_100g,fat_g_100g,carbohydrate_g_100g,fiber_g_100g,source_id
+NUT-SPI,dried spirulina,dried,170495,57.47,28.5,290,7.72,23.9,3.6,SRC-USDA-FDC
+NUT-OATS,oats,dry unenriched regular and quick,173904,13.15,4.25,379,6.52,67.7,10.1,SRC-USDA-FDC
+NUT-DATES,dates,deglet noor,171726,2.45,1.02,282,0.39,75.03,8,SRC-USDA-FDC
+NUT-COCOA,cocoa,unsweetened powder,169593,19.6,13.86,228,13.7,57.9,37,SRC-USDA-FDC

@@ -18,7 +18,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(const AlgaMaskApp());
     expect(find.text('AlgaMask'), findsOneWidget);
-    expect(find.text('LOCAL MOCK'), findsOneWidget);
+    expect(find.text('DAY 1'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('failed request releases loading state for retry', (
@@ -27,7 +27,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: InputScreen(client: FailingClient())),
     );
-    final button = find.text('Run mock experiment');
+    final button = find.text('Show placeholder');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();

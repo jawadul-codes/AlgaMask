@@ -1,6 +1,16 @@
+import sys
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, Field
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scoring import placeholder
 
 from .agents.supervisor import run_workflow
 from .report import render_report
@@ -12,9 +22,20 @@ app.add_middleware(CORSMiddleware, allow_origin_regex=r"http://(localhost|127\.0
 runs: dict[str, RunResult] = {}
 
 
+class Day1Request(BaseModel):
+    inclusion_pct: float = Field(default=5, gt=0, le=15)
+    exclusions: list[str] = Field(default_factory=list)
+    flavour: str = "cocoa"
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "mode": "mock", "version": "0.1.0"}
+
+
+@app.post("/day1/preview")
+def day1_preview(request: Day1Request):
+    return placeholder(request.inclusion_pct, request.exclusions, request.flavour)
 
 
 @app.post("/runs", response_model=RunResult)

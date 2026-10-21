@@ -1,0 +1,2 @@
+masker_id,ingredient,ingredient_form,target_category,mechanism_class,protein_bar_compatibility,evidence_strength,starting_level,allergen_warning,flavour_warning,colour_texture_warning,source_id,evidence_note,review_status
+MSK-COCOA,cocoa,unsweetened powder,bitter,complementary flavour,high,low,screening level,,strong flavour,colour,SRC-DAY1-SAMPLE,Day 1 skeleton row. No reviewed masking claim is attached.,extracted
