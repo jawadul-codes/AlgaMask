@@ -99,13 +99,18 @@ def main() -> int:
             if row[field] == "":
                 continue
             try:
-                float(row[field])
+                value = float(row[field])
             except ValueError:
                 errors.append(f"{row['ingredient_id']} {field}")
+                continue
+            if value < 0:
+                errors.append(f"{row['ingredient_id']} {field} below 0")
     if data["algae_vocs"] and len({row["voc_id"] for row in data["algae_vocs"]}) != len(data["algae_vocs"]):
         errors.append("algae_vocs.csv needs unique voc_id values")
     if data["maskers"] and len({row["masker_id"] for row in data["maskers"]}) != len(data["maskers"]):
         errors.append("maskers.csv needs unique masker_id values")
+    if data["nutrition"] and len({row["ingredient_id"] for row in data["nutrition"]}) != len(data["nutrition"]):
+        errors.append("nutrition.csv needs unique ingredient_id values")
     for row in data["nutrition"]:
         if not row["ingredient_id"] or not row["source_record_id"]:
             errors.append("nutrition.csv rows need ingredient_id and source_record_id")
