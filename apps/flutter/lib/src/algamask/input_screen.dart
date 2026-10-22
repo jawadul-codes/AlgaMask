@@ -181,8 +181,6 @@ class _InputScreenState extends State<InputScreen> {
                       'peanut',
                       'tree_nut',
                       'sesame',
-                      'milk',
-                      'soy',
                       'oats',
                       'coconut',
                     ])
