@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from algamask.api import app, runs
+from algamask.api import app
 from algamask.runtime import RetrievalRuntime, RetrievalUnavailable, Settings
 from algamask.search_schemas import EvidenceHit, SearchResult
 
@@ -96,9 +96,9 @@ def test_api_readiness_search_validation_and_failures(client):
     assert api.post("/rag/search", json={"query": "hexanal", "chunk_tag": "diagnosis"}).status_code == 200
     assert api.post("/rag/search", json={"query": " "}).status_code == 422
     runtime._search = SearchDouble(fail=True)
-    before = set(runs)
+    before = app.state.run_store.history()
     assert api.post("/runs", json={}).status_code == 503
-    assert set(runs) == before
+    assert app.state.run_store.history() == before
     assert api.post("/rag/search", json={"query": "hexanal"}).status_code == 503
 
 

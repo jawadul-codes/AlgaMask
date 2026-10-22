@@ -1,7 +1,10 @@
 import sys
+import os
+import sqlite3
+import logging
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
@@ -18,12 +21,20 @@ from .report import render_report
 from .schemas import RunRequest, RunResult
 from .runtime import RetrievalRuntime, RetrievalUnavailable, Settings
 from .search_schemas import SearchRequest, SearchResult
+from .run_store import RunStore
 
 app = FastAPI(title="AlgaMask API", version="0.2.0")
 app.state.retrieval_runtime = RetrievalRuntime(Settings.from_env())
 app.add_middleware(CORSMiddleware, allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?", allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
-# Deliberately local and ephemeral. Replace with persistence before real trials.
-runs: dict[str, RunResult] = {}
+app.state.run_store = RunStore(Path(os.environ.get("ALGAMASK_RUN_DB", ROOT / "var/runs.sqlite3")))
+
+
+def storage(operation, *args):
+    try:
+        return operation(*args)
+    except (sqlite3.Error, OSError, ValueError) as exc:
+        logging.getLogger(__name__).exception("Run storage operation failed")
+        raise HTTPException(503, detail={"code": "storage_unavailable", "message": "Run storage is unavailable; no durable success was confirmed."}) from exc
 
 
 @app.get("/health")
@@ -75,19 +86,23 @@ def create_run(payload: RunRequest, request: Request):
         result = run_workflow(payload, search, runtime.generation_provider() if search else None)
     except (ValueError, RuntimeError, OSError) as exc:
         raise HTTPException(503, detail={"code": "run_failed", "message": "Run processing failed; no mock fallback was used."}) from exc
-    if len(runs) >= 100:
-        del runs[next(iter(runs))]
-    runs[result.run_id] = result
+    storage(request.app.state.run_store.save, result)
     return result
 
 
+@app.get("/runs")
+def history(request: Request, limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)):
+    return {"runs": storage(request.app.state.run_store.history, limit, offset), "limit": limit, "offset": offset}
+
+
 @app.get("/runs/{run_id}", response_model=RunResult)
-def get_run(run_id: str):
-    if run_id not in runs:
-        raise HTTPException(404, "Run not found. Local runs are cleared on restart.")
-    return runs[run_id]
+def get_run(run_id: str, request: Request):
+    result = storage(request.app.state.run_store.get, run_id)
+    if result is None:
+        raise HTTPException(404, "Run not found.")
+    return result
 
 
 @app.get("/runs/{run_id}/report", response_class=HTMLResponse)
-def report(run_id: str):
-    return render_report(get_run(run_id))
+def report(run_id: str, request: Request):
+    return render_report(get_run(run_id, request))

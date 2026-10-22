@@ -16,8 +16,8 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 4. **Complete:** connect real retrieval to the six-agent backend and API.
 5. **Complete for constrained evidence explanations:** grounded generation with citations.
 6. **Implemented for development screening; scientific/production gates remain:** formulation, nutrition, constraints, and reporting.
-7. **Implemented; live-browser/device verification pending:** connect Flutter to the real run workflow.
-8. Add persistence, failure handling, and release verification.
+7. **Implemented and local-browser verified; native-device verification pending:** connect Flutter to the real run workflow.
+8. **In progress:** durable local runs implemented; broader failure handling and release verification remain.
 
 ## Step 1 scope
 
@@ -47,12 +47,39 @@ explanations (extractive by default; local Ollama optional and live-tested).
 Step 6 now has exact-form experimental grid search, constraints, sourced nutrition
 and reports; see `docs/FORMULATION_ENGINE.md`. Validated production bounds, complete
 allergen/nutrition coverage and manufacturing/sensory evidence remain unresolved.
-Step 7 Flutter now uses `/runs` and displays these explicit limits. Next is live
-browser end-to-end verification and Step 8 persistence/failure/release work.
+Step 7 Flutter now uses `/runs`; the local browser flow is verified. Step 8 has
+SQLite persistence and restart-safe reports. Continue with history UI, idempotent
+submission/job failure handling and release verification; see `RUN_PERSISTENCE.md`.
 Real retrieval uses ALGAMASK_MODE=development; default mode
 remains mock. Production retrieval still requires a release; no release was created.
 
 ## Step 7 work log — in progress
+## Step 8 work log — in progress
+
+- Starting local SQLite persistence with transactional writes, restart-safe reads,
+  bounded history and explicit storage errors. No automatic deletion of old runs.
+- Will verify the browser workflow against a loopback development server. No
+  production exposure or scientific approval changes are included.
+- Implemented configurable SQLite run storage, transactional inserts, schema-version
+  checks, validated reads and paginated history. Removed silent 100-run eviction.
+- Storage errors return explicit 503 responses without a false durable success;
+  missing IDs remain 404. Tests use isolated temporary databases, never user history.
+- Verification: **153 backend tests passed**; custom-port Flutter web build succeeded.
+  Tests cover concurrent inserts, 105 retained runs, duplicate protection, corrupt
+  payloads, storage outage handling and reopening/report equality.
+- Live in-app browser: Flutter → `/runs` → local MiniLM retrieval → screened candidates
+  and nutrition succeeded. Allergy-excluded run displayed insufficient-data reasons.
+  Its print-ready button opened the stored report; reloading the same report after a
+  backend process restart succeeded. Verification DB: `var/browser-verification.sqlite3`.
+- Screenshot: `var/verification/persisted-report.jpg` (ignored local artifact).
+- Existing server on port 8000 was not changed. Verification used ports 8123/8310.
+- Stopped both temporary verification servers after the restart check; retained the
+  verification database and screenshot. `git diff --check` passed. No commit/push.
+- Remaining Step 8: Flutter history/reopen UI, idempotency and durable execution-failure
+  handling, backup/restore verification, release checks and security/deployment scope.
+  No claim of production readiness or completed scientific validation.
+
+## Step 7 work log
 
 - Connecting Flutter to `/runs` with editable species/serving/targets, real evidence,
   nutrition and explicit blocked states. Preserve all local Step 6 changes.

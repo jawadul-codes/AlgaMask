@@ -30,7 +30,9 @@ free-from certification. Nutrition is estimated, not a measurement of the produc
 
 Requests wait up to 120 seconds with controls disabled. Errors allow manual retry;
 there is no automatic duplicate POST. A timed-out server run may still finish.
-Runs are currently in memory and report URLs stop working after backend restart.
+Run records and report URLs survive backend restart when the same SQLite file is
+used (`ALGAMASK_RUN_DB`, default `var/runs.sqlite3`). Flutter history browsing is not
+implemented yet; the API exposes paginated run summaries. See `docs/RUN_PERSISTENCE.md`.
 This is a local web workflow; physical-device networking and native platform
 permissions are not validated in this increment. No hosted deployment is configured.
 
