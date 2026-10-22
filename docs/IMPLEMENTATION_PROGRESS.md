@@ -48,6 +48,27 @@ Step 6: evidence-driven formulation, nutrition, constraints and reporting. Recip
 remain demonstrations. Real retrieval uses ALGAMASK_MODE=development; default mode
 remains mock. Production retrieval still requires a release; no release was created.
 
+## Step 6 work log — in progress
+
+- Started with the dataset-backed nutrition foundation. Existing recipes still use
+  mock ingredient IDs; they must not receive nutrition by guessing ingredient forms.
+- Missing Chlorella energy, incomplete allergen coverage and matrix-specific bounds
+  prevent claiming fully validated recipes. Preserve the frozen candidate unchanged.
+- Current increment: exact-form calculations, missing-value propagation, record-level
+  provenance and regression tests. Optimizer/API/report integration follows afterward.
+- Implemented `estimate_nutrition` using validated dataset snapshots and exact
+  ingredient-form IDs, with per-serving/per-100-g estimates and protein per 100 kcal.
+- Defaults to approved records; development use is explicit. Missing/ambiguous
+  records fail closed for each nutrient. Full source records and qualifications are
+  retained. Sugar and total omega-3 remain unknown; no unsupported substitutions.
+- Hardened scalar nutrition arithmetic against negative/nonfinite values and overflow;
+  zero-mass entries do not contaminate a nonempty estimate with missing values.
+- Verification: **108 tests passed** (10 new regression cases). Documented boundaries
+  and remaining work in `docs/FORMULATION_ENGINE.md`. API/report integration and
+  constrained recipe generation are **not complete**; Step 6 remains in progress.
+- Changes are local, not committed or pushed. Resume with exact-form recipe
+  generation and independent constraints, then wire nutrition into API/report output.
+
 ## Step 5 work log
 
 - Added strict generation contracts, exact-note grounding checks, source/dataset-bound
