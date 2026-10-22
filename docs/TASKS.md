@@ -2,6 +2,11 @@
 
 The sprint document is treated as a requirements reference. Tasks below have no calendar deadlines.
 
+Use [the revised RAG sprint plan](RAG_SPRINT_PLAN.md) for the seven execution
+stages and their acceptance gates. Day labels identify work packages, not dates.
+Record each gate's owner, status, verification evidence and completion date here
+as work is completed. The backlog below remains the implementation checklist.
+
 ## Completed skeleton
 
 - Flutter web app with algae, inclusion, serving mass, flavour and exclusion inputs.

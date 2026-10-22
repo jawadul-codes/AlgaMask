@@ -6,8 +6,11 @@ for d in ["manifests","raw","staging","reviewed","fixtures","dictionaries","publ
     (root/"data"/d).mkdir(parents=True, exist_ok=True)
 (root/"indexes"/"reviewed_evidence").mkdir(parents=True, exist_ok=True)
 
-for t in TABLES:   # header-only templates: no invented scientific data
-    with open(root/"data/reviewed"/f"{t}.csv","w",newline="",encoding="utf-8") as f:
+for t in TABLES:   # Create missing templates only; never erase populated data.
+    path = root/"data/reviewed"/f"{t}.csv"
+    if path.exists():
+        continue
+    with open(path,"x",newline="",encoding="utf-8") as f:
         csv.writer(f).writerow([c[0] for c in full_cols(t)])
 
 with open(root/"data/dictionaries/columns.csv","w",newline="",encoding="utf-8") as f:
@@ -23,8 +26,10 @@ with open(root/"data/dictionaries/enums.csv","w",newline="",encoding="utf-8") as
     w = csv.writer(f); w.writerow(["enum","value","description"])
     for e,vals in ENUMS.items():
         for v,d in vals: w.writerow([e,v,d])
-with open(root/"data/manifests/source_manifest.csv","w",newline="",encoding="utf-8") as f:
-    csv.writer(f).writerow(["file_path","source_id","sha256","bytes","retrieved_at","licence","origin_url","committed_to_git"])
+manifest = root/"data/manifests/source_manifest.csv"
+if not manifest.exists():
+    with open(manifest,"x",newline="",encoding="utf-8") as f:
+        csv.writer(f).writerow(["file_path","source_id","sha256","bytes","retrieved_at","licence","origin_url","committed_to_git"])
 (root/"data/raw/.gitignore").write_text("*\n!.gitignore\n")
 for d in ["staging","fixtures","published"]: (root/"data"/d/".gitkeep").touch()
 (root/"indexes/reviewed_evidence/.gitkeep").touch()

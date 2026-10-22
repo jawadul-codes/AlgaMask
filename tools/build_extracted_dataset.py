@@ -1102,8 +1102,9 @@ def demo_formulations() -> tuple[list[dict], list[dict]]:
             "run_id": "",
             "random_seed": "",
             "dataset_version": "",
-            "recipe_json": name,
+            "recipe_json": json.dumps({"name": name}),
             **prov("", "", "assumed_for_demo", "Same arithmetic as the current mock optimizer at 45 g, 5 percent blend. Dried dates stand in for the mock date paste and are not paste. Not a laboratory recipe."),
+            "record_version": "2",
         })
         for form_id, grams, role in items:
             lines.append({

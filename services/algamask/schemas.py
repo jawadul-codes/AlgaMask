@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Algae(StrEnum):
@@ -11,6 +11,7 @@ class Algae(StrEnum):
 
 
 class RunRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
     algae: Algae = Algae.blend
     inclusion_pct: float = Field(default=5, gt=0, le=15)
     serving_g: float = Field(default=45, ge=40, le=50)
@@ -37,19 +38,30 @@ class AgentOutput(BaseModel):
 
 
 class IngredientAmount(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
     ingredient_id: str
-    grams: float
+    grams: float = Field(gt=0)
     role: str
     chunk_ids: list[str] = Field(default_factory=list)
 
 
 class Formulation(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
     id: str
     name: str
-    ingredients: list[IngredientAmount]
-    total_g: float
+    ingredients: list[IngredientAmount] = Field(min_length=1)
+    total_g: float = Field(gt=0)
     status: str = "assumed for demo"
     warnings: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_mass(self):
+        if abs(sum(item.grams for item in self.ingredients) - self.total_g) > 0.001:
+            raise ValueError("ingredient masses must sum to total_g")
+        ids = [item.ingredient_id for item in self.ingredients]
+        if len(ids) != len(set(ids)):
+            raise ValueError("duplicate ingredient IDs in formulation")
+        return self
 
 
 class TraceStep(BaseModel):
