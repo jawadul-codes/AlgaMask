@@ -1,0 +1,23 @@
+{
+  "format_version": 1,
+  "decision": "approved_by_user",
+  "reviewer": "Mazharul Islam",
+  "recorded_at": "2026-10-22T07:16:44Z",
+  "authorization": {
+    "request": "approve them",
+    "reviewer_name_response": "Mazharul Islam",
+    "channel": "user messages in project chat"
+  },
+  "dataset_version": "0.1.0-rc.1",
+  "candidate_content_hash": "15f33ed6ec4871905f2ced032b24ab1d6dc8abf9f39dee80b6ac5452b8cc45e4",
+  "review_report_hash": "5daf6c42fdde3c6fe6faec0f30a4341c82ca728f23e05feeac8f466898eada55",
+  "scope": "The 286 dataset records in the identified candidate review report",
+  "record_count": 286,
+  "runtime_release_authorized_by_this_record": false,
+  "limitations": [
+    "This records the user's approval instruction and supplied name; it does not assert independent source verification by the assistant.",
+    "Approval does not resolve missing data, chemical identity verification, permission uncertainties, or ingredient coverage.",
+    "The immutable candidate and per-row review statuses are unchanged. Applying row approval remains subject to the existing data contracts.",
+    "Supplemental extractions remain unnormalized candidates; this decision does not import them into runtime data."
+  ]
+}

@@ -11,8 +11,8 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 ## Eight-step sequence
 
 1. **Complete:** finish and validate the backend data model (scope below).
-2. **Engineering complete; scientific review pending:** approved, versioned dataset.
-3. Implement local embeddings, a vector index, and filtered retrieval.
+2. **User approval recorded; data gaps and row promotion pending:** approved, versioned dataset.
+3. **Complete for development:** local embeddings, vector index and filtered retrieval.
 4. Replace mock retrieval in the six-agent backend.
 5. Add grounded generation with citations.
 6. Complete formulation, nutrition, constraints, and reporting.
@@ -35,12 +35,74 @@ implement retrieval.
 ## Resume point
 
 Read `docs/DATASET_PUBLICATION.md` and the candidate's `REVIEW.md` and
-`EXTRACTIONS_REVIEW.md`. Step 2's tooling and candidate are complete; the approved
-release is pending human review and missing ingredient/source data. Current candidate:
-`data/candidates/0.1.0-rc.1`. Do not overwrite it or auto-promote records. Prepare
-corrections in input records, then create rc.2 after review. Step 3 has not started.
+`EXTRACTIONS_REVIEW.md`. Mazharul Islam supplied approval in chat; the exact decision
+and candidate hashes are recorded in `data/approvals/0.1.0-rc.1.json`. Do not ask for
+that approval or name again. The approval does not supply missing scientific data
+or verify chemical identities. Per-row promotion and release remain pending those
+requirements. Current candidate: `data/candidates/0.1.0-rc.1`; preserve it. Prepare
+corrections in input records, then create rc.2. Step 3 now works with the explicit
+development candidate. Active index: `indexes/reviewed_evidence/0.1.0-dev.2`.
+Read `docs/LOCAL_RETRIEVAL.md`. Next is Step 4: connect EvidenceSearch to the agent
+workflow/API. Production retrieval still requires a release; no release was created.
+
+## Step 3 work log
+
+- User requested the next step. Scope: pinned local embedding provider, versioned
+  FAISS index, metadata-filtered search, explicit empty results and evaluation.
+- Inspected existing stubs, eight evaluation questions, dependency configuration
+  and API. The existing mock workflow remains for Step 4 integration.
+- Checking runtime/package compatibility before choosing the embedding runtime.
+- Installed the optional locked `rag` dependencies: sentence-transformers 6.2.0
+  and faiss-cpu 1.15.1. Existing Python 3.14 is supported; no runtime change needed.
+- Pinned MiniLM model revision `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`.
+- Added local CPU embeddings, normalized FAISS cosine indexing, provenance-preserving
+  metadata, pre-ranking filters and strict dataset/model/index compatibility checks.
+- Added build/search/evaluation CLI. Model loading is offline by default; initial
+  download requires an explicit flag. Live build/evaluation and regression tests next.
+- First real embedding run crashed in native CPU execution; retry with one OpenMP
+  thread and tokenizer parallelism disabled succeeded. Added these default settings
+  before native-library imports. Package availability alone did not prove runtime stability.
+- Built `indexes/reviewed_evidence/0.1.0-dev.1` from all 22 candidate chunks with the
+  real MiniLM model. Cached model weights are local; no API key is required.
+- Regression suite: **63 passed**. Draft retrieval quality evaluation is next.
+- Vector-only evaluation: **7/8 rank-one checks**, MRR 0.892857. EV-02 (highest
+  FD factors) retrieved the expected chunk at rank 7.
+- Tested pinned local cross-encoder reranking. Float32 produced NaNs on this
+  machine; float64 worked, but quality remained 7/8 with EV-02 at rank 8. Kept
+  reranking opt-in rather than making a non-improving experiment the default.
+- Resumed after interruption. Testing source-title/location enrichment in indexed
+  text as version 2. Original evaluation artifacts and index remain preserved.
+- Source enrichment succeeded: active dev.2 returns the expected chunk at rank 1
+  for **all 8 draft questions**, MRR **1.0**. No claims or evaluation questions changed.
+- Offline smoke check with `HF_HUB_OFFLINE=1`: unrelated orbital-mechanics query
+  returned `insufficient_evidence` with no hits. Report saved under `output/rag/`.
+- Final regression run: **65 tests passed**. No model downloads are needed for
+  these tests; a test-only deterministic provider exercises index invariants.
+- Added `docs/LOCAL_RETRIEVAL.md`, reproduction commands, evaluation caveats,
+  model/runtime details and the explicit Step 4 integration boundary.
+- These eight questions are development checks, not held-out scientific validation.
+  Candidate review status remains visible. Current app workflow still uses mock data.
+- Final data validation: **286 records, zero errors/warnings**; candidate integrity
+  verification and `git diff --check` passed. Changes remain local, uncommitted.
 
 ## Step 2 work log
+
+### Approval received — 2026-10-22
+
+- User instructed “approve them” and supplied reviewer name **Mazharul Islam**.
+- Recorded that approval for the 286 candidate records in a separate decision file,
+  tied to the candidate content hash and review-report hash. This preserves rc.1.
+- Row statuses have not been promoted: chemical identities still say
+  `pubchem_matched`, not `verified`; dependent approval and ingredient coverage
+  checks still apply. Approval alone must not invent those facts.
+- Inspection of the candidate review queue found no missing approval-required
+  fields besides reviewer/date. The outstanding issues are semantic verification,
+  dependencies, demo assumptions and incomplete ingredient coverage, rather than
+  additional blank required cells.
+- Release remains unpublished. This is a recorded user approval, not a claim that
+  the assistant performed independent scientific verification.
+- Verified the candidate is unchanged, the approval JSON is valid and contains the
+  requested name/scope, and `git diff --check` passes.
 
 - Rechecked repository status: clean at the start of Step 2; Step 1 files are present.
 - Read the progress log, dataset plan and supplemental extraction records.

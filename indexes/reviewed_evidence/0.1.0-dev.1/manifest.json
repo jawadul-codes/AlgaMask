@@ -1,0 +1,23 @@
+{
+  "content_hash": "127f5ed222962251238737cb295b5873d8f5b789580dac04cbf416613ddd6222",
+  "count": 22,
+  "dataset_hash": "15f33ed6ec4871905f2ced032b24ab1d6dc8abf9f39dee80b6ac5452b8cc45e4",
+  "dataset_version": "0.1.0-rc.1",
+  "development_only": true,
+  "embedding": {
+    "device": "cpu",
+    "dimensions": 384,
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "normalized": true,
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+  },
+  "files": {
+    "documents.json": "31ef4ca6fd34781d3bd058f9f75bccfa9f4c7b40f5c362c2f9a48331f221e2b6",
+    "vectors.faiss": "b658a8a236ab541f298f132b7ba70f8582e9a22d0c8fdc9a2b2966d29788483c"
+  },
+  "format_version": 1,
+  "index_type": "IndexFlatIP",
+  "index_version": "0.1.0-dev.1",
+  "metric": "cosine",
+  "text_version": "claim-matrix-species-v1"
+}
