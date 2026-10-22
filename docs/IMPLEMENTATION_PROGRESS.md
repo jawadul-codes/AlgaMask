@@ -11,7 +11,7 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 ## Eight-step sequence
 
 1. **Complete:** finish and validate the backend data model (scope below).
-2. Convert extracted research into an approved, versioned dataset.
+2. **Engineering complete; scientific review pending:** approved, versioned dataset.
 3. Implement local embeddings, a vector index, and filtered retrieval.
 4. Replace mock retrieval in the six-agent backend.
 5. Add grounded generation with citations.
@@ -34,11 +34,48 @@ implement retrieval.
 
 ## Resume point
 
-Step 1 is complete. Next is Step 2: review extracted research, resolve missing
-provenance/permissions and ingredient coverage, and implement versioned publication.
-Begin by reading this log and `docs/BACKEND_DATA_MODEL.md`, then inspect current Git
-status. Scientific approval remains outstanding; do not auto-promote extracted rows.
-The application still uses mock evidence. Database persistence remains in Step 8.
+Read `docs/DATASET_PUBLICATION.md` and the candidate's `REVIEW.md` and
+`EXTRACTIONS_REVIEW.md`. Step 2's tooling and candidate are complete; the approved
+release is pending human review and missing ingredient/source data. Current candidate:
+`data/candidates/0.1.0-rc.1`. Do not overwrite it or auto-promote records. Prepare
+corrections in input records, then create rc.2 after review. Step 3 has not started.
+
+## Step 2 work log
+
+- Rechecked repository status: clean at the start of Step 2; Step 1 files are present.
+- Read the progress log, dataset plan and supplemental extraction records.
+- Existing dataset plan requires human scientific approval. Supplemental extraction
+  records include unresolved units, permissions and incomplete methods; these must
+  remain review candidates until resolved.
+- Implemented dataset audits with per-record missing approval fields, dependency
+  lists, ingredient coverage, and publication blockers.
+- Added candidate/publication/verification commands, content hashes, immutable
+  version paths, concurrent-build reservations and cleanup of failed builds.
+- Production publication requires approved records and minimum corpus coverage;
+  supplemental extractions remain candidate-only. Regression tests are pending.
+- Created and verified `data/candidates/0.1.0-rc.1`, preserving 286 records in 21
+  tables and the separate 15-source/25-record extraction packet. The candidate
+  includes human-readable review reports, machine-readable records and SHA-256 hashes.
+- Added `docs/DATASET_PUBLICATION.md` with commands, review order and known limits.
+- All 286 current records remain extracted; no scientific approval was invented.
+  There are 19 nutrition rows, one screening bound and five allergen relationships
+  for 20 forms. These coverage gaps and per-record dependencies are in the packet.
+- Initial publication tests: 46 total tests passed. Final supplemental and
+  approval-bypass checks added; final verification pending below.
+
+### Step 2 verification and remaining gate
+
+- Final backend suite: **48 passed**, with the existing Starlette deprecation warning.
+- Reviewed dataset: **286 records / 21 tables / zero validation errors or warnings**.
+- Supplemental extraction validation and sprint validation: **passed**.
+- Candidate integrity verification and `git diff --check`: **passed**.
+- Tests prove deterministic content hashes, rejection of unapproved publication,
+  no overwrite, failed-build cleanup, path validation, tamper detection, supplemental
+  preservation and successful publication of a synthetic approved test corpus.
+- Current production release: **not published**. A human scientific reviewer must
+  resolve the review queue and missing coverage before the approved-release gate passes.
+- Changes remain local; no commit or push performed. Step 2 is not scientifically
+  complete merely because its publication tooling is ready.
 
 ### Inspection findings
 
