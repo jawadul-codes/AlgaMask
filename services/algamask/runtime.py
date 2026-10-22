@@ -16,12 +16,16 @@ class Settings(BaseModel):
     mode: Literal["mock", "development", "production"] = "mock"
     dataset_path: Path = ROOT / "data/candidates/0.1.0-rc.1"
     index_path: Path = ROOT / "indexes/reviewed_evidence/0.1.0-dev.2"
+    generation_provider: Literal["extractive", "ollama"] = "extractive"
+    generation_model: str = "llama3.2:latest"
+    ollama_url: str = "http://127.0.0.1:11434"
 
     @classmethod
     def from_env(cls):
         values = {field: os.environ[key] for field, key in (
             ("mode", "ALGAMASK_MODE"), ("dataset_path", "ALGAMASK_DATASET_PATH"),
-            ("index_path", "ALGAMASK_INDEX_PATH")) if key in os.environ}
+            ("index_path", "ALGAMASK_INDEX_PATH"), ("generation_provider", "ALGAMASK_GENERATION_PROVIDER"),
+            ("generation_model", "ALGAMASK_GENERATION_MODEL"), ("ollama_url", "ALGAMASK_OLLAMA_URL")) if key in os.environ}
         return cls(**values)
 
 
@@ -35,6 +39,12 @@ class RetrievalRuntime:
         self._search = None
         self._lock = Lock()
         self.status = "disabled" if settings.mode == "mock" else "not_loaded"
+
+    def generation_provider(self):
+        from .generation import ExtractiveProvider, OllamaProvider
+        if self.settings.generation_provider == "extractive":
+            return ExtractiveProvider()
+        return OllamaProvider(self.settings.generation_model, self.settings.ollama_url)
 
     def get_search(self):
         if self.settings.mode == "mock":

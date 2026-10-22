@@ -14,7 +14,7 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 2. **User approval recorded; data gaps and row promotion pending:** approved, versioned dataset.
 3. **Complete for development:** local embeddings, vector index and filtered retrieval.
 4. **Complete:** connect real retrieval to the six-agent backend and API.
-5. Add grounded generation with citations.
+5. **Complete for constrained evidence explanations:** grounded generation with citations.
 6. Complete formulation, nutrition, constraints, and reporting.
 7. Connect Flutter to the real run workflow.
 8. Add persistence, failure handling, and release verification.
@@ -42,9 +42,41 @@ or verify chemical identities. Per-row promotion and release remain pending thos
 requirements. Current candidate: `data/candidates/0.1.0-rc.1`; preserve it. Prepare
 corrections in input records, then create rc.2. Step 3 now works with the explicit
 development candidate. Active index: `indexes/reviewed_evidence/0.1.0-dev.2`.
-Read `docs/RAG_WORKFLOW.md`. Step 4 is complete; next is Step 5: grounded generation
-with citations. Real retrieval works when ALGAMASK_MODE=development; default mode
+Read `docs/GROUNDED_GENERATION.md`. Step 5 is complete for exact-note, cited evidence
+explanations (extractive by default; local Ollama optional and live-tested). Next is
+Step 6: evidence-driven formulation, nutrition, constraints and reporting. Recipes
+remain demonstrations. Real retrieval uses ALGAMASK_MODE=development; default mode
 remains mock. Production retrieval still requires a release; no release was created.
+
+## Step 5 work log
+
+- Added strict generation contracts, exact-note grounding checks, source/dataset-bound
+  citations, a versioned prompt and prompt hash, and one bounded correction retry.
+- Default extractive generation works without a model server. Optional local Ollama
+  generation selects/reproduces supported notes; it cannot introduce free-form claims
+  or doses. Methods are labelled separately in every generation result.
+- Found installed Ollama/Llama 3.2; started a temporary server on loopback port 11435
+  for live verification. No model was downloaded and no hosted provider was contacted.
+- Connected generated explanations to Chemistry and independent metadata/text checks
+  to Critic. Invalid generation blocks recipe/impact work and is stored as a failed run.
+- HTML reports include cited explanations with links to retrieved notes, provider,
+  method, model, original matrix, support class and review status.
+- Real-model API test passed with five grounded claims. First response failed schema
+  validation; the one correction retry succeeded. Model digest:
+  `a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72`.
+- Added tests for invented IDs, altered numbers, removed qualifications, missing
+  evidence families, metadata tampering, injection attempts and provider outages.
+- Git push request remains authorized/pending; inspect final diff and commit only
+  Step 5 changes after verification, then push without force.
+- Final verification: **98 tests passed** and `git diff --check` passed. Added local
+  transport/model-identity tests and an API test proving failed generations remain
+  inspectable without returning mock formulations.
+- Added `docs/GROUNDED_GENERATION.md` with exact scope, configuration, output and
+  failure contracts. Free-form claims and new recipe/dose facts are intentionally
+  outside this step's exact-note grounding contract.
+- Stopped the temporary Ollama server started for verification on port 11435.
+- Fetched origin/main before committing: local and remote were aligned at 66a0880;
+  Step 4 was already committed/pushed. Only this step's changes need publishing.
 
 ## Step 4 work log
 

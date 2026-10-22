@@ -1,9 +1,9 @@
 # Retrieval-connected workflow — Step 4
 
 The backend can now use the Step 3 local index through `/runs` and `/rag/search`.
-The six-agent trace distinguishes real retrieval from the remaining demonstration
-roles. Step 5 will implement grounded reasoning/generation; Step 6 handles real
-formulation calculations and constraints.
+The six-agent trace distinguishes real retrieval and grounded explanations from the
+remaining demonstration roles. Step 5 is documented in `docs/GROUNDED_GENERATION.md`;
+Step 6 handles real formulation calculations and constraints.
 
 ## Start the backend
 
@@ -72,9 +72,9 @@ blocked and formulations/controls are empty. A model/index failure returns an ex
 
 Retrieval success only means relevant context was found. A passage explaining a
 missing masking trial is still context; it is not positive efficacy evidence. Current
-chemistry records `context_chunk_ids`, and demonstration recipe ingredients carry no
-evidence citations. The HTML report labels candidate data, mock recipes and unknown
-impact values. This avoids implying the real citations support placeholder doses.
+chemistry emits validated source-scoped claims, and demonstration recipe ingredients
+carry no evidence citations. The HTML report labels candidate data, mock recipes and
+unknown impact values. This avoids implying the real citations support placeholder doses.
 
 The Flutter client still calls its existing preview route. Flutter integration is
 Step 7; this step changes the backend's run workflow, not the active Flutter screen.

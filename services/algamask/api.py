@@ -72,7 +72,7 @@ def create_run(payload: RunRequest, request: Request):
     runtime = request.app.state.retrieval_runtime
     search = None if runtime.settings.mode == "mock" else configured_search(request)
     try:
-        result = run_workflow(payload, search)
+        result = run_workflow(payload, search, runtime.generation_provider() if search else None)
     except (ValueError, RuntimeError, OSError) as exc:
         raise HTTPException(503, detail={"code": "run_failed", "message": "Run processing failed; no mock fallback was used."}) from exc
     if len(runs) >= 100:

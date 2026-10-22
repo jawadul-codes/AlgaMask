@@ -2,6 +2,7 @@ from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from .generation import GenerationResult
 
 
 class Algae(StrEnum):
@@ -77,9 +78,10 @@ class RunResult(BaseModel):
     created_at: str
     mode: Literal["mock", "rag_development", "rag"] = "mock"
     retrieval: dict[str, Any] | None = None
+    generation: GenerationResult | None = None
     version: str = "0.1.0"
     request: RunRequest
-    status: Literal["report_ready", "insufficient_data"]
+    status: Literal["report_ready", "insufficient_data", "generation_failed"]
     trace: list[TraceStep]
     sensory_map: list[dict]
     evidence: list[dict]

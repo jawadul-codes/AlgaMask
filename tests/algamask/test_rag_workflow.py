@@ -46,7 +46,9 @@ def test_real_retrieval_runs_and_trace(client, algae, expected):
     assert run["mode"] == "rag_development"
     assert len(run["trace"]) == 6
     assert run["trace"][1]["status"] == "complete"
-    assert run["trace"][2]["status"] == "mock"
+    assert run["trace"][2]["status"] == "complete"
+    assert run["generation"]["method"] == "extractive"
+    assert run["generation"]["claims"]
     assert [q.species for q in runtime._search.queries if q.chunk_tag == "diagnosis"] == expected
     assert runtime._search.queries[-1].chunk_tag == "intervention"
     assert run["retrieval"]["dataset_hash"] == "a" * 64
@@ -98,3 +100,20 @@ def test_mock_search_is_explicitly_disabled(monkeypatch):
     api = TestClient(app)
     assert api.post("/runs", json={}).json()["mode"] == "mock"
     assert api.post("/rag/search", json={"query": "test"}).status_code == 503
+
+
+def test_generation_failure_is_stored_without_mock_result(client, monkeypatch):
+    from algamask.generation import ExtractiveProvider
+    class BadProvider(ExtractiveProvider):
+        def generate(self, payload):
+            return {"claims": []}
+    api, runtime = client
+    monkeypatch.setattr(runtime, "generation_provider", lambda: BadProvider())
+    response = api.post("/runs", json={})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["status"] == "generation_failed"
+    assert not result["formulations"] and not result["controls"]
+    assert result["generation"]["attempts"] == 2
+    assert api.get(f"/runs/{result['run_id']}").json() == result
+    assert "blocked" in api.get(f"/runs/{result['run_id']}/report").text
