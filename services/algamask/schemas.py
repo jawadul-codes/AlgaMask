@@ -75,7 +75,8 @@ class TraceStep(BaseModel):
 class RunResult(BaseModel):
     run_id: str
     created_at: str
-    mode: Literal["mock"] = "mock"
+    mode: Literal["mock", "rag_development", "rag"] = "mock"
+    retrieval: dict[str, Any] | None = None
     version: str = "0.1.0"
     request: RunRequest
     status: Literal["report_ready", "insufficient_data"]

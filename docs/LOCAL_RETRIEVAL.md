@@ -101,6 +101,6 @@ Model references: [embedding model card](https://huggingface.co/sentence-transfo
 
 ## Next boundary
 
-Step 4 connects `EvidenceSearch` to the Retrieval agent and API workflow. Current
-`/runs` remains the existing mock workflow; Step 3 alone does not make app answers
-or formulations grounded in this evidence. Grounded generation belongs to Step 5.
+Step 4 now connects `EvidenceSearch` to the Retrieval agent and API workflow when
+`ALGAMASK_MODE=development` is configured. See `docs/RAG_WORKFLOW.md`. The default
+mode remains mock. Grounded generation belongs to Step 5.

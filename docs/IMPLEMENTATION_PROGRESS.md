@@ -13,7 +13,7 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 1. **Complete:** finish and validate the backend data model (scope below).
 2. **User approval recorded; data gaps and row promotion pending:** approved, versioned dataset.
 3. **Complete for development:** local embeddings, vector index and filtered retrieval.
-4. Replace mock retrieval in the six-agent backend.
+4. **Complete:** connect real retrieval to the six-agent backend and API.
 5. Add grounded generation with citations.
 6. Complete formulation, nutrition, constraints, and reporting.
 7. Connect Flutter to the real run workflow.
@@ -42,8 +42,33 @@ or verify chemical identities. Per-row promotion and release remain pending thos
 requirements. Current candidate: `data/candidates/0.1.0-rc.1`; preserve it. Prepare
 corrections in input records, then create rc.2. Step 3 now works with the explicit
 development candidate. Active index: `indexes/reviewed_evidence/0.1.0-dev.2`.
-Read `docs/LOCAL_RETRIEVAL.md`. Next is Step 4: connect EvidenceSearch to the agent
-workflow/API. Production retrieval still requires a release; no release was created.
+Read `docs/RAG_WORKFLOW.md`. Step 4 is complete; next is Step 5: grounded generation
+with citations. Real retrieval works when ALGAMASK_MODE=development; default mode
+remains mock. Production retrieval still requires a release; no release was created.
+
+## Step 4 work log
+
+- Added explicit mock/development/production retrieval settings and a lazy, locked
+  offline model/index loader. Native retrieval libraries remain optional in mock mode.
+- Moved search request/response contracts into a dependency-light module; retained
+  compatibility imports from `rag.py`.
+- Connected species-specific diagnosis searches and a flavour/inclusion intervention
+  search to the Retrieval agent. Blend runs query both species separately.
+- Recorded per-query evidence, candidate status, dataset hash, embedding identity and
+  index version in run/trace output. Missing required evidence blocks all later roles.
+- Added `/rag/search` and `/rag/ready`; `/health` reports configured mode/readiness.
+  Retrieval failures return 503, with no automatic mock fallback or saved success.
+- Kept other agent roles explicitly demonstrational. Chemistry records context IDs,
+  not support claims; placeholder recipes have no scientific citations in real mode.
+- Updated HTML reports to show real evidence provenance, retrieval mode and trace,
+  while labelling demonstration recipes and unknown nutrition/sensory outcomes.
+- Verification: **73 tests passed**. Real-model offline API smoke checks passed for
+  spirulina/chlorella/blend with **6/6/9 passages** and successful report rendering.
+  Unknown-source query returned insufficient evidence.
+- Added `docs/RAG_WORKFLOW.md` with start commands and exact integration boundaries.
+  Flutter still uses its previous preview route; connection is planned for Step 7.
+- Existing approval files remain untouched. No commit, push or server restart was
+  performed. Changes are local.
 
 ## Step 3 work log
 

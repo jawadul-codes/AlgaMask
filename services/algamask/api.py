@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
@@ -16,16 +16,43 @@ from scoring import placeholder
 from .agents.supervisor import run_workflow
 from .report import render_report
 from .schemas import RunRequest, RunResult
+from .runtime import RetrievalRuntime, RetrievalUnavailable, Settings
+from .search_schemas import SearchRequest, SearchResult
 
-app = FastAPI(title="AlgaMask mock API", version="0.1.0")
+app = FastAPI(title="AlgaMask API", version="0.2.0")
+app.state.retrieval_runtime = RetrievalRuntime(Settings.from_env())
 app.add_middleware(CORSMiddleware, allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?", allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 # Deliberately local and ephemeral. Replace with persistence before real trials.
 runs: dict[str, RunResult] = {}
 
 
 @app.get("/health")
-def health():
-    return {"status": "ok", "mode": "mock", "version": "0.1.0"}
+def health(request: Request):
+    runtime = request.app.state.retrieval_runtime
+    return {"status": "ok", "mode": runtime.settings.mode, "version": "0.2.0", "retrieval": runtime.status}
+
+
+def configured_search(request: Request):
+    try:
+        return request.app.state.retrieval_runtime.get_search()
+    except RetrievalUnavailable as exc:
+        raise HTTPException(503, detail={"code": "retrieval_unavailable", "message": str(exc)}) from exc
+
+
+@app.get("/rag/ready")
+def rag_ready(request: Request):
+    search = configured_search(request)
+    return {"status": "ready", **{key: search.manifest[key] for key in
+                                  ("dataset_version", "dataset_hash", "index_version", "development_only")}}
+
+
+@app.post("/rag/search", response_model=SearchResult)
+def rag_search(query: SearchRequest, request: Request):
+    search = configured_search(request)
+    try:
+        return search.search(query)
+    except (ValueError, RuntimeError, OSError) as exc:
+        raise HTTPException(503, detail={"code": "retrieval_failed", "message": "Evidence search failed; no mock fallback was used."}) from exc
 
 
 class Day1Request(BaseModel):
@@ -41,8 +68,13 @@ def day1_preview(request: Day1Request):
 
 
 @app.post("/runs", response_model=RunResult)
-def create_run(request: RunRequest):
-    result = run_workflow(request)
+def create_run(payload: RunRequest, request: Request):
+    runtime = request.app.state.retrieval_runtime
+    search = None if runtime.settings.mode == "mock" else configured_search(request)
+    try:
+        result = run_workflow(payload, search)
+    except (ValueError, RuntimeError, OSError) as exc:
+        raise HTTPException(503, detail={"code": "run_failed", "message": "Run processing failed; no mock fallback was used."}) from exc
     if len(runs) >= 100:
         del runs[next(iter(runs))]
     runs[result.run_id] = result
