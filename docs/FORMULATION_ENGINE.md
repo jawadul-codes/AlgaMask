@@ -23,18 +23,55 @@ Sugar is not available in this schema. Some omega-3 entries are ALA only, so no
 total omega-3 estimate is produced. Neither carbohydrate nor ALA is silently
 substituted for these missing quantities. Original record qualifications are retained.
 
-## Remaining in Step 6
+## Implemented: experimental screening workflow
 
-- Replace mock ingredient IDs and placeholder recipes with exact-form constrained
-  candidate generation. Do not silently substitute dried dates for date paste.
-- Separate explicit engineering assumptions from source-supported screening bounds;
-  the current snack-bar bound does not establish safe protein-bar usage.
-- Add feasibility checks for nutrition targets, exclusions and incomplete allergen
-  coverage. Missing allergen rows must not imply an allergen-free product.
-- Build matched baseline/unmasked controls and expose calculations in the run API,
-  independent critic checks and HTML reports.
-- Keep measured sensory outcomes unknown until actual panel data exists.
+With `ALGAMASK_MODE=development`, `/runs` now uses the exact dataset snapshot retained
+by the verified retrieval index. After grounded explanation succeeds, the Recipe
+stage enumerates nine candidates: dried dates at 25/30/35%, flavour ingredients at
+1/2/3%, requested algae inclusion (50:50 for blend), and rolled oats as the remainder.
+Cocoa-spice splits its flavour mass equally between cocoa and cinnamon. Vanilla is
+extract; citrus is raw orange peel. These are **explicit engineering assumptions**,
+not recommended doses or evidence-backed manufacturing recipes. Dried dates are
+not labelled date paste. No retrieved passage is assigned as dose support.
 
-The existing run API still returns demonstration recipes and unknown nutrition.
-This increment does not change scientific approvals, publish a release, or make
-recipes eligible for production.
+The search checks serving mass, exact species inclusion, grid membership and
+exclusions. Optional per-serving request fields are `min_protein_g`,
+`max_energy_kcal` and `max_sugar_g`. A target with missing data cannot pass. Sugar
+targets currently block all candidates; energy targets block Chlorella/blend.
+Candidates meeting the checks are ranked by estimated protein per serving, with
+stable ID tie-breaking; at most three are returned. Failure means **no verified
+candidate in this nine-point grid**, not proof that the user's goal is impossible.
+The Critic repeats checks independently of the generator's success result.
+
+Oats/coconut exclusions remove matching ingredient forms. Peanut/tree-nut/sesame/
+milk/soy allergy exclusions block screening: the corpus cannot establish complete
+free-from coverage, even when no positive allergen relationship is present. This
+conservative behavior must not be relaxed by interpreting missing rows as negative
+allergen findings. Candidate runs without exclusions still are not allergen-safe
+certifications.
+
+The top candidate has matched controls: A0 replaces flavour mass with oats; B0 also
+replaces algae mass with oats. Dates and total mass remain constant. Controls do
+not have to satisfy candidate nutrition targets. Other candidates do not have
+individually matched controls. The reported protein-density percentage change is
+only for the top candidate versus B0; missing/zero baseline values yield unknown.
+
+`impact.nutrition` contains estimates and provenance per candidate/control;
+`impact.screening` records all nine verdicts, assumptions, search version and control
+parent. HTML reports show estimates, missing-data reasons, source qualifications,
+review status and screening audit. Sensory change remains unknown and panel size 0.
+The default mock mode remains demonstrational and rejects nutrition targets rather
+than silently ignoring them. Production formulation is explicitly blocked: this
+engineering grid is development-only, even if a future retrieval release exists.
+
+## Remaining for scientifically validated formulations
+
+- Collect/review applicable protein-bar bounds with a confirmed mass basis and
+  material/process context; the existing snack-bar bound is not automatically reused.
+- Resolve nutrient and supplier-specific allergen coverage, ingredient processing
+  assumptions, product-lot measurements and actual sensory trials.
+- Extend the search space and constraint policy using those reviewed inputs, then
+  verify production eligibility separately from arithmetic feasibility.
+
+No scientific approvals were changed, no dataset release was published, and no
+formulation is claimed production eligible. Flutter integration is a later step.

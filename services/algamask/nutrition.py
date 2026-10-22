@@ -51,7 +51,7 @@ def estimate_nutrition(formula: Formulation, snapshot: DatasetSnapshot,
         raise ValueError(f"Unknown ingredient-form IDs: {', '.join(unknown)}")
     rows = {}
     for row in snapshot.records("ingredient_nutrition", approved_only=approved_only):
-        if row.basis == "per_100g":
+        if row.basis == "per_100g" and row.review_status in {"approved", "verified", "extracted"}:
             rows.setdefault(row.ingredient_form_id, []).append(row)
     selected = {}
     warnings = ["Database/literature composition is not a measurement of the prototype lot.",

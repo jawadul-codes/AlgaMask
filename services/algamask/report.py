@@ -6,8 +6,8 @@ from .schemas import RunResult
 def render_report(result: RunResult) -> str:
     rows = "".join(f"<tr><td>{escape(f.id)}</td><td>{escape(f.name)}</td><td>{f.total_g:g} g</td><td>{escape(', '.join(f'{i.ingredient_id}: {i.grams:g} g' for i in f.ingredients))}</td></tr>" for f in result.controls + result.formulations)
     limitations = "".join(f"<li>{escape(text)}</li>" for text in result.limitations)
-    label = {"mock": "MOCK • Assumed for demo", "rag_development": "LOCAL RETRIEVAL • Development data • Demonstration recipes",
-             "rag": "LOCAL RETRIEVAL • Demonstration recipes"}[result.mode]
+    label = {"mock": "MOCK • Assumed for demo", "rag_development": "LOCAL RETRIEVAL • Development data • Experimental screening",
+             "rag": "LOCAL RETRIEVAL • Production formulation unavailable"}[result.mode]
     evidence = "".join(
         f"<li id=\"evidence-{escape(item['chunk_id'])}\"><strong>{escape(item['chunk_id'])}</strong> — {escape(item.get('claim_summary', item.get('text', '')))}"
         f"<br>Source: {escape(item['source_id'])}; {escape(item.get('source_title', item.get('title', '')))}"
@@ -26,13 +26,32 @@ def render_report(result: RunResult) -> str:
         explanation = (f"<h2>Cited evidence explanation</h2><p>Method: {escape(generated.method)}; "
                        f"provider: {escape(generated.provider)}; model: {escape(generated.model or 'none')}; "
                        f"status: {escape(generated.status)}</p><p>{escape(generated.limitation)}</p><ul>{claims}</ul>")
+    nutrition = ""
+    def number(value):
+        return "unknown" if value is None else f"{value:.3f}"
+    for code, estimate in result.impact.get("nutrition", {}).items():
+        nutrient_rows = "".join(f"<tr><td>{escape(key)}</td><td>{number(value)}</td><td>{number(estimate['per_100g'][key])}</td>"
+                                f"<td>{escape(', '.join(estimate['missing'][key]))}</td></tr>"
+                                for key, value in estimate["per_serving"].items())
+        sources = "".join(f"<li>{escape(r['nutrition_id'])}: {escape(r['source_id'] or '')}; {escape(r['source_location'] or '')}"
+                          f" — {escape(r['match_rationale'] or '')}; {escape(r['transformation_record'] or '')}; review: {escape(r['review_status'])}</li>"
+                          for r in estimate["records"])
+        warnings = "".join(f"<li>{escape(w)}</li>" for w in estimate["warnings"])
+        nutrition += (f"<h3>{escape(code)} — estimated composition</h3><table><tr><th>Nutrient / unit</th><th>Per serving</th><th>Per 100 g</th><th>Missing forms</th></tr>{nutrient_rows}</table>"
+                      f"<p>Protein g per 100 kcal: {number(estimate['protein_g_per_100_kcal'])}</p><ul>{warnings}</ul><ul>{sources}</ul>")
+    screening = result.impact.get("screening")
+    screening_html = ""
+    if screening:
+        from json import dumps
+        screening_html = f"<h2>Screening assumptions and checks</h2><pre>{escape(dumps(screening, indent=2))}</pre>"
+    heading = "Demonstration formulations" if result.mode == "mock" else "Experimental formulations — not production eligible"
     return f"""<!doctype html><html lang="en"><meta charset="utf-8"><title>AlgaMask concept report</title>
 <style>body{{font:16px system-ui;max-width:900px;margin:48px auto;padding:24px;color:#183c32}}td,th{{padding:12px;text-align:left;border-bottom:1px solid #ddd}}table{{border-collapse:collapse;width:100%}}li{{margin-bottom:12px}}@media print{{button{{display:none}}}}</style>
 <h1>AlgaMask concept report</h1><p>{label} • {escape(result.status)}</p><p>Run {escape(result.run_id)}</p>
 <p>{escape(result.request.algae.value)} · {result.request.inclusion_pct:g}% inclusion · {result.request.serving_g:g} g serving</p>
 {provenance}<h2>Workflow trace</h2><ol>{trace}</ol>{explanation}
-<h2>Demonstration formulations</h2><table><tr><th>Code</th><th>Concept</th><th>Mass</th><th>Ingredients</th></tr>{rows}</table>
-<h2>Retrieved context</h2><p>Context does not establish support for the demonstration formulations.</p><ul>{evidence}</ul>
-<h2>Impact comparison</h2><p>{escape(result.impact['explanation'])}</p><p>Nutrition change: unknown. Sensory change: unknown. Panel size: 0.</p>
+<h2>{heading}</h2><table><tr><th>Code</th><th>Concept</th><th>Mass</th><th>Ingredients</th></tr>{rows}</table>{screening_html}
+<h2>Retrieved context</h2><p>Context does not establish effective or safe ingredient doses for these formulations.</p><ul>{evidence}</ul>
+<h2>Impact comparison</h2><p>{escape(result.impact['explanation'])}</p><p>Estimated protein-density change (%): {number(result.impact.get('nutrition_change_pct'))}. Sensory change: unknown. Panel size: 0.</p>{nutrition}
 <h2>Limitations</h2><ul>{limitations}</ul><p>The JSON run record contains the complete six-agent trace and evidence provenance.</p>
 <button onclick="window.print()">Print / save as PDF</button></html>"""

@@ -11,6 +11,8 @@ class SearchDouble:
                 "index_version": "test-index", "embedding": {"model": "test"}, "development_only": True}
 
     def __init__(self, empty_tag=None, fail=False):
+        from algamask.dataset import load_dataset
+        self.snapshot = load_dataset(Settings().dataset_path / "reviewed")
         self.queries = []
         self.empty_tag, self.fail = empty_tag, fail
 
@@ -49,6 +51,9 @@ def test_real_retrieval_runs_and_trace(client, algae, expected):
     assert run["trace"][2]["status"] == "complete"
     assert run["generation"]["method"] == "extractive"
     assert run["generation"]["claims"]
+    assert len(run["formulations"]) == 3
+    assert run["impact"]["nutrition"]
+    assert run["impact"]["dataset_hash"] == run["retrieval"]["dataset_hash"]
     assert [q.species for q in runtime._search.queries if q.chunk_tag == "diagnosis"] == expected
     assert runtime._search.queries[-1].chunk_tag == "intervention"
     assert run["retrieval"]["dataset_hash"] == "a" * 64
@@ -59,6 +64,19 @@ def test_real_retrieval_runs_and_trace(client, algae, expected):
     report = api.get(f"/runs/{run['run_id']}/report").text
     assert "LOCAL RETRIEVAL" in report and "test-index" in report
     assert "&lt;script&gt;" in report and "<script>" not in report
+    assert "estimated composition" in report
+    assert "NUT-OAT-DRY" in report
+
+
+def test_unverifiable_targets_are_inspectable(client):
+    api, _ = client
+    response = api.post("/runs", json={"max_sugar_g": 5})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["status"] == "insufficient_data"
+    assert not result["formulations"] and not result["controls"]
+    assert "unknown" in str(result["trace"][3]["output"])
+    assert "Cannot verify" in api.get(f"/runs/{result['run_id']}/report").text
 
 
 @pytest.mark.parametrize("missing", ["diagnosis", "intervention"])

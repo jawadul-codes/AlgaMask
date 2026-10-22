@@ -1,0 +1,95 @@
+import 'package:algamask/src/algamask/report_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+Map<String, dynamic> result(String status) => {
+  'run_id': 'test',
+  'status': status,
+  'mode': 'rag_development',
+  'request': {'algae': 'blend'},
+  'retrieval': {
+    'dataset_version': 'candidate',
+    'index_version': 'index',
+    'dataset_hash': 'a' * 64,
+  },
+  'generation': {
+    'method': 'extractive',
+    'status': 'complete',
+    'limitation': 'Exact notes only',
+    'claims': [
+      {
+        'text': 'Source-scoped finding',
+        'citation': {'chunk_id': 'C1', 'source_id': 'SRC1'},
+      },
+    ],
+  },
+  'trace': [
+    {'agent': 'Critic', 'state': 'REJECTED', 'status': 'blocked'},
+  ],
+  'evidence': [],
+  'controls': [],
+  'formulations': [],
+  'limitations': ['No scientific approval'],
+  'impact': {
+    'explanation': 'Estimated, not measured',
+    'nutrition_change_pct': null,
+    'screening': {
+      'scope': 'Nine-point grid',
+      'verdicts': {
+        'S25-1': ['Cannot verify energy: unknown.'],
+      },
+    },
+    'nutrition': {
+      'S25-1': {
+        'per_serving': {'energy_kcal': null, 'protein_g': 5.5},
+        'per_100g': {'energy_kcal': null, 'protein_g': 12.222},
+        'missing': {
+          'energy_kcal': ['IF-CHL-PWD'],
+          'protein_g': [],
+        },
+        'protein_g_per_100_kcal': null,
+        'warnings': ['Development records'],
+        'records': [],
+      },
+    },
+  },
+};
+
+void main() {
+  for (final status in [
+    'report_ready',
+    'insufficient_data',
+    'generation_failed',
+  ]) {
+    testWidgets('$status report renders on phone with unknown nutrients', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ReportView(
+                result: result(status),
+                reportUri: Uri.parse('http://localhost:8000/runs/test/report'),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('LOCAL RAG · development data'), findsOneWidget);
+      expect(find.text('Source-scoped finding'), findsOneWidget);
+      final tile = find.text('S25-1 · composition estimate');
+      await tester.ensureVisible(tile);
+      await tester.tap(tile);
+      await tester.pumpAndSettle();
+      expect(find.text('energy_kcal: unknown per serving'), findsOneWidget);
+      expect(find.textContaining('IF-CHL-PWD'), findsOneWidget);
+      expect(find.textContaining('Cannot verify energy'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+}

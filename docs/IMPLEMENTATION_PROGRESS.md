@@ -15,8 +15,8 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 3. **Complete for development:** local embeddings, vector index and filtered retrieval.
 4. **Complete:** connect real retrieval to the six-agent backend and API.
 5. **Complete for constrained evidence explanations:** grounded generation with citations.
-6. Complete formulation, nutrition, constraints, and reporting.
-7. Connect Flutter to the real run workflow.
+6. **Implemented for development screening; scientific/production gates remain:** formulation, nutrition, constraints, and reporting.
+7. **Implemented; live-browser/device verification pending:** connect Flutter to the real run workflow.
 8. Add persistence, failure handling, and release verification.
 
 ## Step 1 scope
@@ -43,12 +43,74 @@ requirements. Current candidate: `data/candidates/0.1.0-rc.1`; preserve it. Prep
 corrections in input records, then create rc.2. Step 3 now works with the explicit
 development candidate. Active index: `indexes/reviewed_evidence/0.1.0-dev.2`.
 Read `docs/GROUNDED_GENERATION.md`. Step 5 is complete for exact-note, cited evidence
-explanations (extractive by default; local Ollama optional and live-tested). Next is
-Step 6: evidence-driven formulation, nutrition, constraints and reporting. Recipes
-remain demonstrations. Real retrieval uses ALGAMASK_MODE=development; default mode
+explanations (extractive by default; local Ollama optional and live-tested).
+Step 6 now has exact-form experimental grid search, constraints, sourced nutrition
+and reports; see `docs/FORMULATION_ENGINE.md`. Validated production bounds, complete
+allergen/nutrition coverage and manufacturing/sensory evidence remain unresolved.
+Step 7 Flutter now uses `/runs` and displays these explicit limits. Next is live
+browser end-to-end verification and Step 8 persistence/failure/release work.
+Real retrieval uses ALGAMASK_MODE=development; default mode
 remains mock. Production retrieval still requires a release; no release was created.
 
+## Step 7 work log — in progress
+
+- Connecting Flutter to `/runs` with editable species/serving/targets, real evidence,
+  nutrition and explicit blocked states. Preserve all local Step 6 changes.
+- Replaced legacy two-card preview UI with the full experimental run form and report.
+  Added algae/serving controls, optional validated nutrition targets, milk/soy
+  exclusions, loading/duplicate-submit protection and retryable failures.
+- API client now uses `/runs`, checks the response envelope, waits up to 120 seconds,
+  and creates report links from the same configured host. No automatic POST retry.
+- Reports expose submitted settings, mock/development/released-evidence mode,
+  citations, source links (HTTP/S only), dataset identity, ingredient amounts,
+  nutrient estimates/unknowns/provenance, all grid verdicts, trace and limitations.
+- JSON copy and print-ready report actions retained. Display explicitly separates
+  submitted results from subsequently edited inputs. No recipe is called safe or
+  production-approved. Backend data/approval statuses are unchanged.
+- Verification: **11 Flutter tests passed**, **149 backend tests passed**,
+  `flutter analyze` reported no issues, `flutter build web` succeeded and
+  `git diff --check` passed. No dependency upgrades were requested or performed.
+- Added API contract/error tests and phone-width widget coverage for ready,
+  insufficient-data and generation-failed reports, unknown nutrients, invalid target
+  input and retry state. Documented local run commands in `apps/flutter/README.md`.
+- Remaining verification: live browser → running backend → displayed report, actual
+  clipboard/external-link behavior and physical-device networking. Unit/widget tests
+  and compilation do not establish those. No server or browser session was started.
+- Step 8 persistence remains unimplemented; report URLs depend on in-memory runs.
+  All changes remain local and unpushed, including the preserved Step 6 changes.
+
 ## Step 6 work log — in progress
+
+### Integrated development screening increment
+
+- Retained the verified retrieval dataset snapshot for numerical work; no mutable
+  reviewed-directory fallback or guessed mapping from mock ingredient IDs.
+- Added a deterministic nine-point exact-form grid with explicit engineering
+  assumptions, independent Critic checks, stable protein ranking and top-three output.
+- Added per-serving protein minimum, calorie maximum and sugar maximum requests.
+  Unknown required nutrients fail checks; mock mode cannot silently ignore targets.
+- Added conservative milk/soy/peanut/tree-nut/sesame exclusion handling: incomplete
+  free-from coverage blocks a candidate. Direct oats/coconut exclusions also checked.
+- Added matched B0/A0 controls for the top candidate, nutrition provenance, declared
+  comparison basis, per-serving/per-100-g report tables and all grid verdicts.
+- Production formulation remains blocked; the single snack-bar bound is not reused
+  as a validated protein-bar bound. No dataset rows or approvals were modified.
+- Real offline MiniLM/API/report smoke test passed: Spirulina with 5 g protein minimum
+  and 200 kcal maximum returned three candidates; blend retained unknown energy;
+  a 5 g sugar maximum returned insufficient data with no candidates.
+- Development workflow implementation is ready for Flutter integration, not product
+  manufacture. Larger optimization spaces and production eligibility require the
+  missing reviewed constraints/data documented in `FORMULATION_ENGINE.md`.
+- This increment remains local; no commit or push requested/performed.
+- Final verification: **149 tests passed**, real local retrieval/API smoke checks
+  passed, and `git diff --check` passed.
+
+### Earlier nutrition foundation increment (historical)
+
+- Continuing with a bounded, deterministic engineering search over exact ingredient
+  forms, independent mass/inclusion/exclusion/target checks, matched controls and
+  API/report nutrition. Search proportions are explicit experimental assumptions,
+  not inferred from retrieved passages or promoted to scientific safety bounds.
 
 - Started with the dataset-backed nutrition foundation. Existing recipes still use
   mock ingredient IDs; they must not receive nutrition by guessing ingredient forms.

@@ -38,6 +38,12 @@ def test_excluded_matrix_rejects_all_formulas():
     assert run["trace"][4]["state"] == "REJECTED"
 
 
+def test_mock_does_not_silently_ignore_nutrition_targets():
+    run = client.post("/runs", json={"min_protein_g": 5}).json()
+    assert run["status"] == "insufficient_data"
+    assert not run["formulations"]
+
+
 @pytest.mark.parametrize("payload", [{"inclusion_pct": 0}, {"inclusion_pct": 16}, {"serving_g": 0}, {"algae": "unknown"}, {"exclusions": ["unknown"]}])
 def test_invalid_requests(payload):
     assert client.post("/runs", json=payload).status_code == 422

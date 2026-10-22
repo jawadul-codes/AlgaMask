@@ -16,8 +16,11 @@ class RunRequest(BaseModel):
     algae: Algae = Algae.blend
     inclusion_pct: float = Field(default=5, gt=0, le=15)
     serving_g: float = Field(default=45, ge=40, le=50)
-    exclusions: list[Literal["peanut", "tree_nut", "sesame", "oats", "coconut"]] = Field(default_factory=list)
+    exclusions: list[Literal["peanut", "tree_nut", "sesame", "oats", "coconut", "milk", "soy"]] = Field(default_factory=list)
     flavour: Literal["cocoa-spice", "vanilla", "citrus"] = "cocoa-spice"
+    min_protein_g: float | None = Field(default=None, ge=0, le=50)
+    max_energy_kcal: float | None = Field(default=None, gt=0, le=1000)
+    max_sugar_g: float | None = Field(default=None, ge=0, le=50)
 
 
 class AgentInput(BaseModel):

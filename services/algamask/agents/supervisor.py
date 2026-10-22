@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from ..optimizer import build_formula
+from .. import formulation_engine
 from ..schemas import AgentOutput, RunRequest, RunResult, TraceStep
 from . import chemistry, critic, impact_agent, profile, recipe, retrieve
 
@@ -25,9 +26,11 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
         metadata = {key: search.manifest[key] for key in ("dataset_version", "dataset_hash", "index_version", "embedding", "development_only")}
         metadata["searches"] = searches
         mode = "rag_development" if metadata["development_only"] else "rag"
-        limitations = ["Evidence and cited explanations use local retrieval; sensory profile and recipe generation remain demonstration logic.",
-                       "Retrieved passages provide context, not proof that the demonstration formulations work.",
-                       "Nutrition, screening constraints and human sensory outcomes are not implemented in this workflow."]
+        limitations = ["Cited explanations use local retrieval; the sensory profile remains illustrative.",
+                       "Retrieved passages do not establish effective or safe ingredient doses.",
+                       "Recipe search uses an explicit experimental grid, not scientifically validated protein-bar bounds.",
+                       "Composition estimates are not product measurements; missing values remain unknown.",
+                       "Manufacturing, complete allergen coverage and human sensory outcomes remain unverified."]
         if metadata["development_only"]:
             limitations.insert(0, "Development candidate data: record-level review and publication checks remain unresolved.")
         complete = all(item["result"]["hits"] for item in searches)
@@ -62,11 +65,32 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
     else:
         candidates = chemistry.run(request, evidence)
         record("Chemistry", "CANDIDATES_GENERATED", "Selected a placeholder aroma strategy.", candidates)
-    formulas = recipe.run(request, candidates)
     if search is not None:
-        for formula in formulas:
-            for ingredient in formula.ingredients:
-                ingredient.chunk_ids = []  # Mock recipe logic has not established scientific support.
+        formulas, controls, audit = formulation_engine.screen(request, search.snapshot,
+                                                              development=metadata["development_only"])
+        record("Recipe", "RECIPES_SCREENED", "Searched an explicit nine-point experimental grid.",
+               audit, "complete" if formulas else "blocked")
+        verdicts = {f.id: formulation_engine.check_formula(f, request, search.snapshot) for f in formulas}
+        accepted = [f for f in formulas if not verdicts[f.id]]
+        if len(accepted) != len(formulas):
+            raise ValueError("Independent formulation check failed")
+        record("Critic", "SCREENING_PASSED" if accepted else "REJECTED",
+               "Checked mass, species inclusion, exclusions and requested nutrition targets; not scientific approval.",
+               {"verdicts": verdicts, "accepted_ids": [f.id for f in accepted],
+                "grounding_checked": True, "grounding_errors": grounding_errors, "production_eligible": False},
+               "complete" if accepted else "blocked")
+        impact = formulation_engine.impact(accepted, controls, search.snapshot)
+        impact["dataset_hash"] = metadata["dataset_hash"]
+        impact["screening"] = audit
+        record("Impact", "COMPOSITION_ESTIMATED" if accepted else "BLOCKED",
+               "Calculated available nutrients with source records; sensory outcomes are unknown.",
+               impact, "complete" if accepted else "blocked")
+        return RunResult(run_id=str(uuid4()), created_at=datetime.now(timezone.utc).isoformat(), mode=mode,
+                         retrieval=metadata, generation=generation, request=request,
+                         status="report_ready" if accepted else "insufficient_data", trace=trace,
+                         sensory_map=sensory, evidence=evidence, formulations=accepted, controls=controls,
+                         impact=impact, limitations=limitations)
+    formulas = recipe.run(request, candidates)
     record("Recipe", "RECIPES_GENERATED", "Created three mass-balanced demonstration concepts.", {"formulations": [f.model_dump() for f in formulas]})
     verdicts = critic.run(request, formulas)
     approved = [f for f in formulas if not verdicts[f.id]]

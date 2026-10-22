@@ -4,181 +4,238 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'api_client.dart';
-
 class ReportView extends StatelessWidget {
-  const ReportView({super.key, required this.result});
+  const ReportView({super.key, required this.result, required this.reportUri});
   final Map<String, dynamic> result;
-
-  Widget section(String title, List<Widget> children) => Padding(
-    padding: const EdgeInsets.only(top: 20),
-    child: Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
-            ...children,
-          ],
-        ),
+  final Uri reportUri;
+  String number(dynamic value) =>
+      value is num ? value.toStringAsFixed(3) : 'unknown';
+  Widget section(String title, List<Widget> children) => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 12),
+          ...children,
+        ],
       ),
     ),
   );
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
+  Widget details(String title, dynamic data) => ExpansionTile(
+    title: Text(title),
     children: [
-      Text(
-        result['status'] == 'report_ready'
-            ? 'Your concept report'
-            : 'No feasible mock formulation',
-        style: Theme.of(context).textTheme.headlineMedium,
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: SelectableText(const JsonEncoder.withIndent('  ').convert(data)),
       ),
-      if (result['status'] != 'report_ready')
-        const Text(
-          'An exclusion conflicts with the available mock recipe. Change the exclusions or extend the ingredient library. No rejected recipe is returned.',
-        ),
-      const SizedBox(height: 12),
-      Wrap(
-        spacing: 12,
-        runSpacing: 8,
-        children: [
-          OutlinedButton.icon(
-            icon: const Icon(Icons.copy),
-            label: const Text('Copy JSON'),
-            onPressed: () async {
-              await Clipboard.setData(
-                ClipboardData(
-                  text: const JsonEncoder.withIndent('  ').convert(result),
-                ),
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Run JSON copied.')),
-                );
-              }
-            },
-          ),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.print_outlined),
-            label: const Text('Print-ready report'),
-            onPressed: () async {
-              try {
-                final opened = await launchUrl(
-                  Uri.parse('$apiBase/runs/${result['run_id']}/report'),
-                  webOnlyWindowName: '_blank',
-                );
-                if (!opened) {
-                  throw StateError('Could not open report');
-                }
-              } catch (_) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Could not open report. Check the backend and retry.',
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
-          ),
-        ],
-      ),
-      section('Six-agent trace', [
-        for (final step in result['trace'])
-          ExpansionTile(
-            title: Text('${step['agent']} · ${step['state']}'),
-            subtitle: Text(step['summary'] as String),
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: SelectableText(
-                  const JsonEncoder.withIndent('  ').convert(step['output']),
-                ),
-              ),
-            ],
-          ),
-      ]),
-      section('Sensory profile · illustrative risks', [
-        const Text('Molecular structures and evidence links are pending.'),
-        for (final item in result['sensory_map'])
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item['category'] as String),
-                const SizedBox(height: 6),
-                LinearProgressIndicator(
-                  value: (item['relative_risk'] as num).toDouble(),
-                  minHeight: 8,
-                ),
-              ],
-            ),
-          ),
-      ]),
-      section('Controls & generated concepts', [
-        for (final formula in [
-          ...result['controls'],
-          ...result['formulations'],
-        ])
-          ExpansionTile(
-            initiallyExpanded: formula['id'] == 'A1',
-            title: Text('${formula['id']} · ${formula['name']}'),
-            subtitle: Text('${formula['total_g']} g · assumed for demo'),
-            children: [
-              for (final ingredient in formula['ingredients'])
-                ListTile(
-                  title: Text('${ingredient['ingredient_id']}'),
-                  subtitle: Text('${ingredient['role']}'),
-                  trailing: Text('${ingredient['grams']} g'),
-                ),
-              const Padding(
-                padding: EdgeInsets.all(12),
-                child: Text(
-                  'Score / confidence: unavailable. Screening validation pending.',
-                ),
-              ),
-            ],
-          ),
-      ]),
-      section('Evidence placeholders', [
-        for (final item in result['evidence'])
-          ExpansionTile(
-            title: Text(item['title'] as String),
-            subtitle: Text('${item['chunk_id']} · ${item['status']}'),
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                  '${item['text']} Source: ${item['source_id']} (synthetic; no external citation).',
-                ),
-              ),
-            ],
-          ),
-      ]),
-      section('B0 → A0 → A1 impact comparison', [
-        const Text(
-          'Nutrition change: unknown\nSensory change: unknown\nPanel participants: 0',
-        ),
-        const SizedBox(height: 12),
-        Text(result['impact']['explanation'] as String),
-      ]),
-      section('Limitations & next experiment', [
-        for (final item in result['limitations'])
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Text('• $item'),
-          ),
-      ]),
     ],
   );
+
+  Future<void> open(BuildContext context, Uri uri) async {
+    try {
+      if (!['http', 'https'].contains(uri.scheme) ||
+          !await launchUrl(uri, webOnlyWindowName: '_blank')) {
+        throw StateError('Cannot open link');
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not open link. Check the backend or source URL.',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = result['status'];
+    final impact = result['impact'] as Map;
+    final nutrition = impact['nutrition'] as Map? ?? {};
+    final generation = result['generation'] as Map?;
+    final retrieval = result['retrieval'] as Map?;
+    final mode = result['mode'] == 'mock'
+        ? 'MOCK · synthetic fixtures'
+        : result['mode'] == 'rag_development'
+        ? 'LOCAL RAG · development data'
+        : 'LOCAL RAG · released evidence';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          status == 'report_ready'
+              ? 'Your experimental report'
+              : status == 'generation_failed'
+              ? 'Evidence explanation blocked'
+              : 'Insufficient data or unmet constraints',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        Text(mode),
+        const Text(
+          'Not production-approved. Arithmetic checks are not scientific or allergen-safety approval.',
+        ),
+        if (status != 'report_ready')
+          const Text(
+            'No verified candidate was returned. See the screening checks and workflow trace; this does not prove that your goal is impossible.',
+          ),
+        details('Submitted settings', result['request']),
+        Wrap(
+          spacing: 8,
+          children: [
+            OutlinedButton(
+              onPressed: () async {
+                await Clipboard.setData(
+                  ClipboardData(
+                    text: const JsonEncoder.withIndent('  ').convert(result),
+                  ),
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Run JSON copied.')),
+                  );
+                }
+              },
+              child: const Text('Copy JSON'),
+            ),
+            OutlinedButton(
+              onPressed: () => open(context, reportUri),
+              child: const Text('Print-ready report'),
+            ),
+          ],
+        ),
+        if (retrieval != null)
+          section('Dataset provenance', [
+            Text(
+              'Dataset: ${retrieval['dataset_version']} · Index: ${retrieval['index_version']}',
+            ),
+            SelectableText('Dataset hash: ${retrieval['dataset_hash']}'),
+          ]),
+        if (generation != null)
+          section('Cited evidence explanation', [
+            Text('${generation['method']} · ${generation['status']}'),
+            Text('${generation['limitation'] ?? ''}'),
+            for (final claim in generation['claims'] ?? [])
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${claim['text']}'),
+                    Text(
+                      'Citation: ${claim['citation']['chunk_id']} · ${claim['citation']['source_id']}',
+                    ),
+                    details('Citation provenance', claim['citation']),
+                  ],
+                ),
+              ),
+          ]),
+        section('Controls and screened candidates', [
+          for (final formula in [
+            ...result['controls'],
+            ...result['formulations'],
+          ])
+            ExpansionTile(
+              title: Text('${formula['id']} · ${formula['name']}'),
+              subtitle: Text(
+                '${number(formula['total_g'])} g · ${formula['status']}',
+              ),
+              children: [
+                for (final ingredient in formula['ingredients'])
+                  ListTile(
+                    title: Text('${ingredient['ingredient_id']}'),
+                    trailing: Text('${number(ingredient['grams'])} g'),
+                  ),
+                for (final warning in formula['warnings'] ?? [])
+                  Text('$warning'),
+              ],
+            ),
+        ]),
+        section('Estimated nutrition', [
+          Text('${impact['explanation']}'),
+          Text(
+            'Estimated protein-density change (%): ${number(impact['nutrition_change_pct'])}',
+          ),
+          const Text('Sensory change: unknown · Panel participants: 0'),
+          for (final entry in nutrition.entries)
+            ExpansionTile(
+              title: Text('${entry.key} · composition estimate'),
+              children: [
+                for (final nutrient
+                    in (entry.value['per_serving'] as Map).entries)
+                  ListTile(
+                    title: Text(
+                      '${nutrient.key}: ${number(nutrient.value)} per serving',
+                    ),
+                    subtitle: Text(
+                      'Per 100 g: ${number(entry.value['per_100g'][nutrient.key])}\nMissing forms: ${(entry.value['missing'][nutrient.key] as List).join(', ')}',
+                    ),
+                  ),
+                Text(
+                  'Protein g per 100 kcal: ${number(entry.value['protein_g_per_100_kcal'])}',
+                ),
+                for (final warning in entry.value['warnings']) Text('$warning'),
+                details('Nutrition source records', entry.value['records']),
+              ],
+            ),
+        ]),
+        if (impact['screening'] != null)
+          section('Screening checks and assumptions', [
+            Text('${impact['screening']['scope']}'),
+            if (impact['screening']['reason'] != null)
+              Text('${impact['screening']['reason']}'),
+            for (final entry
+                in (impact['screening']['verdicts'] as Map).entries)
+              Text(
+                '${entry.key}: ${(entry.value as List).isEmpty ? 'Passed computational checks' : (entry.value as List).join(' ')}',
+              ),
+            details('Search and control comparison basis', impact['screening']),
+          ]),
+        section('Retrieved evidence', [
+          for (final item in result['evidence'])
+            ExpansionTile(
+              title: Text(
+                '${item['source_title'] ?? item['title'] ?? item['source_id']}',
+              ),
+              subtitle: Text(
+                '${item['chunk_id']} · ${item['review_status'] ?? item['status']}',
+              ),
+              children: [
+                Text('${item['claim_summary'] ?? item['text']}'),
+                Text(
+                  'Source: ${item['source_id']} · Location: ${item['source_location'] ?? 'synthetic'}',
+                ),
+                if (item['source_url'] is String &&
+                    [
+                      'http',
+                      'https',
+                    ].contains(Uri.tryParse(item['source_url'])?.scheme))
+                  TextButton(
+                    onPressed: () =>
+                        open(context, Uri.parse(item['source_url'])),
+                    child: const Text('Open source'),
+                  ),
+              ],
+            ),
+        ]),
+        section('Six-agent trace', [
+          for (final step in result['trace'])
+            details(
+              '${step['agent']} · ${step['state']} · ${step['status']}',
+              step,
+            ),
+        ]),
+        section('Limitations', [
+          for (final item in result['limitations']) Text('• $item'),
+        ]),
+      ],
+    );
+  }
 }

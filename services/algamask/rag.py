@@ -119,6 +119,8 @@ class EvidenceSearch:
             raise ValueError("Invalid normalized index vectors")
         self.documents, self.values, self.manifest, self.provider = docs, values, manifest, provider
         self.reranker = reranker
+        # Retain the exact verified dataset for downstream numerical work.
+        self.snapshot = load_dataset(dataset / "reviewed")
 
     def search(self, request: SearchRequest) -> SearchResult:
         eligible = [i for i, d in enumerate(self.documents)
