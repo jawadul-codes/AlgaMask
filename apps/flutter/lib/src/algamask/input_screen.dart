@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'api_client.dart';
 import 'report_view.dart';
+import 'history_screen.dart';
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key, this.client});
@@ -54,11 +55,13 @@ class _InputScreenState extends State<InputScreen> {
           'max_sugar_g': double.parse(sugar.text.trim()),
       });
       if (mounted) setState(() => result = response);
+    } on ApiFailure catch (failure) {
+      if (mounted) setState(() => error = failure.message);
     } catch (_) {
       if (mounted) {
         setState(
           () => error =
-              'Could not complete the run. Check the backend at ${client.baseUrl} and retry. A timed-out run may still finish on the server.',
+              'Could not complete the run. Check the backend at ${client.baseUrl} and retry with the same inputs to recover the original submission, or open experiment history.',
         );
       }
     } finally {
@@ -98,7 +101,22 @@ class _InputScreenState extends State<InputScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('AlgaMask')),
+    appBar: AppBar(
+      title: const Text('AlgaMask'),
+      actions: [
+        IconButton(
+          tooltip: 'Experiment history',
+          onPressed: loading
+              ? null
+              : () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => HistoryScreen(client: client),
+                  ),
+                ),
+          icon: const Icon(Icons.history),
+        ),
+      ],
+    ),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(

@@ -98,7 +98,9 @@ def test_api_readiness_search_validation_and_failures(client):
     runtime._search = SearchDouble(fail=True)
     before = app.state.run_store.history()
     assert api.post("/runs", json={}).status_code == 503
-    assert app.state.run_store.history() == before
+    after = app.state.run_store.history()
+    assert len(after) == len(before) + 1
+    assert after[0]['state'] == 'failed'
     assert api.post("/rag/search", json={"query": "hexanal"}).status_code == 503
 
 

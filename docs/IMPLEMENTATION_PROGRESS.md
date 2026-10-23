@@ -1,6 +1,6 @@
 # AlgaMask implementation progress
 
-Updated: 2026-10-22
+Updated: 2026-10-23
 
 ## Working agreement
 
@@ -17,7 +17,7 @@ Preserve existing work. Scientific approval must not be inferred from code valid
 5. **Complete for constrained evidence explanations:** grounded generation with citations.
 6. **Implemented for development screening; scientific/production gates remain:** formulation, nutrition, constraints, and reporting.
 7. **Implemented and local-browser verified; native-device verification pending:** connect Flutter to the real run workflow.
-8. **In progress:** durable local runs implemented; broader failure handling and release verification remain.
+8. **Implemented and verified for local development:** history, idempotency, failure recovery, database migration/backup/restore and release checks. Hosted production and scientific gates remain.
 
 ## Step 1 scope
 
@@ -48,13 +48,53 @@ Step 6 now has exact-form experimental grid search, constraints, sourced nutriti
 and reports; see `docs/FORMULATION_ENGINE.md`. Validated production bounds, complete
 allergen/nutrition coverage and manufacturing/sensory evidence remain unresolved.
 Step 7 Flutter now uses `/runs`; the local browser flow is verified. Step 8 has
-SQLite persistence and restart-safe reports. Continue with history UI, idempotent
-submission/job failure handling and release verification; see `RUN_PERSISTENCE.md`.
+SQLite persistence and restart-safe reports. History/filter/reopen/retry UI,
+submission keys, durable attempt states, interruption detection, backup/restore and
+the local release command are implemented; see `RUN_PERSISTENCE.md`.
+Remaining product gates are scientific dataset publication/production formulations
+and a deployment/identity design if the app is to leave single-user loopback use.
 Real retrieval uses ALGAMASK_MODE=development; default mode
 remains mock. Production retrieval still requires a release; no release was created.
 
-## Step 7 work log — in progress
-## Step 8 work log — in progress
+## Step 8 work log
+
+### Reliability completion — 2026-10-23
+
+- Implementing history/reopen/filtering in Flutter, persisted submission keys,
+  execution states with heartbeat-based interruption detection, explicit retry,
+  storage readiness, backup/restore verification and a local release-check command.
+- Execution remains in the local API process; no hosted deployment is configured.
+  Changes will preserve existing SQLite version-1 records through migration.
+- Added SQLite schema 2: submissions, attempt audit records, atomic claim/finish,
+  30-second leases renewed every 5 seconds and stale-worker fencing. Retrying a
+  prior attempt number is idempotent. Storage readiness and filtered history added.
+- Flutter history/filter/reopen/retry implemented. Unresolved submission keys persist
+  through local preferences; same-client concurrent submissions share one request.
+  Added shared_preferences for device-side recovery; server database enforces keys.
+- Added snapshot/restore tooling with exclusive destination creation and integrity /
+  record validation. Restored in-flight attempts become interrupted for explicit retry.
+- Added `tools/check_release.py` for combined backend/Flutter/data/index/workflow/
+  backup checks. Production validation remains fail-closed on missing release gates.
+- Combined verification passed: **161 backend tests, 15 Flutter tests**, clean
+  Flutter analysis/build, real MiniLM retrieval with ready and insufficient-data
+  outcomes, database backup/restore and identical restored reports. Production-mode
+  check returned nonzero: current data is not an approved runtime release.
+- Live browser verified real submission, saved-history reopening, simulated lease
+  interruption recognition, explicit retry to a real report and reopening after
+  browser reload. The earlier interrupted attempt remains in the audit records.
+- Browser testing exposed a stale list status after retry; corrected the local row
+  on report load. Targeted history tests, analysis and web build passed afterward.
+- Added shared_preferences 2.5.6 and its resolved dependencies for local pending-key
+  recovery. No hosted credentials/accounts or external deployment were configured.
+- Screenshot: `var/verification/history-recovery.jpg`; verification-only SQLite file:
+  `var/reliability-verification.sqlite3`. Existing user server/database untouched.
+- README and persistence guide now describe current behavior, migration and recovery,
+  inclusive UTC date filters, retry semantics, data retention and remaining gates.
+- All implementation changes are local; no commit or push was requested for this stage.
+- Stopped temporary verification servers on 8123/8310 after capturing proof. Retained
+  the verification database and screenshot. Final `git diff --check` passed.
+
+### Earlier persistence increment (historical)
 
 - Starting local SQLite persistence with transactional writes, restart-safe reads,
   bounded history and explicit storage errors. No automatic deletion of old runs.

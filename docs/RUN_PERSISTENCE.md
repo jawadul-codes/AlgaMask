@@ -1,48 +1,102 @@
-# Local run persistence
+# Run history, execution recovery and backups
 
-Run results now use SQLite instead of a process-local dictionary. The default file
-is `var/runs.sqlite3` under the repository root; override with `ALGAMASK_RUN_DB`.
-The database directory is ignored by Git. No existing dataset files are changed.
+SQLite defaults to `var/runs.sqlite3`; override with `ALGAMASK_RUN_DB`. Keep the same
+path across restarts. Schema 1 migrates transactionally to schema 2, preserving all
+stored results. The `var/` directory is ignored by Git. Unknown future schemas fail
+closed. No automatic deletion or retention expiry is enabled; records remain until
+an operator deliberately archives/removes them. A user deletion feature is deferred.
 
-`POST /runs` returns a result only after its transaction commits. Ready reports,
-insufficient-data runs and generation-blocked results are stored with the full
-request, trace, evidence, generation metadata, nutrition and dataset/index identity.
-Repeated run IDs are rejected rather than overwritten. There is no automatic
-100-record eviction. All queries use parameters and each operation closes its own
-connection; SQLite serializes concurrent writes with a five-second busy timeout.
+## Submission and execution
 
-- `GET /runs?limit=20&offset=0`: newest-first summaries; limit 1–100, offset >= 0.
-- `GET /runs/{id}`: validated stored run, or 404 when absent.
-- `GET /runs/{id}/report`: HTML rendered from that stored run, without recomputing
-  retrieval or requiring the model to load again.
+`POST /runs` accepts an optional `Idempotency-Key` header (16–128 letters, digits,
+underscores or hyphens). Canonical validated inputs are bound to that key; exclusions
+are sorted and deduplicated. Concurrent callers with the same key share one job.
+Different inputs with an existing key return 409. A missing header creates an
+independent submission for backward compatibility.
 
-Storage errors (including corrupt payloads or unsupported schema versions) return
-503 with `storage_unavailable`; they are logged server-side without putting filesystem
-details in the response. No in-memory fallback claims durable success. Schema version
-1 is checked explicitly. Current HTML rendering is used for old records: this is not
-an immutable archived PDF or a versioned renderer.
+- 200: completed RunResult, saved atomically with its execution state.
+- 202: `{job: ...}` for an existing queued/running execution; no duplicate work.
+- 503: failed/interrupted attempt with a safe error code and job details when stored.
+- 422: invalid inputs/header; no job created.
 
-## Operational boundary
+An execution moves queued → running → completed or failed. A completed execution
+can have a report status of `report_ready`, `insufficient_data` or `generation_failed`;
+these are valid workflow outcomes. Unexpected failures are saved separately as failed
+executions. Each attempt retains timestamps, error code and runtime configuration.
+Result records retain evidence/index/dataset identity. Raw exceptions are server logs,
+not client error messages.
 
-This is a **local, single-user development service**, not a hosted release. Bind to
-loopback. There is no authentication/authorization, encryption layer, background job
-queue, idempotency key, backup scheduler, retention/deletion UI or Flutter history
-browser yet. `/health` remains a liveness check, not proof that storage is writable.
-Exceptions before a RunResult exists return 503 but are not durable failed-job rows.
-A timeout/retry can create separate runs. These are remaining Step 8 tasks, not
-capabilities implied by persistence.
+A heartbeat renews a 30-second lease every 5 seconds. History/job access and new
+claims reconcile expired active jobs as interrupted. Reconciliation is lazy, so an
+idle database does not rewrite itself at the expiry instant. A recovered worker whose
+lease/token is no longer current cannot save a result. Work executes synchronously
+in the API process; there is no separate worker queue. Abrupt shutdown does not
+resume computation automatically. Model calls are bounded by the existing provider
+timeouts; no new cancellation endpoint is provided.
 
-Keep the database path stable across restarts. For a simple consistent backup, stop
-the service before copying the database and keep the copy outside the repository.
-Do not delete the database to resolve errors. Filesystem access to the database
-exposes all stored input/output; protect it like other local project data. Old
-in-memory runs from processes started before this change cannot be recovered by it.
+`POST /jobs/{id}/retry` takes `{"expected_attempt": N}`. Failed/interrupted jobs can
+start one new attempt using saved inputs and the current backend configuration.
+Replaying the same expected attempt never creates another attempt, even if the first
+retry already failed. Completed jobs return their saved result. Earlier attempts
+remain in the audit history. Retries can change runtime configuration; the new
+attempt records that configuration explicitly.
 
-## Verified
+Flutter stores unresolved submission keys in local preferences, scoped to backend
+URL and submitted values. Retrying unchanged inputs after a timeout reuses the key.
+Successful responses clear that pending key so a later deliberate experiment can
+create a new run. Same-client simultaneous calls share one request. Device preferences
+are a convenience, not an authoritative archive: clearing site data, changing browser
+origin/device, or independently submitting in another tab can create a new key.
+History can recover saved work regardless of that local key cache.
 
-Tests cover reopen/read equality, persisted report equality, more than 100 records,
-concurrent writes, duplicate rejection, missing/injection-like IDs, corrupt payloads,
-storage failure responses and history pagination validation. A real Flutter browser
-run using local MiniLM retrieval generated a report; an allergy-blocked report opened
-from Flutter and remained available at the same URL after the verification backend
-was stopped and restarted with the same database.
+## History and readiness
+
+- `GET /runs?limit=20&offset=0`: stable newest-first ordering, maximum page size 100.
+  Optional `status`, `algae`, `since=YYYY-MM-DD`, `until=YYYY-MM-DD`; date endpoints
+  are inclusive UTC days. New inserts can shift offset pages; refresh starts at page 1.
+- `GET /runs/{id}` and `/runs/{id}/report`: completed JSON and HTML, without rerunning
+  models. Legacy schema-1 reports remain accessible and appear as completed history.
+- `GET /jobs/{id}`: current execution plus attempts. Legacy results have no job audit.
+- `GET /storage/ready`: checks schema, SQLite quick integrity and a committed write.
+- `/health`: liveness only. `/rag/ready`: separate model/index readiness.
+
+Flutter's history button opens filtering, pagination, stored reports, execution
+details and explicit retry. Refresh checks running/interrupted jobs. Report HTML
+uses the current renderer; it is not an immutable archived PDF.
+
+## Backup and restore
+
+SQLite's backup API takes a consistent snapshot, including while the server is
+running. Destination files are created exclusively with owner-only permissions;
+existing paths are never overwritten. Integrity and stored records are validated.
+
+```sh
+uv run python tools/run_database.py backup var/runs.sqlite3 var/backups/runs-2026-10-23.sqlite3
+uv run python tools/run_database.py restore var/backups/runs-2026-10-23.sqlite3 var/restored-runs.sqlite3
+```
+
+Choose a fresh destination for every operation. To use a restored copy, stop the
+backend, set `ALGAMASK_RUN_DB` to that copy, and restart. The original database stays
+intact. Any queued/running attempts in the restored copy become interrupted with
+`restored_interrupted` so they can be retried explicitly. Copy backups to a separate
+protected location for protection against disk loss; no backup scheduler is included.
+
+## Local release verification
+
+```sh
+uv run --extra rag --extra dev python tools/check_release.py
+uv run --extra rag --extra dev python tools/check_release.py --mode production
+```
+
+The development command runs backend tests, Flutter analysis/tests/build, immutable
+dataset verification, real offline index/model validation and workflow checks, plus
+backup/restore/report comparisons in temporary databases. It honors configured
+dataset/index/generation settings and needs the corresponding cached model/runtime.
+The production command fails while dataset publication, validated production
+formulations and hosted access controls are unavailable. Passing development checks
+does not grant scientific approval or deploy anything.
+
+This remains a single-user loopback service. CORS allows local HTTP origins and the
+submission-key header; CORS is not authentication. Hosted/multi-user use still needs
+an identity/authorization design, TLS, operational monitoring and deployment-specific
+configuration. The current task does not introduce an external host or accounts.

@@ -28,11 +28,13 @@ protein/calorie/sugar targets are editable. Unknown target inputs block screenin
 sugar data and Chlorella energy are incomplete. Allergy exclusions do not imply
 free-from certification. Nutrition is estimated, not a measurement of the product.
 
-Requests wait up to 120 seconds with controls disabled. Errors allow manual retry;
-there is no automatic duplicate POST. A timed-out server run may still finish.
+Requests wait up to 120 seconds with controls disabled. Unresolved submission keys
+are retained on this device; retrying unchanged inputs can recover the original run.
+A timed-out server run may still finish. Use history to inspect its state.
 Run records and report URLs survive backend restart when the same SQLite file is
-used (`ALGAMASK_RUN_DB`, default `var/runs.sqlite3`). Flutter history browsing is not
-implemented yet; the API exposes paginated run summaries. See `docs/RUN_PERSISTENCE.md`.
+used (`ALGAMASK_RUN_DB`, default `var/runs.sqlite3`). The history icon opens filters
+for state/species/UTC dates, pagination, saved reports and explicit failed-attempt
+retry. See `docs/RUN_PERSISTENCE.md` for backup/restore and retry boundaries.
 This is a local web workflow; physical-device networking and native platform
 permissions are not validated in this increment. No hosted deployment is configured.
 

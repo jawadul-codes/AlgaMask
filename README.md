@@ -1,73 +1,77 @@
 # AlgaMask
 
-A runnable Flutter + FastAPI skeleton for an algae protein-bar formulation assistant. The current release runs entirely with deterministic mock data and requires no API keys.
+AlgaMask is a local Flutter + FastAPI application for experimental algae-bar
+formulation screening. It supports source-grounded evidence explanations, exact-form
+nutrition estimates, constraint checks, matched controls, reports and saved history.
+Current formulations are computational experiments; manufacturing/sensory validation
+and scientific dataset publication remain incomplete.
 
-Choose spirulina, chlorella or a blend, inclusion percentage, serving mass, exclusions and flavour direction. Submit a run to see six agent roles, a sensory-profile placeholder, three mass-balanced concept recipes, B0/A0 controls, evidence placeholders and a printable report. The frozen Day 1 proof and B0/A0/A1 definitions are in [docs/DAY1_SCOPE.md](docs/DAY1_SCOPE.md) and [data/sprint/scope.json](data/sprint/scope.json).
+## Start locally
 
-## Run locally
-
-Requirements: Python 3.11+, [uv](https://docs.astral.sh/uv/) and Flutter stable. Flutter web is the configured target. First setup downloads packages; subsequent mock runs need no external services.
-
-From the repository root, start the backend:
+Requirements: Python 3.11+, uv and Flutter. Install dependencies:
 
 ```sh
-uv sync --extra dev --locked
-uv run uvicorn algamask.api:app --host 127.0.0.1 --port 8000
+uv sync --extra dev --extra rag --locked
 ```
 
-In a second terminal:
+For the real local evidence workflow, configure the cached model/index described in
+[Local retrieval](docs/LOCAL_RETRIEVAL.md), then start:
+
+```sh
+ALGAMASK_MODE=development uv run --extra rag uvicorn algamask.api:app --host 127.0.0.1 --port 8000
+```
+
+Omitting `ALGAMASK_MODE` selects the explicit mock workflow. No hosted API key is
+needed for default extractive explanations. Optional local Ollama generation is
+documented in [Grounded generation](docs/GROUNDED_GENERATION.md).
+
+In another terminal:
 
 ```sh
 cd apps/flutter
 flutter pub get
-flutter run -d chrome --web-port 3000
+flutter run -d chrome --web-port 3000 --dart-define=API_BASE_URL=http://127.0.0.1:8000
 ```
 
-Alternatively use `flutter run -d web-server --web-port 3000` and open http://localhost:3000 yourself. The app calls `http://127.0.0.1:8000` by default. Override with `--dart-define=API_BASE_URL=http://127.0.0.1:8000` when starting or building Flutter. Use HTTP localhost origins for local development; CORS is restricted to localhost and 127.0.0.1.
+Use loopback for this single-user development service. API docs are available at
+http://127.0.0.1:8000/docs. Hosted access controls are not configured.
 
-API documentation: http://127.0.0.1:8000/docs
+## Use the app
 
-## Try it
+Choose algae, serving size, inclusion, flavour, exclusions and optional nutrition
+targets, then run an experiment. Inspect candidates, controls, cited evidence,
+estimated nutrition and screening reasons. The report records the dataset/index
+used. Missing nutrient values stay unknown and block any target needing them.
 
-1. Run the default blend at 5% inclusion and 45 g serving mass.
-2. Inspect Profile → Retrieval → Chemistry → Recipe → Critic → Impact in the returned trace.
-3. Open A1 to inspect ingredients, then expand evidence and impact sections.
-4. Copy the complete run JSON, or open the print-ready report and use Print / Save as PDF.
-5. Exclude oats and run again to see the explicit no-feasible-recipe path.
+Use the history icon to filter/reopen saved results or inspect failed/interrupted
+attempts. An explicit retry preserves earlier attempts. Submission keys protect
+same-input network retries; completed reports survive backend restarts. Copy JSON
+or open the printable HTML report. See [Run persistence](docs/RUN_PERSISTENCE.md)
+for exact retry, retention, migration, backup and restore behavior.
 
-The loading indicator covers the API request. The completed trace is returned together; per-agent streaming is a future integration.
+Evidence retrieval and numeric calculations use the versioned dataset. Sensory
+profiles remain illustrative; the engineering search grid is not a validated recipe
+space. Full allergen coverage, ingredient/process bounds, nutrient gaps and panel
+results remain open. See [Formulation engine](docs/FORMULATION_ENGINE.md).
 
-## What is real, and what is mocked?
+## Verify
 
-The HTTP workflow (including the Day 1 Flutter route), request validation, IDs, timestamps, mass arithmetic, ingredient exclusions, report rendering and JSON export are functional. Three concepts are generated deterministically from request inputs. The mock base recipe contains oats and date paste, plus selected algae and a flavour ingredient. It is not a validated protein-bar recipe.
+```sh
+uv run --extra rag --extra dev python tools/check_release.py
+```
 
-Evidence, sensory risk bars and ingredient proportions are **assumed for demo**. There is no live LLM, molecular calculation or vector index. Nutrition and measured sensory improvements are **unknown**, not invented or zero-filled. Screening bounds, calorie/sugar limits and scientific claim validation have not been implemented. The Critic currently checks ingredient membership, exclusions and positive mass/mass balance only.
-
-The report is a print-ready HTML page with browser PDF printing. Copy JSON preserves the full trace and fixture evidence. Runs are kept in memory (up to 100), and disappear on restart or eviction. The skeleton has no authentication and is intended for local use.
+This checks backend tests, Flutter analysis/tests/build, dataset/index integrity,
+real retrieval workflows and database backup/restore. Add `--mode production` to
+check production gates; the current candidate correctly fails that check.
 
 ## Project map
 
-```text
-apps/flutter/             Flutter web application and widget tests
-services/algamask/        FastAPI, schemas, mock services and report rendering
-  agents/                Six role modules and deterministic supervisor
-data/reviewed/           21-table reviewed schema; extracted rows, none approved
-data/fixtures/           Reproducible request scenarios
-indexes/reviewed_evidence/  Future vector-index integration
-tests/algamask/          API, constraint, report and data-boundary tests
-docs/TASKS.md            Task-based backlog without timeline commitments
-```
+- `apps/flutter/`: local web client and tests.
+- `services/algamask/`: API, six-agent workflow, retrieval, generation, screening and storage.
+- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.1`.
+- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.2`.
+- `tools/`: dataset/index operations, database recovery and release verification.
+- `var/`: ignored local databases and verification artifacts.
+- [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): completed work and remaining gates.
 
-Data rules, the extracted rows, and what is still missing are documented in [data/README.md](data/README.md). The next implementation tasks are in [docs/TASKS.md](docs/TASKS.md). The running app still uses synthetic fixtures and does not load `data/reviewed/`.
-
-## Checks
-
-```sh
-uv run pytest -q
-cd apps/flutter
-flutter analyze
-flutter test
-flutter build web
-```
-
-Both dependency lockfiles are checked in. No credentials are required or stored.
+No deployment or scientific publication is implied by a successful local run.

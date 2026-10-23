@@ -5,15 +5,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+import 'fake_keys.dart';
+
 void main() {
   test(
     'POST /runs with exact payload; report shares configured host',
     () async {
       final client = ApiClient(
+        keys: FakeKeys(),
         baseUrl: 'http://localhost:8123',
         client: MockClient((request) async {
           expect(request.url.path, '/runs');
           expect(request.method, 'POST');
+          expect(request.headers['Idempotency-Key'], isNotEmpty);
           expect(jsonDecode(request.body), {
             'algae': 'blend',
             'max_sugar_g': 5,
@@ -46,6 +50,7 @@ void main() {
   for (final status in [422, 503]) {
     test('HTTP $status is not a successful report', () async {
       final client = ApiClient(
+        keys: FakeKeys(),
         client: MockClient((_) async => http.Response('{}', status)),
       );
       await expectLater(client.run({}), throwsException);
@@ -54,9 +59,53 @@ void main() {
   }
   test('legacy preview response is rejected', () async {
     final client = ApiClient(
+      keys: FakeKeys(),
       client: MockClient((_) async => http.Response('{}', 200)),
     );
     await expectLater(client.run({}), throwsFormatException);
+    client.close();
+  });
+  test(
+    'transport retry across client recreation reuses submission key',
+    () async {
+      final keys = FakeKeys();
+      final headers = <String>[];
+      final transport = MockClient((request) async {
+        headers.add(request.headers['Idempotency-Key']!);
+        throw http.ClientException('offline');
+      });
+      await expectLater(
+        ApiClient(keys: keys, client: transport).run({'algae': 'blend'}),
+        throwsException,
+      );
+      await expectLater(
+        ApiClient(keys: keys, client: transport).run({'algae': 'blend'}),
+        throwsException,
+      );
+      expect(headers[0], headers[1]);
+      expect(keys.issued, 1);
+    },
+  );
+  test('running response preserves key and exposes job', () async {
+    final keys = FakeKeys();
+    final client = ApiClient(
+      keys: keys,
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode({
+            'job': {'job_id': 'j', 'state': 'running'},
+          }),
+          202,
+        ),
+      ),
+    );
+    await expectLater(
+      client.run({}),
+      throwsA(
+        isA<ApiFailure>().having((e) => e.job!['state'], 'state', 'running'),
+      ),
+    );
+    expect(keys.entries, isNotEmpty);
     client.close();
   });
 }
