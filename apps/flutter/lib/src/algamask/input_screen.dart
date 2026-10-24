@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'api_client.dart';
-import 'report_view.dart';
+import 'design.dart';
 import 'history_screen.dart';
+import 'report_view.dart';
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key, this.client});
@@ -20,8 +21,7 @@ class _InputScreenState extends State<InputScreen> {
   String algae = 'spirulina', flavour = 'cocoa-spice';
   double inclusion = 5, serving = 45;
   final exclusions = <String>{};
-  bool loading = false;
-  bool fixedProof = false;
+  bool loading = false, fixedProof = false;
   String? error;
   Map<String, dynamic>? result;
 
@@ -71,8 +71,596 @@ class _InputScreenState extends State<InputScreen> {
     }
   }
 
-  Widget target(
+  void openHistory() => Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => HistoryScreen(client: client)),
+  );
+
+  @override
+  Widget build(BuildContext context) => AlgaShell(
+    selected: 'new',
+    onNew: result == null ? null : () => setState(() => result = null),
+    onHistory: loading ? null : openHistory,
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(28, 32, 28, 64),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1240),
+          child: result == null
+              ? _builder()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () => setState(() => result = null),
+                        icon: const Icon(Icons.arrow_back, size: 18),
+                        label: const Text('New experiment'),
+                      ),
+                    ),
+                    ReportView(
+                      result: result!,
+                      reportUri: client.reportUrl(result!['run_id'] as String),
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _builder() => Form(
+    key: form,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'NEW EXPERIMENT',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+            color: AlgaColors.green,
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Design a better algae bar',
+          style: TextStyle(
+            fontSize: 39,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -1.7,
+            height: 1.08,
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Explore algae sources, formulation options, and nutrition targets before laboratory trials.',
+          style: TextStyle(fontSize: 15, color: AlgaColors.muted),
+        ),
+        const SizedBox(height: 28),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final left = _setupCard(), right = _briefCard();
+            if (constraints.maxWidth < 880) {
+              return Column(
+                children: [left, const SizedBox(height: 18), right],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 7, child: left),
+                const SizedBox(width: 18),
+                Expanded(flex: 4, child: right),
+              ],
+            );
+          },
+        ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 18),
+            child: AlgaNotice(text: error!),
+          ),
+        if (loading)
+          const Padding(
+            padding: EdgeInsets.only(top: 18),
+            child: Column(
+              children: [
+                LinearProgressIndicator(),
+                SizedBox(height: 10),
+                Text(
+                  'Retrieving evidence and screening candidates. The first local run may take longer.',
+                ),
+              ],
+            ),
+          ),
+      ],
+    ),
+  );
+
+  Widget _setupCard() => AlgaCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _step(
+          '01',
+          'Algae source',
+          'Select the primary algae source for this experiment.',
+        ),
+        const SizedBox(height: 18),
+        if (fixedProof)
+          const AlgaNotice(
+            text: 'Fixed proof uses spirulina at 2% inclusion and a 45 g ingredient input.',
+          )
+        else
+          LayoutBuilder(
+            builder: (context, c) => Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _choice(
+                  'spirulina',
+                  'Spirulina',
+                  'Primary source',
+                  Icons.spa_outlined,
+                  algae == 'spirulina',
+                  c.maxWidth,
+                ),
+                _choice(
+                  'chlorella',
+                  'Chlorella',
+                  'Alternative source',
+                  Icons.grass,
+                  algae == 'chlorella',
+                  c.maxWidth,
+                ),
+                _choice(
+                  'blend',
+                  'Blend',
+                  'Combined sources',
+                  Icons.blur_on,
+                  algae == 'blend',
+                  c.maxWidth,
+                ),
+              ],
+            ),
+          ),
+        const SizedBox(height: 27),
+        const Divider(color: AlgaColors.line),
+        const SizedBox(height: 18),
+        _step('02', 'Formula', 'Set the core formulation parameters.'),
+        const SizedBox(height: 20),
+        if (!fixedProof)
+          LayoutBuilder(
+            builder: (context, c) {
+              final a = _rangeControl(
+                'Algae inclusion',
+                '${inclusion.round()}%',
+                inclusion,
+                1,
+                15,
+                14,
+                (v) => setState(() => inclusion = v),
+              );
+              final b = _rangeControl(
+                'Serving size',
+                '${serving.round()} g',
+                serving,
+                40,
+                50,
+                10,
+                (v) => setState(() => serving = v),
+              );
+              return c.maxWidth < 510
+                  ? Column(children: [a, const SizedBox(height: 12), b])
+                  : Row(
+                      children: [
+                        Expanded(child: a),
+                        const SizedBox(width: 25),
+                        Expanded(child: b),
+                      ],
+                    );
+            },
+          )
+        else
+          const Text(
+            'Spirulina 2% · 45 g ingredient input',
+            style: TextStyle(color: AlgaColors.muted),
+          ),
+        const SizedBox(height: 24),
+        const Divider(color: AlgaColors.line),
+        const SizedBox(height: 18),
+        _step(
+          '03',
+          'Flavour direction',
+          'Select the intended flavour direction.',
+        ),
+        const SizedBox(height: 18),
+        if (!fixedProof)
+          LayoutBuilder(
+            builder: (context, c) => Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _choice(
+                  'cocoa-spice',
+                  'Cocoa + spice',
+                  'Warm and familiar',
+                  Icons.coffee_outlined,
+                  flavour == 'cocoa-spice',
+                  c.maxWidth,
+                  isFlavour: true,
+                ),
+                _choice(
+                  'vanilla',
+                  'Vanilla',
+                  'Mild profile',
+                  Icons.local_florist_outlined,
+                  flavour == 'vanilla',
+                  c.maxWidth,
+                  isFlavour: true,
+                ),
+                _choice(
+                  'citrus',
+                  'Citrus',
+                  'Bright notes',
+                  Icons.wb_sunny_outlined,
+                  flavour == 'citrus',
+                  c.maxWidth,
+                  isFlavour: true,
+                ),
+              ],
+            ),
+          )
+        else
+          const Text(
+            'Cocoa + spice',
+            style: TextStyle(color: AlgaColors.muted),
+          ),
+        const SizedBox(height: 26),
+        const Divider(color: AlgaColors.line),
+        SwitchListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          title: const Text(
+            'Fixed B0 / A0 / A1 experiment',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          subtitle: const Text(
+            'spirulina-proof-v1 · engineering assumptions',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: fixedProof,
+          onChanged: loading ? null : (v) => setState(() => fixedProof = v),
+        ),
+        if (fixedProof)
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              '45 g ingredient input, not finished serving. Spirulina 2% in A0/A1; dates 13.50 g and cocoa 0.90 g in every arm. A1 adds 0.45 g cinnamon by replacing oats. Nutrition targets apply to A1; exclusions apply to every arm.',
+              style: TextStyle(
+                fontSize: 12,
+                color: AlgaColors.muted,
+                height: 1.5,
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
+
+  Widget _briefCard() => AlgaCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Live experiment brief',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'This summary updates as you adjust your selections.',
+          style: TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        const SizedBox(height: 17),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AlgaColors.pale,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              _summary(
+                'Algae source',
+                fixedProof ? 'Spirulina' : _title(algae),
+                Icons.spa_outlined,
+              ),
+              _summary(
+                'Algae inclusion',
+                fixedProof ? '2%' : '${inclusion.round()}%',
+                Icons.percent,
+              ),
+              _summary(
+                'Serving size',
+                fixedProof ? '45 g' : '${serving.round()} g',
+                Icons.inventory_2_outlined,
+              ),
+              _summary(
+                'Flavour direction',
+                fixedProof ? 'Cocoa + spice' : _title(flavour),
+                Icons.local_florist_outlined,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 23),
+        const Divider(color: AlgaColors.line),
+        const SizedBox(height: 15),
+        const Text(
+          'Nutrition targets',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 3),
+        const Text(
+          'Optional limits per serving',
+          style: TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        const SizedBox(height: 16),
+        _target('Minimum protein', 'g', protein, 50),
+        _target('Maximum energy', 'kcal', energy, 1000, positive: true),
+        _target('Maximum sugar', 'g', sugar, 50),
+        const Text(
+          'Sugar data is missing. Chlorella and blend energy are incomplete; targets needing those values cannot currently pass.',
+          style: TextStyle(fontSize: 11, color: AlgaColors.muted, height: 1.45),
+        ),
+        const SizedBox(height: 21),
+        const Divider(color: AlgaColors.line),
+        const SizedBox(height: 15),
+        const Text(
+          'Exclusions',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 3),
+        const Text(
+          'Ingredients to exclude from screening',
+          style: TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 6,
+          runSpacing: 4,
+          children: [
+            for (final value in [
+              'peanut',
+              'tree_nut',
+              'sesame',
+              'oats',
+              'coconut',
+              'milk',
+              'soy',
+            ])
+              FilterChip(
+                label: Text(
+                  value.replaceAll('_', ' '),
+                  style: const TextStyle(fontSize: 11),
+                ),
+                selected: exclusions.contains(value),
+                onSelected: loading
+                    ? null
+                    : (v) => setState(
+                        () => v
+                            ? exclusions.add(value)
+                            : exclusions.remove(value),
+                      ),
+                visualDensity: VisualDensity.compact,
+                selectedColor: AlgaColors.pale,
+                checkmarkColor: AlgaColors.green,
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Exclusions may block screening because free-from coverage is incomplete. No result certifies allergen safety.',
+          style: TextStyle(fontSize: 11, color: AlgaColors.muted, height: 1.4),
+        ),
+        const SizedBox(height: 18),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: loading ? null : submit,
+            icon: Icon(
+              loading ? Icons.hourglass_top : Icons.play_arrow_rounded,
+            ),
+            label: Text(loading ? 'Running…' : 'Run screening'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const AlgaNotice(
+          text: 'Computational experiment · not production approved',
+        ),
+      ],
+    ),
+  );
+
+  Widget _step(String number, String title, String subtitle) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        width: 42,
+        height: 42,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: AlgaColors.pale,
+          shape: BoxShape.circle,
+        ),
+        child: Text(
+          number,
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            color: AlgaColors.forest,
+          ),
+        ),
+      ),
+      const SizedBox(width: 13),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.4,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  Widget _choice(
+    String value,
+    String title,
+    String subtitle,
+    IconData icon,
+    bool selected,
+    double available, {
+    bool isFlavour = false,
+  }) {
+    final width = available < 510 ? available : (available - 24) / 3;
+    return InkWell(
+      borderRadius: BorderRadius.circular(9),
+      onTap: loading
+          ? null
+          : () => setState(() => isFlavour ? flavour = value : algae = value),
+      child: Container(
+        width: width,
+        height: 148,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xfff3f8f1) : Colors.white,
+          border: Border.all(
+            color: selected ? AlgaColors.green : AlgaColors.line,
+            width: selected ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  selected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  color: selected ? AlgaColors.forest : AlgaColors.muted,
+                  size: 19,
+                ),
+                const Spacer(),
+                Icon(icon, color: AlgaColors.green, size: 37),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+            ),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _rangeControl(
+    String title,
+    String valueText,
+    double value,
+    double min,
+    double max,
+    int divisions,
+    ValueChanged<double> onChanged,
+  ) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            ),
+          ),
+          Text(
+            valueText,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              color: AlgaColors.forest,
+            ),
+          ),
+        ],
+      ),
+      Slider(
+        value: value,
+        min: min,
+        max: max,
+        divisions: divisions,
+        onChanged: loading ? null : onChanged,
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '$min${title == 'Algae inclusion' ? '%' : ' g'}',
+            style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+          ),
+          Text(
+            '$max${title == 'Algae inclusion' ? '%' : ' g'}',
+            style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+          ),
+        ],
+      ),
+    ],
+  );
+
+  Widget _summary(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 7),
+    child: Row(
+      children: [
+        Icon(icon, size: 18, color: AlgaColors.forest),
+        const SizedBox(width: 11),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+        ),
+      ],
+    ),
+  );
+
+  Widget _target(
     String label,
+    String unit,
     TextEditingController controller,
     double maximum, {
     bool positive = false,
@@ -84,7 +672,8 @@ class _InputScreenState extends State<InputScreen> {
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
         labelText: label,
-        helperText: 'Optional · per serving',
+        suffixText: unit,
+        hintText: 'Optional',
       ),
       validator: (text) {
         if (text == null || text.trim().isEmpty) return null;
@@ -101,181 +690,7 @@ class _InputScreenState extends State<InputScreen> {
     ),
   );
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('AlgaMask'),
-      actions: [
-        IconButton(
-          tooltip: 'Experiment history',
-          onPressed: loading
-              ? null
-              : () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => HistoryScreen(client: client),
-                  ),
-                ),
-          icon: const Icon(Icons.history),
-        ),
-      ],
-    ),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: Form(
-            key: form,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Design an algae-bar experiment',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Experimental screening, not a safety-approved recipe. Results identify the backend mode and data limitations. Missing values remain unknown.',
-                ),
-                const SizedBox(height: 24),
-                SwitchListTile(
-                  title: const Text('Fixed B0 / A0 / A1 experiment'),
-                  subtitle: const Text(
-                    'spirulina-proof-v1 · engineering assumptions, not approved for physical testing',
-                  ),
-                  value: fixedProof,
-                  onChanged: loading
-                      ? null
-                      : (value) => setState(() => fixedProof = value),
-                ),
-                if (fixedProof)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      '45 g ingredient input, not finished serving. Spirulina 2% in A0/A1; dates 13.50 g and cocoa 0.90 g in every arm. A1 adds 0.45 g cinnamon by replacing oats. Nutrition targets apply to A1; exclusions apply to every arm.',
-                    ),
-                  ),
-                if (!fixedProof) ...[
-                  DropdownButtonFormField<String>(
-                    initialValue: algae,
-                    decoration: const InputDecoration(labelText: 'Algae'),
-                    items: [
-                      for (final value in ['spirulina', 'chlorella', 'blend'])
-                        DropdownMenuItem(value: value, child: Text(value)),
-                    ],
-                    onChanged: loading
-                        ? null
-                        : (value) => setState(() => algae = value!),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Algae inclusion · ${inclusion.round()}%'),
-                  Slider(
-                    value: inclusion,
-                    min: 1,
-                    max: 15,
-                    divisions: 14,
-                    label: '${inclusion.round()}%',
-                    onChanged: loading
-                        ? null
-                        : (value) => setState(() => inclusion = value),
-                  ),
-                  Text('Serving · ${serving.round()} g'),
-                  Slider(
-                    value: serving,
-                    min: 40,
-                    max: 50,
-                    divisions: 10,
-                    label: '${serving.round()} g',
-                    onChanged: loading
-                        ? null
-                        : (value) => setState(() => serving = value),
-                  ),
-                  DropdownButtonFormField<String>(
-                    initialValue: flavour,
-                    decoration: const InputDecoration(
-                      labelText: 'Flavour direction',
-                    ),
-                    items: [
-                      for (final value in ['cocoa-spice', 'vanilla', 'citrus'])
-                        DropdownMenuItem(value: value, child: Text(value)),
-                    ],
-                    onChanged: loading
-                        ? null
-                        : (value) => setState(() => flavour = value!),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                target('Minimum protein (g)', protein, 50),
-                target('Maximum energy (kcal)', energy, 1000, positive: true),
-                target('Maximum sugar (g)', sugar, 50),
-                const Text(
-                  'Sugar data is missing. Chlorella/blend energy is incomplete. Targets requiring those values cannot currently pass.',
-                ),
-                const SizedBox(height: 20),
-                const Text('Exclusions'),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final value in [
-                      'peanut',
-                      'tree_nut',
-                      'sesame',
-                      'oats',
-                      'coconut',
-                    ])
-                      FilterChip(
-                        label: Text(value.replaceAll('_', ' ')),
-                        selected: exclusions.contains(value),
-                        onSelected: loading
-                            ? null
-                            : (selected) => setState(() {
-                                selected
-                                    ? exclusions.add(value)
-                                    : exclusions.remove(value);
-                              }),
-                      ),
-                  ],
-                ),
-                const Text(
-                  'Allergy exclusions may block screening because free-from coverage is incomplete. No result certifies allergen safety.',
-                ),
-                const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: loading ? null : submit,
-                  child: Text(loading ? 'Running…' : 'Run experiment'),
-                ),
-                if (loading) ...[
-                  const SizedBox(height: 12),
-                  const LinearProgressIndicator(),
-                  const Text(
-                    'Retrieving evidence and checking candidates. The first local run can take longer.',
-                  ),
-                ],
-                if (error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text(
-                      error!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ),
-                if (result != null) ...[
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Saved result for the submitted settings. Editing inputs does not change this result; run again to apply changes.',
-                  ),
-                  ReportView(
-                    result: result!,
-                    reportUri: client.reportUrl(result!['run_id'] as String),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+  String _title(String value) => value == 'cocoa-spice'
+      ? 'Cocoa + spice'
+      : value[0].toUpperCase() + value.substring(1);
 }

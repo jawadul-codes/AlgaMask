@@ -80,7 +80,7 @@ void main() {
           ),
         ),
       );
-      expect(find.text('LOCAL RAG · development data'), findsOneWidget);
+      expect(find.textContaining('LOCAL RAG · development data'), findsOneWidget);
       expect(find.text('Source-scoped finding'), findsOneWidget);
       final tile = find.text('S25-1 · composition estimate');
       await tester.ensureVisible(tile);

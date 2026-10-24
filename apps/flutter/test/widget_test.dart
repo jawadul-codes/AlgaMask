@@ -47,12 +47,13 @@ void main() {
   ) async {
     final client = SuccessfulClient();
     await tester.pumpWidget(MaterialApp(home: InputScreen(client: client)));
+    await tester.ensureVisible(find.byType(SwitchListTile));
     await tester.tap(find.byType(SwitchListTile));
     await tester.pumpAndSettle();
     expect(find.byType(Slider), findsNothing);
-    expect(find.textContaining('45 g ingredient input'), findsOneWidget);
+    expect(find.textContaining('45 g ingredient input'), findsWidgets);
     await tester.enterText(find.byType(TextFormField).first, '5');
-    final button = find.text('Run experiment');
+    final button = find.text('Run screening');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();
@@ -71,7 +72,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(const AlgaMaskApp());
     expect(find.text('AlgaMask'), findsOneWidget);
-    expect(find.text('Design an algae-bar experiment'), findsOneWidget);
+    expect(find.text('Design a better algae bar'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('failed request releases loading state for retry', (
@@ -80,7 +81,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: InputScreen(client: FailingClient())),
     );
-    final button = find.text('Run experiment');
+    final button = find.text('Run screening');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();
@@ -95,16 +96,16 @@ void main() {
     final client = SuccessfulClient();
     await tester.pumpWidget(MaterialApp(home: InputScreen(client: client)));
     await tester.enterText(find.byType(TextFormField).first, '5');
-    final button = find.text('Run experiment');
+    final button = find.text('Run screening');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();
     expect(client.submitted!['min_protein_g'], 5);
     expect(client.submitted!['serving_g'], 45);
     expect(client.submitted!.containsKey('max_sugar_g'), isFalse);
-    expect(find.text('Your experimental report'), findsOneWidget);
-    expect(find.text('LOCAL RAG · development data'), findsOneWidget);
-    expect(find.text('Real source shape'), findsOneWidget);
+    expect(find.text('Screening report'), findsOneWidget);
+    expect(find.textContaining('LOCAL RAG · development data'), findsOneWidget);
+    expect(find.textContaining('Real source shape'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -112,7 +113,7 @@ void main() {
     final client = SuccessfulClient();
     await tester.pumpWidget(MaterialApp(home: InputScreen(client: client)));
     await tester.enterText(find.byType(TextFormField).first, 'NaN');
-    final button = find.text('Run experiment');
+    final button = find.text('Run screening');
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pumpAndSettle();

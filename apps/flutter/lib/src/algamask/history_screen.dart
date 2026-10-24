@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'api_client.dart';
+import 'design.dart';
 import 'report_view.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -110,154 +111,199 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Experiment history')),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+  Widget build(BuildContext context) => AlgaShell(
+    selected: 'history',
+    onNew: () => Navigator.of(context).pop(),
+    onHistory: selected == null ? null : () => setState(() => selected = null),
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(28, 32, 28, 64),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
+          constraints: const BoxConstraints(maxWidth: 1240),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  DropdownButton<String>(
-                    value: status ?? 'all',
-                    items: [
-                      for (final s in [
-                        'all',
-                        'queued',
-                        'running',
-                        'failed',
-                        'interrupted',
-                        'report_ready',
-                        'insufficient_data',
-                        'generation_failed',
-                      ])
-                        DropdownMenuItem(
-                          value: s,
-                          child: Text(
-                            s == 'all'
-                                ? 'All statuses'
-                                : s.replaceAll('_', ' '),
-                          ),
-                        ),
-                    ],
-                    onChanged: loading
-                        ? null
-                        : (s) {
-                            setState(() => status = s == 'all' ? null : s);
-                            refresh();
-                          },
+              if (selected != null) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: () => setState(() => selected = null),
+                    icon: const Icon(Icons.arrow_back, size: 18),
+                    label: const Text('Experiment history'),
                   ),
-                  DropdownButton<String>(
-                    value: algae ?? 'all',
-                    items: [
-                      for (final s in [
-                        'all',
-                        'spirulina',
-                        'chlorella',
-                        'blend',
-                      ])
-                        DropdownMenuItem(
-                          value: s,
-                          child: Text(s == 'all' ? 'All algae' : s),
-                        ),
-                    ],
-                    onChanged: loading
-                        ? null
-                        : (s) {
-                            setState(() => algae = s == 'all' ? null : s);
-                            refresh();
-                          },
+                ),
+                ReportView(
+                  result: selected!,
+                  reportUri: widget.client.reportUrl(
+                    selected!['run_id'] as String,
                   ),
-                  OutlinedButton(
-                    onPressed: loading
-                        ? null
-                        : () async {
-                            final range = await showDateRangePicker(
-                              context: context,
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 1),
+                ),
+              ] else ...[
+                const Text(
+                  'EXPERIMENTS',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2,
+                    color: AlgaColors.green,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Experiment history',
+                  style: TextStyle(
+                    fontSize: 39,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1.7,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  'Reopen a report or inspect a saved attempt.',
+                  style: TextStyle(fontSize: 14, color: AlgaColors.muted),
+                ),
+                const SizedBox(height: 24),
+                AlgaCard(
+                  child: Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      DropdownButton<String>(
+                        value: status ?? 'all',
+                        items: [
+                          for (final s in [
+                            'all',
+                            'queued',
+                            'running',
+                            'failed',
+                            'interrupted',
+                            'report_ready',
+                            'insufficient_data',
+                            'generation_failed',
+                          ])
+                            DropdownMenuItem(
+                              value: s,
+                              child: Text(
+                                s == 'all'
+                                    ? 'All statuses'
+                                    : s.replaceAll('_', ' '),
                               ),
-                              initialDateRange: dates,
-                            );
-                            if (range != null && mounted) {
-                              setState(() => dates = range);
-                              refresh();
-                            }
-                          },
+                            ),
+                        ],
+                        onChanged: loading
+                            ? null
+                            : (s) {
+                                setState(() => status = s == 'all' ? null : s);
+                                refresh();
+                              },
+                      ),
+                      DropdownButton<String>(
+                        value: algae ?? 'all',
+                        items: [
+                          for (final s in [
+                            'all',
+                            'spirulina',
+                            'chlorella',
+                            'blend',
+                          ])
+                            DropdownMenuItem(
+                              value: s,
+                              child: Text(s == 'all' ? 'All algae' : s),
+                            ),
+                        ],
+                        onChanged: loading
+                            ? null
+                            : (s) {
+                                setState(() => algae = s == 'all' ? null : s);
+                                refresh();
+                              },
+                      ),
+                      OutlinedButton(
+                        onPressed: loading
+                            ? null
+                            : () async {
+                                final range = await showDateRangePicker(
+                                  context: context,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 1),
+                                  ),
+                                  initialDateRange: dates,
+                                );
+                                if (range != null && mounted) {
+                                  setState(() => dates = range);
+                                  refresh();
+                                }
+                              },
+                        child: Text(
+                          dates == null
+                              ? 'Filter dates (UTC)'
+                              : '${dates!.start.toIso8601String().split('T').first} – ${dates!.end.toIso8601String().split('T').first} UTC',
+                        ),
+                      ),
+                      if (dates != null)
+                        TextButton(
+                          onPressed: loading
+                              ? null
+                              : () {
+                                  setState(() => dates = null);
+                                  refresh();
+                                },
+                          child: const Text('Clear dates'),
+                        ),
+                      OutlinedButton(
+                        onPressed: loading ? null : () => refresh(),
+                        child: const Text('Refresh history'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (loading) const LinearProgressIndicator(),
+                if (error != null)
+                  Padding(
+                    padding: const EdgeInsets.all(12),
                     child: Text(
-                      dates == null
-                          ? 'Filter dates (UTC)'
-                          : '${dates!.start.toIso8601String().split('T').first} – ${dates!.end.toIso8601String().split('T').first} UTC',
+                      error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ),
-                  if (dates != null)
+                if (!loading && error == null && rows.isEmpty)
+                  const Text('No experiments match these filters.'),
+                for (final row in rows)
+                  AlgaCard(
+                    padding: EdgeInsets.zero,
+                    child: ListTile(
+                      title: Text(
+                        '${row['algae']} · ${row['status'].toString().replaceAll('_', ' ')}',
+                      ),
+                      subtitle: Text('${row['created_at']}\n${row['run_id']}'),
+                      onTap: loading ? null : () => open(row),
+                      trailing: const Icon(Icons.chevron_right),
+                    ),
+                  ),
+                Wrap(
+                  spacing: 12,
+                  children: [
                     TextButton(
-                      onPressed: loading
+                      onPressed: loading || offset == 0
                           ? null
-                          : () {
-                              setState(() => dates = null);
-                              refresh();
-                            },
-                      child: const Text('Clear dates'),
+                          : () => refresh(page: offset - 20),
+                      child: const Text('Previous'),
                     ),
-                  OutlinedButton(
-                    onPressed: loading ? null : () => refresh(),
-                    child: const Text('Refresh history'),
-                  ),
-                ],
-              ),
-              if (loading) const LinearProgressIndicator(),
-              if (error != null)
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    error!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+                    Text('Page ${offset ~/ 20 + 1}'),
+                    TextButton(
+                      onPressed: loading || rows.length < 20
+                          ? null
+                          : () => refresh(page: offset + 20),
+                      child: const Text('Next'),
                     ),
-                  ),
+                  ],
                 ),
-              if (!loading && error == null && rows.isEmpty)
-                const Text('No experiments match these filters.'),
-              for (final row in rows)
-                Card(
-                  child: ListTile(
-                    title: Text(
-                      '${row['algae']} · ${row['status'].toString().replaceAll('_', ' ')}',
-                    ),
-                    subtitle: Text('${row['created_at']}\n${row['run_id']}'),
-                    onTap: loading ? null : () => open(row),
-                    trailing: const Icon(Icons.chevron_right),
-                  ),
-                ),
-              Wrap(
-                spacing: 12,
-                children: [
-                  TextButton(
-                    onPressed: loading || offset == 0
-                        ? null
-                        : () => refresh(page: offset - 20),
-                    child: const Text('Previous'),
-                  ),
-                  Text('Page ${offset ~/ 20 + 1}'),
-                  TextButton(
-                    onPressed: loading || rows.length < 20
-                        ? null
-                        : () => refresh(page: offset + 20),
-                    child: const Text('Next'),
-                  ),
-                ],
-              ),
-              if (execution != null)
-                Card(
-                  child: Padding(
+                if (execution != null)
+                  AlgaCard(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -294,14 +340,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ],
                     ),
                   ),
-                ),
-              if (selected != null)
-                ReportView(
-                  result: selected!,
-                  reportUri: widget.client.reportUrl(
-                    selected!['run_id'] as String,
-                  ),
-                ),
+              ],
             ],
           ),
         ),
