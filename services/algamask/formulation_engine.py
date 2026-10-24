@@ -1,6 +1,7 @@
 """Finite engineering screening search, not a scientifically validated recipe solver."""
 from .nutrition import estimate_nutrition
 from .schemas import Formulation, IngredientAmount
+from .experiments import PROOF_VERSION, proof_amounts
 
 SEARCH_VERSION = "exact-form-grid-v1"
 WARNING = "Experimental proportions; no validated protein-bar bounds, process or sensory performance. Not production eligible."
@@ -51,7 +52,14 @@ def check_formula(formula, request, snapshot, *, baseline=False, check_targets=T
         return ["Unknown ingredient forms."]
     if abs(sum(amounts.values()) - request.serving_g) > 1e-6:
         errors.append("Serving mass constraint failed.")
-    if check_grid:
+    if request.experiment == PROOF_VERSION:
+        expected_amounts = proof_amounts(formula.id)
+        if expected_amounts is None or set(amounts) != set(expected_amounts) or any(
+            abs(amounts[key] - value) > 1e-6 for key, value in (expected_amounts or {}).items()
+            if key in amounts
+        ):
+            errors.append("Fixed experiment quantities or ingredient forms do not match spirulina-proof-v1.")
+    elif check_grid:
         allowed = {"IF-OAT-DRY", "IF-DATE-DRIED", *ALGAE.values(), *FLAVOURS[request.flavour]}
         if set(amounts) - allowed:
             errors.append("Ingredient outside declared engineering grid.")
@@ -95,6 +103,8 @@ def check_formula(formula, request, snapshot, *, baseline=False, check_targets=T
 
 
 def screen(request, snapshot, *, development):
+    if request.experiment == PROOF_VERSION:
+        return screen_proof(request, snapshot, development=development)
     audit = {"search_version": SEARCH_VERSION, "production_eligible": False,
              "assumptions": {"date_pct": [25, 30, 35], "flavour_pct": [1, 2, 3],
                              "blend_split": "50:50", "remainder": "IF-OAT-DRY"},
@@ -127,6 +137,29 @@ def screen(request, snapshot, *, development):
     audit["controls_basis"] = "Only matched to top candidate; flavour then algae replaced by oats. Nutrition targets apply to candidates, not controls."
     audit["status"] = "screening_candidates" if selected else "no_verified_candidate_in_grid"
     return selected, controls, audit
+
+
+def screen_proof(request, snapshot, *, development):
+    audit = {"search_version": PROOF_VERSION, "production_eligible": False,
+             "scope": "Fixed engineering comparison; 45 g ingredient input, not verified finished serving. Not approved for physical testing.",
+             "controls_basis": "B0/A0/A1 keep dates and cocoa fixed. A0 substitutes spirulina for oats; A1 substitutes cinnamon for oats. Not a pure cinnamon mechanism test.",
+             "assumptions": {"scope_document": "FIRST_RELEASE_SCOPE.md v1.0", "input_mass_g": 45,
+                             "finished_mass_g": None, "scientific_approval": "pending"},
+             "verdicts": {}, "selected_ids": [], "control_parent_id": None}
+    if not development:
+        audit["reason"] = "Fixed experiment is development-only; scientific approval and physical validation are pending."
+        return [], [], audit
+    arms = [make_formula(code, proof_amounts(code), 45) for code in ("B0", "A0", "A1")]
+    for arm in arms:
+        arm.warnings = [WARNING, audit["scope"], audit["controls_basis"],
+                        "Use dried dates, not date paste. Supplier lots and preparation feasibility are unverified."]
+        audit["verdicts"][arm.id] = check_formula(
+            arm, request, snapshot, baseline=arm.id == "B0", check_targets=arm.id == "A1")
+    if any(audit["verdicts"].values()):
+        audit["status"] = "fixed_experiment_blocked"
+        return [], [], audit
+    audit.update(status="fixed_experiment_candidate", selected_ids=["A1"], control_parent_id="A1")
+    return [arms[2]], arms[:2], audit
 
 
 def impact(formulas, controls, snapshot):

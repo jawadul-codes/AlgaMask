@@ -1,7 +1,11 @@
 # Local evidence retrieval — Step 3
 
-Implemented and tested on 2026-10-22. Active development index:
-`indexes/reviewed_evidence/0.1.0-dev.2`.
+Implemented on 2026-10-22; updated 2026-10-24. Active development index:
+`indexes/reviewed_evidence/0.1.0-dev.3`, paired with candidate rc.4.
+
+Update 2026-10-24: corrected rc.4/dev.3 is activated and verified through Flutter.
+See [activation results](DEVELOPMENT_ACTIVATION.md). The historical implementation
+and evaluation descriptions below refer to the preserved rc.1/dev.2 pair.
 
 ## What works
 
@@ -30,7 +34,7 @@ uv sync --locked --extra dev --extra rag
 # Initial download only; choose a NEW version if the output already exists.
 uv run --extra rag python tools/rag.py build \
   --dataset data/candidates/0.1.0-rc.1 --development \
-  --version 0.1.0-dev.3 --download-model
+  --version 0.1.0-dev.4 --download-model
 
 # Existing dev.2 works offline after the initial model download.
 uv run --extra rag python tools/rag.py search \

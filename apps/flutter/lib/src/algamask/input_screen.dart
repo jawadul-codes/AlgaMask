@@ -21,6 +21,7 @@ class _InputScreenState extends State<InputScreen> {
   double inclusion = 5, serving = 45;
   final exclusions = <String>{};
   bool loading = false;
+  bool fixedProof = false;
   String? error;
   Map<String, dynamic>? result;
 
@@ -42,10 +43,11 @@ class _InputScreenState extends State<InputScreen> {
     });
     try {
       final response = await client.run({
-        'algae': algae,
-        'inclusion_pct': inclusion,
-        'serving_g': serving,
-        'flavour': flavour,
+        if (fixedProof) 'experiment': 'spirulina-proof-v1',
+        'algae': fixedProof ? 'spirulina' : algae,
+        'inclusion_pct': fixedProof ? 2.0 : inclusion,
+        'serving_g': fixedProof ? 45.0 : serving,
+        'flavour': fixedProof ? 'cocoa-spice' : flavour,
         'exclusions': exclusions.toList(),
         if (protein.text.trim().isNotEmpty)
           'min_protein_g': double.parse(protein.text.trim()),
@@ -136,54 +138,73 @@ class _InputScreenState extends State<InputScreen> {
                   'Experimental screening, not a safety-approved recipe. Results identify the backend mode and data limitations. Missing values remain unknown.',
                 ),
                 const SizedBox(height: 24),
-                DropdownButtonFormField<String>(
-                  initialValue: algae,
-                  decoration: const InputDecoration(labelText: 'Algae'),
-                  items: [
-                    for (final value in ['spirulina', 'chlorella', 'blend'])
-                      DropdownMenuItem(value: value, child: Text(value)),
-                  ],
-                  onChanged: loading
-                      ? null
-                      : (value) => setState(() => algae = value!),
-                ),
-                const SizedBox(height: 16),
-                Text('Algae inclusion · ${inclusion.round()}%'),
-                Slider(
-                  value: inclusion,
-                  min: 1,
-                  max: 15,
-                  divisions: 14,
-                  label: '${inclusion.round()}%',
-                  onChanged: loading
-                      ? null
-                      : (value) => setState(() => inclusion = value),
-                ),
-                Text('Serving · ${serving.round()} g'),
-                Slider(
-                  value: serving,
-                  min: 40,
-                  max: 50,
-                  divisions: 10,
-                  label: '${serving.round()} g',
-                  onChanged: loading
-                      ? null
-                      : (value) => setState(() => serving = value),
-                ),
-                DropdownButtonFormField<String>(
-                  initialValue: flavour,
-                  decoration: const InputDecoration(
-                    labelText: 'Flavour direction',
+                SwitchListTile(
+                  title: const Text('Fixed B0 / A0 / A1 experiment'),
+                  subtitle: const Text(
+                    'spirulina-proof-v1 · engineering assumptions, not approved for physical testing',
                   ),
-                  items: [
-                    for (final value in ['cocoa-spice', 'vanilla', 'citrus'])
-                      DropdownMenuItem(value: value, child: Text(value)),
-                  ],
+                  value: fixedProof,
                   onChanged: loading
                       ? null
-                      : (value) => setState(() => flavour = value!),
+                      : (value) => setState(() => fixedProof = value),
                 ),
-                const SizedBox(height: 20),
+                if (fixedProof)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      '45 g ingredient input, not finished serving. Spirulina 2% in A0/A1; dates 13.50 g and cocoa 0.90 g in every arm. A1 adds 0.45 g cinnamon by replacing oats. Nutrition targets apply to A1; exclusions apply to every arm.',
+                    ),
+                  ),
+                if (!fixedProof) ...[
+                  DropdownButtonFormField<String>(
+                    initialValue: algae,
+                    decoration: const InputDecoration(labelText: 'Algae'),
+                    items: [
+                      for (final value in ['spirulina', 'chlorella', 'blend'])
+                        DropdownMenuItem(value: value, child: Text(value)),
+                    ],
+                    onChanged: loading
+                        ? null
+                        : (value) => setState(() => algae = value!),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Algae inclusion · ${inclusion.round()}%'),
+                  Slider(
+                    value: inclusion,
+                    min: 1,
+                    max: 15,
+                    divisions: 14,
+                    label: '${inclusion.round()}%',
+                    onChanged: loading
+                        ? null
+                        : (value) => setState(() => inclusion = value),
+                  ),
+                  Text('Serving · ${serving.round()} g'),
+                  Slider(
+                    value: serving,
+                    min: 40,
+                    max: 50,
+                    divisions: 10,
+                    label: '${serving.round()} g',
+                    onChanged: loading
+                        ? null
+                        : (value) => setState(() => serving = value),
+                  ),
+                  DropdownButtonFormField<String>(
+                    initialValue: flavour,
+                    decoration: const InputDecoration(
+                      labelText: 'Flavour direction',
+                    ),
+                    items: [
+                      for (final value in ['cocoa-spice', 'vanilla', 'citrus'])
+                        DropdownMenuItem(value: value, child: Text(value)),
+                    ],
+                    onChanged: loading
+                        ? null
+                        : (value) => setState(() => flavour = value!),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 target('Minimum protein (g)', protein, 50),
                 target('Maximum energy (kcal)', energy, 1000, positive: true),
                 target('Maximum sugar (g)', sugar, 50),

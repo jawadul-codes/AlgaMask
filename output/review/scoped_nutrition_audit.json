@@ -1,0 +1,1138 @@
+{
+  "source_url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip",
+  "archive_sha256": "b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0",
+  "dataset_file_sha256": "bd132b3f502260e5d64c0eb7cd9994225367bf6424e57d962e0649adb1bda544",
+  "script_sha256": "a1e7b6f6914e3e61fd9a5cbf80673505c8b6daa96e5deb22660957dbfd1d0945",
+  "results": [
+    {
+      "ingredient_form_id": "IF-SPI-PWD",
+      "nutrition_id": "NUT-SPI-PWD",
+      "food": {
+        "fdc_id": "170495",
+        "data_type": "sr_legacy_food",
+        "description": "Seaweed, spirulina, dried",
+        "food_category_id": "11",
+        "publication_date": "2019-04-01"
+      },
+      "metadata_match": true,
+      "checks": [
+        {
+          "field": "protein_g",
+          "nutrient_id": "1003",
+          "local_value": "57.47",
+          "source_value": "57.47",
+          "nutrient": {
+            "id": "1003",
+            "name": "Protein",
+            "unit_name": "G",
+            "nutrient_nbr": "203",
+            "rank": "600.0"
+          },
+          "source_record": {
+            "id": "1528316",
+            "fdc_id": "170495",
+            "nutrient_id": "1003",
+            "amount": "57.47",
+            "data_points": "2",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "energy_kcal",
+          "nutrient_id": "1008",
+          "local_value": "290",
+          "source_value": "290",
+          "nutrient": {
+            "id": "1008",
+            "name": "Energy",
+            "unit_name": "KCAL",
+            "nutrient_nbr": "208",
+            "rank": "300.0"
+          },
+          "source_record": {
+            "id": "1528285",
+            "fdc_id": "170495",
+            "nutrient_id": "1008",
+            "amount": "290",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "carbohydrate_g",
+          "nutrient_id": "1005",
+          "local_value": "23.9",
+          "source_value": "23.9",
+          "nutrient": {
+            "id": "1005",
+            "name": "Carbohydrate, by difference",
+            "unit_name": "G",
+            "nutrient_nbr": "205",
+            "rank": "1110.0"
+          },
+          "source_record": {
+            "id": "1528281",
+            "fdc_id": "170495",
+            "nutrient_id": "1005",
+            "amount": "23.9",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fat_g",
+          "nutrient_id": "1004",
+          "local_value": "7.72",
+          "source_value": "7.72",
+          "nutrient": {
+            "id": "1004",
+            "name": "Total lipid (fat)",
+            "unit_name": "G",
+            "nutrient_nbr": "204",
+            "rank": "800.0"
+          },
+          "source_record": {
+            "id": "1528292",
+            "fdc_id": "170495",
+            "nutrient_id": "1004",
+            "amount": "7.72",
+            "data_points": "2",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "fibre_g",
+          "nutrient_id": "1079",
+          "local_value": "3.6",
+          "source_value": "3.6",
+          "nutrient": {
+            "id": "1079",
+            "name": "Fiber, total dietary",
+            "unit_name": "G",
+            "nutrient_nbr": "291",
+            "rank": "1200.0"
+          },
+          "source_record": {
+            "id": "1528318",
+            "fdc_id": "170495",
+            "nutrient_id": "1079",
+            "amount": "3.6",
+            "data_points": "0",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "iron_mg",
+          "nutrient_id": "1089",
+          "local_value": "28.5",
+          "source_value": "28.5",
+          "nutrient": {
+            "id": "1089",
+            "name": "Iron, Fe",
+            "unit_name": "MG",
+            "nutrient_nbr": "303",
+            "rank": "5400.0"
+          },
+          "source_record": {
+            "id": "1528319",
+            "fdc_id": "170495",
+            "nutrient_id": "1089",
+            "amount": "28.5",
+            "data_points": "2",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "omega3_g",
+          "nutrient_id": "1404",
+          "local_value": "",
+          "source_value": "",
+          "nutrient": {
+            "id": "1404",
+            "name": "PUFA 18:3 n-3 c,c,c (ALA)",
+            "unit_name": "G",
+            "nutrient_nbr": "851",
+            "rank": "14000.0"
+          },
+          "source_record": {},
+          "derivation": {},
+          "status": "missing_preserved"
+        }
+      ]
+    },
+    {
+      "ingredient_form_id": "IF-OAT-DRY",
+      "nutrition_id": "NUT-OAT-DRY",
+      "food": {
+        "fdc_id": "173904",
+        "data_type": "sr_legacy_food",
+        "description": "Cereals, oats, regular and quick, not fortified, dry",
+        "food_category_id": "8",
+        "publication_date": "2019-04-01"
+      },
+      "metadata_match": true,
+      "checks": [
+        {
+          "field": "protein_g",
+          "nutrient_id": "1003",
+          "local_value": "13.15",
+          "source_value": "13.15",
+          "nutrient": {
+            "id": "1003",
+            "name": "Protein",
+            "unit_name": "G",
+            "nutrient_nbr": "203",
+            "rank": "600.0"
+          },
+          "source_record": {
+            "id": "1815039",
+            "fdc_id": "173904",
+            "nutrient_id": "1003",
+            "amount": "13.15",
+            "data_points": "4",
+            "derivation_id": "1",
+            "min": "13",
+            "max": "13.24",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "energy_kcal",
+          "nutrient_id": "1008",
+          "local_value": "379",
+          "source_value": "379",
+          "nutrient": {
+            "id": "1008",
+            "name": "Energy",
+            "unit_name": "KCAL",
+            "nutrient_nbr": "208",
+            "rank": "300.0"
+          },
+          "source_record": {
+            "id": "1815029",
+            "fdc_id": "173904",
+            "nutrient_id": "1008",
+            "amount": "379",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "carbohydrate_g",
+          "nutrient_id": "1005",
+          "local_value": "67.7",
+          "source_value": "67.7",
+          "nutrient": {
+            "id": "1005",
+            "name": "Carbohydrate, by difference",
+            "unit_name": "G",
+            "nutrient_nbr": "205",
+            "rank": "1110.0"
+          },
+          "source_record": {
+            "id": "1815028",
+            "fdc_id": "173904",
+            "nutrient_id": "1005",
+            "amount": "67.7",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fat_g",
+          "nutrient_id": "1004",
+          "local_value": "6.52",
+          "source_value": "6.52",
+          "nutrient": {
+            "id": "1004",
+            "name": "Total lipid (fat)",
+            "unit_name": "G",
+            "nutrient_nbr": "204",
+            "rank": "800.0"
+          },
+          "source_record": {
+            "id": "1815027",
+            "fdc_id": "173904",
+            "nutrient_id": "1004",
+            "amount": "6.52",
+            "data_points": "4",
+            "derivation_id": "1",
+            "min": "6.2",
+            "max": "6.92",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fibre_g",
+          "nutrient_id": "1079",
+          "local_value": "10.1",
+          "source_value": "10.1",
+          "nutrient": {
+            "id": "1079",
+            "name": "Fiber, total dietary",
+            "unit_name": "G",
+            "nutrient_nbr": "291",
+            "rank": "1200.0"
+          },
+          "source_record": {
+            "id": "1814987",
+            "fdc_id": "173904",
+            "nutrient_id": "1079",
+            "amount": "10.1",
+            "data_points": "4",
+            "derivation_id": "1",
+            "min": "8.8",
+            "max": "11",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "iron_mg",
+          "nutrient_id": "1089",
+          "local_value": "4.25",
+          "source_value": "4.25",
+          "nutrient": {
+            "id": "1089",
+            "name": "Iron, Fe",
+            "unit_name": "MG",
+            "nutrient_nbr": "303",
+            "rank": "5400.0"
+          },
+          "source_record": {
+            "id": "1814988",
+            "fdc_id": "173904",
+            "nutrient_id": "1089",
+            "amount": "4.25",
+            "data_points": "4",
+            "derivation_id": "1",
+            "min": "4.1",
+            "max": "4.4",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "omega3_g",
+          "nutrient_id": "1404",
+          "local_value": "",
+          "source_value": "",
+          "nutrient": {
+            "id": "1404",
+            "name": "PUFA 18:3 n-3 c,c,c (ALA)",
+            "unit_name": "G",
+            "nutrient_nbr": "851",
+            "rank": "14000.0"
+          },
+          "source_record": {},
+          "derivation": {},
+          "status": "missing_preserved"
+        }
+      ]
+    },
+    {
+      "ingredient_form_id": "IF-DATE-DRIED",
+      "nutrition_id": "NUT-DATE-DRIED",
+      "food": {
+        "fdc_id": "171726",
+        "data_type": "sr_legacy_food",
+        "description": "Dates, deglet noor",
+        "food_category_id": "9",
+        "publication_date": "2019-04-01"
+      },
+      "metadata_match": true,
+      "checks": [
+        {
+          "field": "protein_g",
+          "nutrient_id": "1003",
+          "local_value": "2.45",
+          "source_value": "2.45",
+          "nutrient": {
+            "id": "1003",
+            "name": "Protein",
+            "unit_name": "G",
+            "nutrient_nbr": "203",
+            "rank": "600.0"
+          },
+          "source_record": {
+            "id": "1634437",
+            "fdc_id": "171726",
+            "nutrient_id": "1003",
+            "amount": "2.45",
+            "data_points": "13",
+            "derivation_id": "1",
+            "min": "2.1",
+            "max": "2.82",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "energy_kcal",
+          "nutrient_id": "1008",
+          "local_value": "282",
+          "source_value": "282",
+          "nutrient": {
+            "id": "1008",
+            "name": "Energy",
+            "unit_name": "KCAL",
+            "nutrient_nbr": "208",
+            "rank": "300.0"
+          },
+          "source_record": {
+            "id": "1634379",
+            "fdc_id": "171726",
+            "nutrient_id": "1008",
+            "amount": "282",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "carbohydrate_g",
+          "nutrient_id": "1005",
+          "local_value": "75.03",
+          "source_value": "75.03",
+          "nutrient": {
+            "id": "1005",
+            "name": "Carbohydrate, by difference",
+            "unit_name": "G",
+            "nutrient_nbr": "205",
+            "rank": "1110.0"
+          },
+          "source_record": {
+            "id": "1634378",
+            "fdc_id": "171726",
+            "nutrient_id": "1005",
+            "amount": "75.03",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fat_g",
+          "nutrient_id": "1004",
+          "local_value": "0.39",
+          "source_value": "0.39",
+          "nutrient": {
+            "id": "1004",
+            "name": "Total lipid (fat)",
+            "unit_name": "G",
+            "nutrient_nbr": "204",
+            "rank": "800.0"
+          },
+          "source_record": {
+            "id": "1634415",
+            "fdc_id": "171726",
+            "nutrient_id": "1004",
+            "amount": "0.39",
+            "data_points": "13",
+            "derivation_id": "1",
+            "min": "0.13",
+            "max": "0.91",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fibre_g",
+          "nutrient_id": "1079",
+          "local_value": "8",
+          "source_value": "8",
+          "nutrient": {
+            "id": "1079",
+            "name": "Fiber, total dietary",
+            "unit_name": "G",
+            "nutrient_nbr": "291",
+            "rank": "1200.0"
+          },
+          "source_record": {
+            "id": "1634443",
+            "fdc_id": "171726",
+            "nutrient_id": "1079",
+            "amount": "8",
+            "data_points": "13",
+            "derivation_id": "1",
+            "min": "7",
+            "max": "8.8",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "iron_mg",
+          "nutrient_id": "1089",
+          "local_value": "1.02",
+          "source_value": "1.02",
+          "nutrient": {
+            "id": "1089",
+            "name": "Iron, Fe",
+            "unit_name": "MG",
+            "nutrient_nbr": "303",
+            "rank": "5400.0"
+          },
+          "source_record": {
+            "id": "1634444",
+            "fdc_id": "171726",
+            "nutrient_id": "1089",
+            "amount": "1.02",
+            "data_points": "13",
+            "derivation_id": "1",
+            "min": "0.88",
+            "max": "1.3",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "omega3_g",
+          "nutrient_id": "1404",
+          "local_value": "",
+          "source_value": "",
+          "nutrient": {
+            "id": "1404",
+            "name": "PUFA 18:3 n-3 c,c,c (ALA)",
+            "unit_name": "G",
+            "nutrient_nbr": "851",
+            "rank": "14000.0"
+          },
+          "source_record": {},
+          "derivation": {},
+          "status": "missing_preserved"
+        }
+      ]
+    },
+    {
+      "ingredient_form_id": "IF-COCOA-PWD",
+      "nutrition_id": "NUT-COCOA-PWD",
+      "food": {
+        "fdc_id": "169593",
+        "data_type": "sr_legacy_food",
+        "description": "Cocoa, dry powder, unsweetened",
+        "food_category_id": "19",
+        "publication_date": "2019-04-01"
+      },
+      "metadata_match": true,
+      "checks": [
+        {
+          "field": "protein_g",
+          "nutrient_id": "1003",
+          "local_value": "19.6",
+          "source_value": "19.6",
+          "nutrient": {
+            "id": "1003",
+            "name": "Protein",
+            "unit_name": "G",
+            "nutrient_nbr": "203",
+            "rank": "600.0"
+          },
+          "source_record": {
+            "id": "1455433",
+            "fdc_id": "169593",
+            "nutrient_id": "1003",
+            "amount": "19.6",
+            "data_points": "8",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "energy_kcal",
+          "nutrient_id": "1008",
+          "local_value": "228",
+          "source_value": "228",
+          "nutrient": {
+            "id": "1008",
+            "name": "Energy",
+            "unit_name": "KCAL",
+            "nutrient_nbr": "208",
+            "rank": "300.0"
+          },
+          "source_record": {
+            "id": "1455415",
+            "fdc_id": "169593",
+            "nutrient_id": "1008",
+            "amount": "228",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "carbohydrate_g",
+          "nutrient_id": "1005",
+          "local_value": "57.9",
+          "source_value": "57.9",
+          "nutrient": {
+            "id": "1005",
+            "name": "Carbohydrate, by difference",
+            "unit_name": "G",
+            "nutrient_nbr": "205",
+            "rank": "1110.0"
+          },
+          "source_record": {
+            "id": "1455414",
+            "fdc_id": "169593",
+            "nutrient_id": "1005",
+            "amount": "57.9",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fat_g",
+          "nutrient_id": "1004",
+          "local_value": "13.7",
+          "source_value": "13.7",
+          "nutrient": {
+            "id": "1004",
+            "name": "Total lipid (fat)",
+            "unit_name": "G",
+            "nutrient_nbr": "204",
+            "rank": "800.0"
+          },
+          "source_record": {
+            "id": "1455451",
+            "fdc_id": "169593",
+            "nutrient_id": "1004",
+            "amount": "13.7",
+            "data_points": "8",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "fibre_g",
+          "nutrient_id": "1079",
+          "local_value": "37",
+          "source_value": "37",
+          "nutrient": {
+            "id": "1079",
+            "name": "Fiber, total dietary",
+            "unit_name": "G",
+            "nutrient_nbr": "291",
+            "rank": "1200.0"
+          },
+          "source_record": {
+            "id": "1455418",
+            "fdc_id": "169593",
+            "nutrient_id": "1079",
+            "amount": "37",
+            "data_points": "0",
+            "derivation_id": "44",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "44",
+            "code": "LC",
+            "description": "Label claim (back calculated from label by NDL staff; Calculated from label claim/serving (g or %RDI)",
+            "source_id": "6"
+          },
+          "status": "match"
+        },
+        {
+          "field": "iron_mg",
+          "nutrient_id": "1089",
+          "local_value": "13.86",
+          "source_value": "13.86",
+          "nutrient": {
+            "id": "1089",
+            "name": "Iron, Fe",
+            "unit_name": "MG",
+            "nutrient_nbr": "303",
+            "rank": "5400.0"
+          },
+          "source_record": {
+            "id": "1455427",
+            "fdc_id": "169593",
+            "nutrient_id": "1089",
+            "amount": "13.86",
+            "data_points": "9",
+            "derivation_id": "",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {},
+          "status": "match"
+        },
+        {
+          "field": "omega3_g",
+          "nutrient_id": "1404",
+          "local_value": "",
+          "source_value": "",
+          "nutrient": {
+            "id": "1404",
+            "name": "PUFA 18:3 n-3 c,c,c (ALA)",
+            "unit_name": "G",
+            "nutrient_nbr": "851",
+            "rank": "14000.0"
+          },
+          "source_record": {},
+          "derivation": {},
+          "status": "missing_preserved"
+        }
+      ]
+    },
+    {
+      "ingredient_form_id": "IF-CINN-PWD",
+      "nutrition_id": "NUT-CINN-PWD",
+      "food": {
+        "fdc_id": "171320",
+        "data_type": "sr_legacy_food",
+        "description": "Spices, cinnamon, ground",
+        "food_category_id": "2",
+        "publication_date": "2019-04-01"
+      },
+      "metadata_match": true,
+      "checks": [
+        {
+          "field": "protein_g",
+          "nutrient_id": "1003",
+          "local_value": "3.99",
+          "source_value": "3.99",
+          "nutrient": {
+            "id": "1003",
+            "name": "Protein",
+            "unit_name": "G",
+            "nutrient_nbr": "203",
+            "rank": "600.0"
+          },
+          "source_record": {
+            "id": "1600463",
+            "fdc_id": "171320",
+            "nutrient_id": "1003",
+            "amount": "3.99",
+            "data_points": "5",
+            "derivation_id": "1",
+            "min": "3.21",
+            "max": "4.5",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "energy_kcal",
+          "nutrient_id": "1008",
+          "local_value": "247",
+          "source_value": "247",
+          "nutrient": {
+            "id": "1008",
+            "name": "Energy",
+            "unit_name": "KCAL",
+            "nutrient_nbr": "208",
+            "rank": "300.0"
+          },
+          "source_record": {
+            "id": "1600510",
+            "fdc_id": "171320",
+            "nutrient_id": "1008",
+            "amount": "247",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "carbohydrate_g",
+          "nutrient_id": "1005",
+          "local_value": "80.59",
+          "source_value": "80.59",
+          "nutrient": {
+            "id": "1005",
+            "name": "Carbohydrate, by difference",
+            "unit_name": "G",
+            "nutrient_nbr": "205",
+            "rank": "1110.0"
+          },
+          "source_record": {
+            "id": "1600509",
+            "fdc_id": "171320",
+            "nutrient_id": "1005",
+            "amount": "80.59",
+            "data_points": "0",
+            "derivation_id": "49",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "49",
+            "code": "NC",
+            "description": "Calculated",
+            "source_id": "2"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fat_g",
+          "nutrient_id": "1004",
+          "local_value": "1.24",
+          "source_value": "1.24",
+          "nutrient": {
+            "id": "1004",
+            "name": "Total lipid (fat)",
+            "unit_name": "G",
+            "nutrient_nbr": "204",
+            "rank": "800.0"
+          },
+          "source_record": {
+            "id": "1600508",
+            "fdc_id": "171320",
+            "nutrient_id": "1004",
+            "amount": "1.24",
+            "data_points": "6",
+            "derivation_id": "43",
+            "min": "0.33",
+            "max": "1.92",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "43",
+            "code": "JO",
+            "description": "Aggregated data involving combinations of data with different source codes when at least one code is not 1, 6, 12, or 13",
+            "source_id": "8"
+          },
+          "status": "match"
+        },
+        {
+          "field": "fibre_g",
+          "nutrient_id": "1079",
+          "local_value": "53.1",
+          "source_value": "53.1",
+          "nutrient": {
+            "id": "1079",
+            "name": "Fiber, total dietary",
+            "unit_name": "G",
+            "nutrient_nbr": "291",
+            "rank": "1200.0"
+          },
+          "source_record": {
+            "id": "1600457",
+            "fdc_id": "171320",
+            "nutrient_id": "1079",
+            "amount": "53.1",
+            "data_points": "9",
+            "derivation_id": "1",
+            "min": "48.7",
+            "max": "57",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "iron_mg",
+          "nutrient_id": "1089",
+          "local_value": "8.32",
+          "source_value": "8.32",
+          "nutrient": {
+            "id": "1089",
+            "name": "Iron, Fe",
+            "unit_name": "MG",
+            "nutrient_nbr": "303",
+            "rank": "5400.0"
+          },
+          "source_record": {
+            "id": "1600453",
+            "fdc_id": "171320",
+            "nutrient_id": "1089",
+            "amount": "8.32",
+            "data_points": "5",
+            "derivation_id": "1",
+            "min": "1.15",
+            "max": "18.34",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        },
+        {
+          "field": "omega3_g",
+          "nutrient_id": "1404",
+          "local_value": "0.011",
+          "source_value": "0.011",
+          "nutrient": {
+            "id": "1404",
+            "name": "PUFA 18:3 n-3 c,c,c (ALA)",
+            "unit_name": "G",
+            "nutrient_nbr": "851",
+            "rank": "14000.0"
+          },
+          "source_record": {
+            "id": "1600506",
+            "fdc_id": "171320",
+            "nutrient_id": "1404",
+            "amount": "0.011",
+            "data_points": "1",
+            "derivation_id": "1",
+            "min": "",
+            "max": "",
+            "median": "",
+            "footnote": "",
+            "min_year_acquired": ""
+          },
+          "derivation": {
+            "id": "1",
+            "code": "A",
+            "description": "Analytical",
+            "source_id": "1"
+          },
+          "status": "match"
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "scientific_approval": false,
+  "limitations": [
+    "Generic foods, not supplier lots.",
+    "Nutrient 1404 is ALA only, not total omega-3.",
+    "Blank values are not zero; source_value_not_used needs review.",
+    "Numeric agreement is not approval of ingredient suitability."
+  ]
+}

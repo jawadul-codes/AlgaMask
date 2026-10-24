@@ -1,0 +1,17 @@
+{
+  "version": "rag-safety-dev-v1",
+  "review_status": "draft_engineering",
+  "cases": [
+    {"id":"cinnamon-related-matrix","kind":"qualified_context","request":{"query":"Cinnamon masking in spirulina cookies flakes noodles","species":"spirulina","chunk_tag":"intervention","source_ids":["SRC-JFS-2018-35546"]},"expected_chunk":"CHK-CIN-OTHER-FOODS","required_text":"does not validate 1% cinnamon in our bar","max_rank":3},
+    {"id":"hexanal-not-sensory-proof","kind":"qualified_context","request":{"query":"Hexanal green grassy relative area","species":"spirulina","source_ids":["SRC-FOODS-2024-1257"]},"expected_chunk":"CHK-SPI-HEXANAL","required_text":"not measured sensory responses","max_rank":3},
+    {"id":"unlisted-not-absent","kind":"qualified_context","request":{"query":"geosmin methylisoborneol FD factor","species":"spirulina","source_ids":["SRC-IJMS-2025-6767"]},"expected_chunk":"CHK-GEOSMIN-GAP","required_text":"does not establish its absence","max_rank":3},
+    {"id":"recipe-denominator","kind":"qualified_context","request":{"query":"recipe quantities 100 g percentage denominator","source_ids":["SRC-ITEPA-2024"]},"expected_chunk":"CHK-BOUND-LIMIT","required_text":"cannot be treated as confirmed","max_rank":3},
+    {"id":"masking-efficacy-gap","kind":"qualified_context","request":{"query":"Does cocoa cinnamon vanilla or citrus reduce a named algae off-note in a protein bar?","chunk_tag":"intervention","matrix":"protein bar"},"expected_chunk":"CHK-NO-MASK","required_text":"does not contain a trial","max_rank":3},
+    {"id":"wrong-species-source","kind":"no_context","request":{"query":"cinnamon masking","species":"chlorella","source_ids":["SRC-JFS-2018-35546"]}},
+    {"id":"wrong-matrix-source","kind":"no_context","request":{"query":"cinnamon masking","matrix":"protein bar","source_ids":["SRC-JFS-2018-35546"]}},
+    {"id":"unknown-source","kind":"no_context","request":{"query":"spirulina","source_ids":["SRC-NOT-PRESENT"]}},
+    {"id":"wrong-purpose-source","kind":"no_context","request":{"query":"spirulina volatiles","chunk_tag":"intervention","source_ids":["SRC-IJMS-2025-6767"]}},
+    {"id":"irrelevant-astronomy","kind":"no_context","request":{"query":"Calculate the orbital period of a satellite around Jupiter."}},
+    {"id":"irrelevant-software","kind":"no_context","request":{"query":"How do I configure a Kubernetes ingress controller TLS certificate?"}}
+  ]
+}

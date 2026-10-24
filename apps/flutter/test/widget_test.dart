@@ -42,6 +42,28 @@ class SuccessfulClient extends ApiClient {
 }
 
 void main() {
+  testWidgets('fixed proof submits exact settings and keeps constraints', (
+    tester,
+  ) async {
+    final client = SuccessfulClient();
+    await tester.pumpWidget(MaterialApp(home: InputScreen(client: client)));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    expect(find.byType(Slider), findsNothing);
+    expect(find.textContaining('45 g ingredient input'), findsOneWidget);
+    await tester.enterText(find.byType(TextFormField).first, '5');
+    final button = find.text('Run experiment');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(client.submitted!['experiment'], 'spirulina-proof-v1');
+    expect(client.submitted!['algae'], 'spirulina');
+    expect(client.submitted!['inclusion_pct'], 2);
+    expect(client.submitted!['serving_g'], 45);
+    expect(client.submitted!['flavour'], 'cocoa-spice');
+    expect(client.submitted!['min_protein_g'], 5);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('form fits phone width', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;

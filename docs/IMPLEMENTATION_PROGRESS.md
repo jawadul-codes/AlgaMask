@@ -1,8 +1,175 @@
 # AlgaMask implementation progress
 
-Updated: 2026-10-23
+Updated: 2026-10-24
+
+## One-command local launcher (2026-10-24, verified)
+
+- Added tools/dev.py: cwd-independent startup, automatic free-port selection,
+  reserved loopback sockets, real RAG/storage readiness and matching Flutter API URL.
+- Compiles an isolated web build to avoid the prior debug-WebSocket problem.
+- Explicit occupied ports fail without stopping their owners. Ctrl+C cleans up only
+  launched services; saved runs, logs and existing services remain intact.
+- Added seven focused launcher tests and setup/troubleshooting documentation.
+- Live launch from apps/flutter (not the repo root) selected 8125/3002 because
+  Antigravity's 8124/3001 were occupied. Readiness, compilation, static serving,
+  compiled API URL and a real fixed-proof run/report all passed.
+- Test run a76a25b5-f045-4dc6-9634-1696647aeef3 is retained in saved history.
+- Explicit-port collision returned a clear error. Ctrl+C exited successfully,
+  closed only 8125/3002 and left 8124/3001 listening. Logs/build retained under
+  var/dev/session-i447tywi. Full suite: 189 passed / 10 opt-in skipped.
+
+## RAG safety regression preparation (2026-10-24, engineering verified)
+
+- Added an eleven-case draft engineering suite: qualified evidence, missing-efficacy
+  context, conflicting species/matrix/purpose filters and unrelated questions.
+- Added an offline runner that records exact hits, scores, provenance, expected
+  ranking, retained qualifications and generation status. Failed cases remain
+  visible and return a nonzero exit status; reports cannot be overwritten.
+- Added tests of the evaluator itself so wrong filters, missing notes, removed
+  caveats, incomplete provenance and unexpected retrieval are not reported as passes.
+- No active service, dataset, index or retrieval threshold changed. This supports
+  Step 4 preparation; independent reviewer-written evaluations are still required.
+- Final offline evaluation: 11/11 pass on rc.4/dev.3. Seven evaluator checks added;
+  full normal suite: 182 passed / 10 opt-in skipped. Diff validation passes.
+- Results and reviewer handoff: RAG_SAFETY_EVALUATION.md and
+  output/rag/safety-dev-v1-final.json. The earlier safety-dev-v1.json is intermediate.
+
+## Fixed proof experiment implementation (2026-10-24, engineering verified)
+
+- Added opt-in spirulina-proof-v1 alongside the unchanged engineering grid.
+- Frozen B0/A0/A1 amounts follow FIRST_RELEASE_SCOPE.md: 45 g input, 2% spirulina
+  in A0/A1, fixed dates/cocoa and separate cinnamon substitution. No optimization
+  or ingredient substitution occurs in this mode.
+- Conflicting settings fail validation; exclusions apply to every arm and nutrition
+  targets to A1. Unknown required values block output. Production and mock execution
+  cannot silently represent this fixed experiment.
+- Added Flutter toggle and explicit input-mass/approval warnings. Preserved legacy
+  grid submission hashes to avoid breaking same-key retries across this change.
+- Scientific review and physical validation remain pending; this is Step 5
+  engineering preparation while the Step 2/3 scientific publication gates stay open.
+- User requested a health check during the final UI check. Backend remains healthy
+  on 8123, rc.4 integrity passes, reviewed tables validate (290 rows; zero issues),
+  and 175 backend tests pass (10 opt-in skipped). Separate real-model suite: 10 pass;
+  Flutter suite: 16 pass; analysis clean.
+- Flutter debug server exited after WebSocket debugger errors; no listener remained
+  on 3000. No code/data loss was found. Switching local UI serving to the compiled
+  web build to avoid relying on the failed debug-service connection.
+- Compiled web build passes and is served on loopback port 3000. Live Flutter run
+  68acbb3b-ad97-4b55-a7ab-435df924b29a completed; B0/A0/A1 quantities match the fixed
+  table exactly. Screenshot: output/review/fixed-proof-live.png. No scientific
+  approval inferred. Recent changes remain local/uncommitted; no automatic push.
+
+## Development dataset/index activation (2026-10-24, completed)
+
+- Updated runtime defaults together to rc.4/dev.3; mock mode remains the default
+  unless development mode is explicitly selected. Production review gates remain.
+- Found a legacy mock service on port 8000 and no Flutter server on port 3000.
+  Preserve that process and its possible in-memory history; start the corrected
+  development service on 8123 and connect Flutter on 3000 to that service.
+- Running readiness confirms rc.4/dev.3 and development_only=true. Flutter submitted
+  a 45 g / 5% spirulina smoke run, displayed corrected claims, opened its printable
+  report, and reopened the same saved result through history.
+- Run: 7d59dcc1-fd1c-4ab8-84d0-4ac6219c407f. All 161 backend tests and 15 Flutter
+  tests pass; Flutter analysis has no issues. Nine opt-in tests were skipped in
+  the normal backend suite; their prior separate real-model pass is recorded.
+- See DEVELOPMENT_ACTIVATION.md for addresses, launch/rollback instructions and
+  the screenshot. This is not approval of a physical recipe or a production release.
+
+## Corrected dataset RAG build and verification (2026-10-24)
+
+- Built immutable dev.3 against rc.4 using the cached local model: 23 evidence notes.
+- All eight existing retrieval questions pass at rank 1. Added nine real-model
+  integration checks for corrected claims, API/report/persistence, mismatch
+  rejection, production rejection and empty-source retrieval; all pass offline.
+- Updated two stale test counts to reflect the audited 290-record/23-note corpus.
+- Details and reproducible commands: REVIEWED_RAG_VERIFICATION.md.
+- Combined-process opt-in suite hit a native OpenMP conflict loading PyTorch after
+  FAISS tests. Keep normal and real-model suites in separate processes; no unsafe
+  duplicate-library override was enabled. This limitation is documented.
+- Final results: normal suite 161 passed / nine opt-in skipped; separate real-model
+  suite nine passed; retrieval evaluation eight of eight; diff validation passes.
+- Active defaults remain rc.1/dev.2; no live restart, scientific approval or
+  production promotion occurred. Next is the paired development switch and UI check.
+
+## Completion roadmap Step 2 - spirulina analytical audit (2026-10-24)
+
+- Checked original full-text XML for both spirulina analytical papers; source
+  URLs, hashes, coverage and limitations are in SPIRULINA_SOURCE_AUDIT.md.
+- Corrected sample populations, material forms and manufacturer-reported drying.
+- Verified 15 stored profile ranges/counts/identification levels and eight FD
+  observations. Added reference-descriptor caveats directly to RAG claims.
+- Corrected the outdated geosmin source note and the inference about an unlisted
+  compound. Revised records remain extracted, with incremented versions.
+- Runtime dataset and RAG index are not switched by this audit.
+- Created and verified candidate rc.4: 290 rows in 21 tables; zero structural
+  errors/warnings. Supplemental validation and prior rc.3 integrity pass.
+- Next engineering action: build a matching development index and run retrieval
+  and report regressions before an explicit active dataset/index switch.
+
+## Completion roadmap - Step 1 (2026-10-24)
+
+- Prepared `FIRST_RELEASE_SCOPE.md` for the new ten-step completion roadmap;
+  the original eight implementation steps below retain their historical meaning.
+- Defined a 45 g input-mass spirulina experiment at 2% inclusion with exact five-form
+  B0/A0/A1 compositions, fixed cocoa/dates and a separate cinnamon substitution.
+- Quantities are engineering assumptions for scientific review, not approved doses.
+- Defined nutrition and sensory comparisons, claim boundaries, process unknowns,
+  ownership and version-change rules. No scientific signatures were invented.
+- Identified a mismatch with current generator controls: it removes all flavour
+  whereas the original proof keeps cocoa. Recorded the required Step 5 alignment;
+  runtime, frozen dataset and RAG index have not been changed by this scope work.
+- Engineering preparation complete; formal signed-scope gate pending. Next is
+  Step 2 source/record review against the five exact ingredient forms.
 
 ## Working agreement
+
+### Completion roadmap Step 2 - methods verification (2026-10-24)
+
+- Recovered both primary PDFs; inspected cinnamon methods and ITEPA recipe/sensory
+  tables visually. Source hashes and locations are recorded in METHODS_SOURCE_AUDIT.md.
+- Added two accurate study-material records; corrected cinnamon and ITEPA joins.
+- ITEPA formula totals exceed its 100 g heading in algae arms. Cleared unsupported
+  normalized bounds and retained reported labels. Confirmed 20 sensory panelists;
+  recorded aroma significance contradiction rather than asserting no sensory effect.
+- Revised source/evidence rows retain extracted status and increment versions.
+- No active dataset/index switch or production publication. Scientific gate remains open.
+- Verification: 290 rows / 21 tables pass structural validation with zero errors and
+  warnings; supplemental validation passes. Created and verified candidate rc.3;
+  rc.2 integrity still passes. Both remain non-production candidates.
+
+### Completion roadmap Step 2 - first review pass (2026-10-24)
+
+- Audited the five scoped ingredient forms, nutrient provenance, bounds and allergen
+  relationships. Logged exact gaps in `SCIENTIFIC_REVIEW_STEP2.md`.
+- Checked primary cinnamon journal abstract/licence, USDA documentation and spirulina
+  profiling metadata/abstract. ITEPA access failed; no full-method validation claimed.
+- Normalized the existing supplemental cinnamon source and one qualified evidence
+  note into review inputs; both remain extracted. Material mapping is intentionally
+  pending, so the note is not yet eligible for species-filtered retrieval.
+- No scientific approval or production publication performed. Step 2 remains open.
+- Validation passed: 288 rows / 21 tables, zero errors/warnings; supplemental packet
+  15 sources / 25 records, zero errors. Created and verified rc.2 (23 evidence notes,
+  11 normalized sources); verified rc.1 integrity. Active rc.1/dev.2 unchanged.
+- Next: independently reproduce the five USDA nutrition records, obtain missing
+  methods and study-material mapping, then review supplier-specific information.
+
+### Implementation agreement
+
+### Completion roadmap Step 2 - nutrition reproduction (2026-10-24)
+
+- Downloaded the official April 2018 USDA SR Legacy archive and hashed it.
+- Added an independent read-only audit for the five scoped foods, comparing food
+  identity, basis, record dates, nutrient IDs, units, values and derivation metadata.
+- All 31 populated nutrient values match; four absent ALA fields remain blank.
+  Cinnamon ALA remains distinct from total omega-3.
+- Negative checks reject altered protein, wrong basis and duplicate local records.
+- Saved source rows and hashes in `output/review/scoped_nutrition_audit.json`;
+  documented results and remaining supplier/reviewer limits in NUTRITION_SOURCE_AUDIT.md.
+- No nutrition correction, approval, candidate rebuild or index switch was needed.
+- Next: verify full cinnamon methods and study material mapping; recover ITEPA
+  methods if available. Supplier/product information still requires team input.
+
+### Standing agreement
 
 Implement one step at a time. Record completed changes, verification, open issues,
 and the next action here throughout the work and before any context handoff.

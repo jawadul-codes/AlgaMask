@@ -1,5 +1,10 @@
 # AlgaMask
 
+### Quick Start
+```sh
+python3 tools/dev.py
+```
+
 AlgaMask is a local Flutter + FastAPI application for experimental algae-bar
 formulation screening. It supports source-grounded evidence explanations, exact-form
 nutrition estimates, constraint checks, matched controls, reports and saved history.
@@ -7,6 +12,35 @@ Current formulations are computational experiments; manufacturing/sensory valida
 and scientific dataset publication remain incomplete.
 
 ## Start locally
+
+### One-command launch (macOS/Linux)
+
+After the dependencies and local RAG model are installed, run this from any terminal
+(including Antigravity):
+
+```sh
+python3 /Users/mohamaadmazharulislam/AlgaMask/tools/dev.py
+```
+
+On another computer, replace the path with your checkout location. From the repository
+root, the shorter command is `python3 tools/dev.py`.
+
+The launcher finds available loopback ports, checks the backend's real RAG and storage,
+builds Flutter with the matching API URL, and prints the app URL. It does not use the
+Flutter browser debugger or stop existing servers. Keep the terminal open; Ctrl+C
+stops only the services it started. Restart the launcher after code changes.
+
+To require specific ports instead of automatic selection:
+
+```sh
+python3 tools/dev.py --api-port 8124 --web-port 3001
+```
+
+An occupied explicit port produces an error without killing its owner. Logs and each
+isolated compiled build are retained under `var/dev/session-*` (ignored by Git).
+See [local launcher](docs/LOCAL_LAUNCHER.md) for setup and troubleshooting.
+
+### Manual launch / initial setup
 
 Requirements: Python 3.11+, uv and Flutter. Install dependencies:
 
@@ -68,8 +102,8 @@ check production gates; the current candidate correctly fails that check.
 
 - `apps/flutter/`: local web client and tests.
 - `services/algamask/`: API, six-agent workflow, retrieval, generation, screening and storage.
-- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.1`.
-- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.2`.
+- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.4`.
+- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.3`.
 - `tools/`: dataset/index operations, database recovery and release verification.
 - `var/`: ignored local databases and verification artifacts.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): completed work and remaining gates.

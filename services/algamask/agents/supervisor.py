@@ -8,6 +8,8 @@ from . import chemistry, critic, impact_agent, profile, recipe, retrieve
 
 
 def run_workflow(request: RunRequest, search=None, generation_provider=None) -> RunResult:
+    if request.experiment != "engineering_grid" and search is None:
+        raise ValueError("Fixed experiment requires development retrieval; mock execution is not supported.")
     trace = []
 
     def record(agent, state, summary, output, status="mock"):
@@ -33,6 +35,12 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
                        "Manufacturing, complete allergen coverage and human sensory outcomes remain unverified."]
         if metadata["development_only"]:
             limitations.insert(0, "Development candidate data: record-level review and publication checks remain unresolved.")
+        if request.experiment == "spirulina-proof-v1":
+            limitations[limitations.index("Recipe search uses an explicit experimental grid, not scientifically validated protein-bar bounds.")] = (
+                "spirulina-proof-v1 is a fixed engineering assumption, not an optimized or approved recipe."
+            )
+            limitations.append("45 g is ingredient input mass, not measured finished serving mass. Per-serving nutrition here means per 45 g input before processing; yield is unknown.")
+            limitations.append("B0/A0/A1 retain cocoa and dates. A1 versus A0 substitutes cinnamon for oats; it cannot isolate a pure cinnamon mechanism. Not approved for physical testing.")
         complete = all(item["result"]["hits"] for item in searches)
         record("Retrieval", "EVIDENCE_RETRIEVED" if complete else "INSUFFICIENT_EVIDENCE",
                "Searched diagnosis and intervention evidence with source provenance.",
@@ -68,7 +76,7 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
     if search is not None:
         formulas, controls, audit = formulation_engine.screen(request, search.snapshot,
                                                               development=metadata["development_only"])
-        record("Recipe", "RECIPES_SCREENED", "Searched an explicit nine-point experimental grid.",
+        record("Recipe", "RECIPES_SCREENED", "Checked the selected versioned engineering experiment.",
                audit, "complete" if formulas else "blocked")
         verdicts = {f.id: formulation_engine.check_formula(f, request, search.snapshot) for f in formulas}
         accepted = [f for f in formulas if not verdicts[f.id]]

@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 class Settings(BaseModel):
     model_config = ConfigDict(frozen=True)
     mode: Literal["mock", "development", "production"] = "mock"
-    dataset_path: Path = ROOT / "data/candidates/0.1.0-rc.1"
-    index_path: Path = ROOT / "indexes/reviewed_evidence/0.1.0-dev.2"
+    dataset_path: Path = ROOT / "data/candidates/0.1.0-rc.4"
+    index_path: Path = ROOT / "indexes/reviewed_evidence/0.1.0-dev.3"
     generation_provider: Literal["extractive", "ollama"] = "extractive"
     generation_model: str = "llama3.2:latest"
     ollama_url: str = "http://127.0.0.1:11434"

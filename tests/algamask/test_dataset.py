@@ -36,7 +36,9 @@ def change(directory, table, mutate):
 def test_current_corpus_and_unknown_values():
     snapshot = load_dataset(ROOT / "data/reviewed")
     assert set(snapshot.row_counts) == set(TABLES)
-    assert sum(snapshot.row_counts.values()) == 286
+    assert sum(snapshot.row_counts.values()) == 290
+    assert snapshot.row_counts["algae_materials"] == 6
+    assert snapshot.row_counts["evidence_chunks"] == 23
     assert snapshot.records("evidence_chunks", approved_only=True) == ()
     record = RECORD_MODELS["ingredient_nutrition"].model_validate({
         "nutrition_id": "N", "ingredient_form_id": "I", "record_version": "1",

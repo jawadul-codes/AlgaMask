@@ -47,7 +47,7 @@ def test_invalid_version(tmp_path, version):
 def test_audit_contains_actionable_review_items():
     report = audit(ROOT / "data/reviewed")
     assert not report["publication_ready"]
-    assert report["status_counts"]["evidence_chunks"] == {"extracted": 22}
+    assert report["status_counts"]["evidence_chunks"] == {"extracted": 23}
     chunk = next(r for r in report["records"] if r["table"] == "evidence_chunks")
     assert "reviewer" in chunk["missing_approval_fields"]
     assert chunk["unapproved_dependencies"]

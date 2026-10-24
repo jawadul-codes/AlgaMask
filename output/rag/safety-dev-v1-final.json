@@ -1,0 +1,367 @@
+{
+  "suite_version": "rag-safety-dev-v1",
+  "review_status": "draft_engineering",
+  "dataset_hash": "e999303a8afda5624002ec8ac27994c40b4ae9b9faf59fa72aecd70336c34432",
+  "index_version": "0.1.0-dev.3",
+  "development_only": true,
+  "case_count": 11,
+  "passed": 11,
+  "results": [
+    {
+      "id": "cinnamon-related-matrix",
+      "kind": "qualified_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": 1,
+      "request": {
+        "query": "Cinnamon masking in spirulina cookies flakes noodles",
+        "top_k": 5,
+        "chunk_tag": "intervention",
+        "species": "spirulina",
+        "matrix": null,
+        "source_ids": [
+          "SRC-JFS-2018-35546"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [
+        {
+          "chunk_id": "CHK-CIN-OTHER-FOODS",
+          "source_id": "SRC-JFS-2018-35546",
+          "source_title": "The Capability of Cinnamon as an Off-Flavor Masking Agent for Spirulina platensis enriched Food Product",
+          "source_url": "https://journal.ugm.ac.id/jfs/article/view/35546",
+          "source_location": "pp.96-97 methods; p.99 selection",
+          "claim_summary": "Cinnamon powder was tested in spirulina-enriched cookies, flakes and dried noodles. Selected additions were 10%, 2.5% and 2.5% respectively. Methods report 9.5% dried spirulina and 0/2.5/5/7.5/10% cinnamon by weight. Complete recipe masses and finished yield are not established here; this does not validate 1% cinnamon in our bar.",
+          "chunk_tag": "intervention",
+          "matrix": "cookies/flakes/dried noodles",
+          "species": [
+            "spirulina"
+          ],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "indirect",
+          "evidence_type": "related_food_matrix",
+          "evidence_status": "literature_derived",
+          "score": 0.7977116107940674,
+          "rerank_score": null
+        }
+      ],
+      "generation_status": "complete"
+    },
+    {
+      "id": "hexanal-not-sensory-proof",
+      "kind": "qualified_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": 1,
+      "request": {
+        "query": "Hexanal green grassy relative area",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": "spirulina",
+        "matrix": null,
+        "source_ids": [
+          "SRC-FOODS-2024-1257"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [
+        {
+          "chunk_id": "CHK-SPI-HEXANAL",
+          "source_id": "SRC-FOODS-2024-1257",
+          "source_title": "Volatile Profiling of Spirulina Food Supplements",
+          "source_url": "https://doi.org/10.3390/foods13081257",
+          "source_location": "Table 3",
+          "claim_summary": "Hexanal was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 1.2 to 8.7 percent of identified VOC area, with the odor words green and grassy. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.",
+          "chunk_tag": "diagnosis",
+          "matrix": "spirulina products and raw biomass",
+          "species": [
+            "spirulina"
+          ],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "direct",
+          "evidence_type": "analytical_detection",
+          "evidence_status": "literature_derived",
+          "score": 0.341172993183136,
+          "rerank_score": null
+        }
+      ],
+      "generation_status": "complete"
+    },
+    {
+      "id": "unlisted-not-absent",
+      "kind": "qualified_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": 1,
+      "request": {
+        "query": "geosmin methylisoborneol FD factor",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": "spirulina",
+        "matrix": null,
+        "source_ids": [
+          "SRC-IJMS-2025-6767"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [
+        {
+          "chunk_id": "CHK-GEOSMIN-GAP",
+          "source_id": "SRC-IJMS-2025-6767",
+          "source_title": "Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis",
+          "source_url": "https://doi.org/10.3390/ijms26146767",
+          "source_location": "Table 2, odorant 22",
+          "claim_summary": "GC-O identified geosmin in the spirulina supplement suspension at FD factor 64, with odor words musty, earthy and beetroot. That factor is not a concentration. 2-methylisoborneol was not in the odorant table; this does not establish its absence from the sample.",
+          "chunk_tag": "diagnosis",
+          "matrix": "spirulina supplement aqueous suspension",
+          "species": [
+            "spirulina"
+          ],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "direct",
+          "evidence_type": "analytical_detection",
+          "evidence_status": "literature_derived",
+          "score": 0.5062040686607361,
+          "rerank_score": null
+        }
+      ],
+      "generation_status": "complete"
+    },
+    {
+      "id": "recipe-denominator",
+      "kind": "qualified_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": 1,
+      "request": {
+        "query": "recipe quantities 100 g percentage denominator",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": null,
+        "matrix": null,
+        "source_ids": [
+          "SRC-ITEPA-2024"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [
+        {
+          "chunk_id": "CHK-BOUND-LIMIT",
+          "source_id": "SRC-ITEPA-2024",
+          "source_title": "Pengaruh Penambahan Spirulina Terhadap Sifat Fisikokimia, Sensoris, dan Aktivitas Antioksidan Snack Bar",
+          "source_url": "https://ojs.unud.ac.id/index.php/itepa/article/view/123629",
+          "source_location": "Table 1 p.827; totals calculated from listed quantities",
+          "claim_summary": "Table 1 labels quantities g/100 g but lists an unchanged 100 g base plus 0/2/3/4/5 g spirulina. Summed input masses are 100/102/103/104/105 g. Therefore treatment labels cannot be treated as confirmed finished-bar mass percentages or safety limits.",
+          "chunk_tag": "intervention",
+          "matrix": "snack bar",
+          "species": [
+            "spirulina"
+          ],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "indirect",
+          "evidence_type": "related_food_matrix",
+          "evidence_status": "literature_derived",
+          "score": 0.5155182480812073,
+          "rerank_score": null
+        },
+        {
+          "chunk_id": "CHK-SNACK-RANGE",
+          "source_id": "SRC-ITEPA-2024",
+          "source_title": "Pengaruh Penambahan Spirulina Terhadap Sifat Fisikokimia, Sensoris, dan Aktivitas Antioksidan Snack Bar",
+          "source_url": "https://ojs.unud.ac.id/index.php/itepa/article/view/123629",
+          "source_location": "Table 5 p.832; aroma narrative p.831",
+          "claim_summary": "The snack-bar paper labels treatments 0/2/3/4/5% spirulina. Table 5 reports 20 panelists and a seven-point liking scale. Overall acceptance shares the same significance letter across treatments; aroma letters differ despite the narrative reporting no significant aroma effect. This inconsistency needs review; no named off-note reduction was measured.",
+          "chunk_tag": "intervention",
+          "matrix": "snack bar",
+          "species": [
+            "spirulina"
+          ],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "indirect",
+          "evidence_type": "related_food_matrix",
+          "evidence_status": "literature_derived",
+          "score": 0.28022825717926025,
+          "rerank_score": null
+        }
+      ],
+      "generation_status": "complete"
+    },
+    {
+      "id": "masking-efficacy-gap",
+      "kind": "qualified_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": 1,
+      "request": {
+        "query": "Does cocoa cinnamon vanilla or citrus reduce a named algae off-note in a protein bar?",
+        "top_k": 5,
+        "chunk_tag": "intervention",
+        "species": null,
+        "matrix": "protein bar",
+        "source_ids": [],
+        "min_score": 0.2
+      },
+      "hits": [
+        {
+          "chunk_id": "CHK-NO-MASK",
+          "source_id": "SRC-FOODS-2024-1257",
+          "source_title": "Volatile Profiling of Spirulina Food Supplements",
+          "source_url": "https://doi.org/10.3390/foods13081257",
+          "source_location": "Absence noted against the formulation candidate list",
+          "claim_summary": "This extract does not contain a trial showing that cocoa, cinnamon, vanilla or citrus reduces a named algae off-note in a protein bar. Those ingredient forms are search-space candidates only.",
+          "chunk_tag": "intervention",
+          "matrix": "protein bar",
+          "species": [],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "hypothesis",
+          "evidence_type": "review",
+          "evidence_status": "literature_derived",
+          "score": 0.7595478296279907,
+          "rerank_score": null
+        },
+        {
+          "chunk_id": "CHK-DATE-FORM",
+          "source_id": "SRC-USDA-FDC",
+          "source_title": "USDA FoodData Central",
+          "source_url": "https://fdc.nal.usda.gov/",
+          "source_location": "Form note on IF-DATE-DRIED",
+          "claim_summary": "The dried-date nutrition row must not be used as date paste. The plan forbids combining nutrients across ingredient forms without an explicit transformation, and none is recorded.",
+          "chunk_tag": "intervention",
+          "matrix": "protein bar",
+          "species": [],
+          "review_status": "extracted",
+          "source_review_status": "extracted",
+          "support_class": "hypothesis",
+          "evidence_type": "review",
+          "evidence_status": "literature_derived",
+          "score": 0.2740522623062134,
+          "rerank_score": null
+        }
+      ],
+      "generation_status": "complete"
+    },
+    {
+      "id": "wrong-species-source",
+      "kind": "no_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": null,
+      "request": {
+        "query": "cinnamon masking",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": "chlorella",
+        "matrix": null,
+        "source_ids": [
+          "SRC-JFS-2018-35546"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [],
+      "generation_status": "blocked"
+    },
+    {
+      "id": "wrong-matrix-source",
+      "kind": "no_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": null,
+      "request": {
+        "query": "cinnamon masking",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": null,
+        "matrix": "protein bar",
+        "source_ids": [
+          "SRC-JFS-2018-35546"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [],
+      "generation_status": "blocked"
+    },
+    {
+      "id": "unknown-source",
+      "kind": "no_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": null,
+      "request": {
+        "query": "spirulina",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": null,
+        "matrix": null,
+        "source_ids": [
+          "SRC-NOT-PRESENT"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [],
+      "generation_status": "blocked"
+    },
+    {
+      "id": "wrong-purpose-source",
+      "kind": "no_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": null,
+      "request": {
+        "query": "spirulina volatiles",
+        "top_k": 5,
+        "chunk_tag": "intervention",
+        "species": null,
+        "matrix": null,
+        "source_ids": [
+          "SRC-IJMS-2025-6767"
+        ],
+        "min_score": 0.2
+      },
+      "hits": [],
+      "generation_status": "blocked"
+    },
+    {
+      "id": "irrelevant-astronomy",
+      "kind": "no_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": null,
+      "request": {
+        "query": "Calculate the orbital period of a satellite around Jupiter.",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": null,
+        "matrix": null,
+        "source_ids": [],
+        "min_score": 0.2
+      },
+      "hits": [],
+      "generation_status": "blocked"
+    },
+    {
+      "id": "irrelevant-software",
+      "kind": "no_context",
+      "passed": true,
+      "errors": [],
+      "expected_rank": null,
+      "request": {
+        "query": "How do I configure a Kubernetes ingress controller TLS certificate?",
+        "top_k": 5,
+        "chunk_tag": null,
+        "species": null,
+        "matrix": null,
+        "source_ids": [],
+        "min_score": 0.2
+      },
+      "hits": [],
+      "generation_status": "blocked"
+    }
+  ],
+  "limitation": "Engineering regression suite, not independently reviewed or held-out. Context retrieval is not proof of efficacy or safety."
+}

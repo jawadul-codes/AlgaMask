@@ -17,6 +17,8 @@ def render_report(result: RunResult) -> str:
     provenance = ""
     if result.retrieval:
         provenance = f"<p>Dataset: {escape(result.retrieval['dataset_version'])}; index: {escape(result.retrieval['index_version'])}</p>"
+    if result.request.experiment == "spirulina-proof-v1":
+        provenance += "<p>Experiment: spirulina-proof-v1. 45 g ingredient input, not verified finished serving. Nutrition per serving refers to this input mass. Scientific and physical-trial approval pending.</p>"
     explanation = ""
     if result.generation:
         generated = result.generation

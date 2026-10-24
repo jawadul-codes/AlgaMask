@@ -101,6 +101,9 @@ class RunStore:
 
     def reserve(self, key: str, request: RunRequest, context: dict):
         values = request.model_dump(mode='json')
+        # Preserve pre-preset submission hashes and same-key retry semantics.
+        if values['experiment'] == 'engineering_grid':
+            values.pop('experiment')
         values['exclusions'] = sorted(set(values['exclusions']))
         payload = json.dumps(values, sort_keys=True, separators=(',', ':'))
         digest = hashlib.sha256(payload.encode()).hexdigest()

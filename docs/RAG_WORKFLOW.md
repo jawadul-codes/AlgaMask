@@ -7,7 +7,7 @@ Step 6 handles real formulation calculations and constraints.
 
 ## Start the backend
 
-From the repository root, with Step 3's cached model and dev.2 index:
+From the repository root, with the cached model and dev.3 index:
 
 ```sh
 uv sync --locked --extra dev --extra rag
@@ -24,14 +24,19 @@ Optional environment overrides:
 | Variable | Default |
 |---|---|
 | `ALGAMASK_MODE` | `mock` (`development` and `production` also accepted) |
-| `ALGAMASK_DATASET_PATH` | Repository `data/candidates/0.1.0-rc.1` |
-| `ALGAMASK_INDEX_PATH` | Repository `indexes/reviewed_evidence/0.1.0-dev.2` |
+| `ALGAMASK_DATASET_PATH` | Repository `data/candidates/0.1.0-rc.4` |
+| `ALGAMASK_INDEX_PATH` | Repository `indexes/reviewed_evidence/0.1.0-dev.3` |
 
 `production` requires a published dataset and compatible non-development index.
 It describes retrieval eligibility, not production readiness of the full app.
 The current candidate fails that requirement, as intended.
 
 ## API
+
+Current activation and Flutter checks are recorded in
+[DEVELOPMENT_ACTIVATION.md](DEVELOPMENT_ACTIVATION.md). The Step 4 descriptions
+below are historical: SQLite persistence and Flutter run/report integration have
+since been implemented. See README.md and RUN_PERSISTENCE.md for current behavior.
 
 ```sh
 curl http://127.0.0.1:8000/rag/ready

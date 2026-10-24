@@ -13,6 +13,7 @@ class Algae(StrEnum):
 
 class RunRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    experiment: Literal["engineering_grid", "spirulina-proof-v1"] = "engineering_grid"
     algae: Algae = Algae.blend
     inclusion_pct: float = Field(default=5, gt=0, le=15)
     serving_g: float = Field(default=45, ge=40, le=50)
@@ -21,6 +22,15 @@ class RunRequest(BaseModel):
     min_protein_g: float | None = Field(default=None, ge=0, le=50)
     max_energy_kcal: float | None = Field(default=None, gt=0, le=1000)
     max_sugar_g: float | None = Field(default=None, ge=0, le=50)
+
+    @model_validator(mode="after")
+    def fixed_experiment_settings(self):
+        if self.experiment == "spirulina-proof-v1" and (
+            self.algae != Algae.spirulina or self.inclusion_pct != 2
+            or self.serving_g != 45 or self.flavour != "cocoa-spice"
+        ):
+            raise ValueError("spirulina-proof-v1 requires spirulina, 2% inclusion, 45 g input mass and cocoa-spice")
+        return self
 
 
 class AgentInput(BaseModel):
