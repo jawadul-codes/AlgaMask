@@ -32,6 +32,20 @@ def test_automatic_selection_skips_busy_port():
                 dev.reserve_port(selected.getsockname()[1], explicit=True)
 
 
+def test_restart_reuses_port_after_accepted_connection():
+    listener = dev.reserve_port(32000)
+    port = listener.getsockname()[1]
+    try:
+        with socket.create_connection(('127.0.0.1', port)) as client:
+            connection, _ = listener.accept()
+            connection.close()
+            assert client.recv(1) == b''
+    finally:
+        listener.close()
+    with dev.reserve_port(port, explicit=True) as restarted:
+        assert restarted.getsockname()[1] == port
+
+
 def test_web_server_keeps_reserved_socket_and_directory(tmp_path):
     sock = dev.reserve_port(31000)
     server = dev.web_server(sock, tmp_path)

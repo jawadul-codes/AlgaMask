@@ -113,7 +113,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) => AlgaShell(
     selected: 'history',
-    onNew: () => Navigator.of(context).pop(),
+    onNew: () => Navigator.of(context).pop(true),
     onHistory: selected == null ? null : () => setState(() => selected = null),
     child: SingleChildScrollView(
       key: ValueKey(selected == null ? 'history-list' : 'history-report'),

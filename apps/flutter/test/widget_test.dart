@@ -84,6 +84,23 @@ class ExclusionClient extends SuccessfulClient {
 }
 
 void main() {
+  testWidgets('new experiment from history clears the previous report', (
+    tester,
+  ) async {
+    final client = SuccessfulClient();
+    await tester.pumpWidget(MaterialApp(home: InputScreen(client: client)));
+    await tester.pumpAndSettle(const Duration(milliseconds: 400));
+    await tester.ensureVisible(find.text('Run screening'));
+    await tester.tap(find.text('Run screening'));
+    await tester.pumpAndSettle();
+    expect(find.text('Screening report'), findsOneWidget);
+    await tester.tap(find.byTooltip('Experiment history'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('New experiment'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 400));
+    expect(find.text('Design a better algae bar'), findsOneWidget);
+    expect(find.text('Screening report'), findsNothing);
+  });
   testWidgets(
     'exclusion modes are explicit, recheck and appear on saved report',
     (tester) async {

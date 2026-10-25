@@ -139,14 +139,24 @@ class _InputScreenState extends State<InputScreen> {
     }
   }
 
-  void openHistory() => Navigator.of(context).push(
-    MaterialPageRoute<void>(builder: (_) => HistoryScreen(client: client)),
-  );
+  void newExperiment() {
+    setState(() => result = null);
+    scheduleCheck();
+  }
+
+  Future<void> openHistory() async {
+    final requestedNewExperiment = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(builder: (_) => HistoryScreen(client: client)),
+    );
+    if (mounted && requestedNewExperiment == true) {
+      newExperiment();
+    }
+  }
 
   @override
   Widget build(BuildContext context) => AlgaShell(
     selected: 'new',
-    onNew: result == null ? null : () => setState(() => result = null),
+    onNew: result == null ? null : newExperiment,
     onHistory: loading ? null : openHistory,
     child: SingleChildScrollView(
       key: ValueKey(
@@ -164,7 +174,7 @@ class _InputScreenState extends State<InputScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: TextButton.icon(
-                        onPressed: () => setState(() => result = null),
+                        onPressed: newExperiment,
                         icon: const Icon(Icons.arrow_back, size: 18),
                         label: const Text('New experiment'),
                       ),

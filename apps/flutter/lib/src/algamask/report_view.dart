@@ -81,9 +81,22 @@ class ReportView extends StatelessWidget {
   }
 
   Future<void> copy(BuildContext context) async {
-    await Clipboard.setData(
-      ClipboardData(text: const JsonEncoder.withIndent('  ').convert(result)),
-    );
+    try {
+      await Clipboard.setData(
+        ClipboardData(text: const JsonEncoder.withIndent('  ').convert(result)),
+      );
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not copy the report. Allow clipboard access or use the print report.',
+            ),
+          ),
+        );
+      }
+      return;
+    }
     if (context.mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Run JSON copied.')));

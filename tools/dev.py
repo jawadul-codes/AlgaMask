@@ -30,6 +30,9 @@ def reserve_port(preferred, *, explicit=False):
     for port in range(preferred, min(preferred + (1 if explicit else 30), 65536)):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
+            # Permit immediate restart after an owned connection enters TIME_WAIT.
+            # SO_REUSEPORT is deliberately not enabled: an active listener still wins.
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind(("127.0.0.1", port))
             sock.listen(128)
             return sock

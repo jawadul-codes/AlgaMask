@@ -2,6 +2,27 @@
 
 Updated: 2026-10-25
 
+## Release Step 1: browser workflow audit (2026-10-25, completed within recorded scope)
+
+- Testing the current compiled Flutter UI against real offline development RAG
+  using an isolated temporary run database and separate local ports.
+- Verified coverage: default run, target edits and invalid inputs, exact blocked
+  chlorella example, ingredient preferences/verified exclusions/oats, fixed proof,
+  history reopening, HTML report and connection-error recovery.
+- Results and evidence recorded in BROWSER_WORKFLOW_AUDIT.md. Four isolated runs
+  persisted through restart; blocked previews created no jobs. History filtering,
+  report reopening, print-report navigation and JSON copying were browser-verified.
+- Fixed New experiment navigation from history, fresh eligibility checks when
+  reopening inputs, clipboard-error feedback, and launcher restart socket reuse.
+- Final checks: analysis clean, 29 Flutter tests passed, web build and browser
+  retest passed; 207 backend tests passed / 10 opt-in ML tests skipped.
+- Actual browser width was 689 px; a requested phone viewport override was ignored.
+  Automated 390 px form/report tests passed, but real phone-browser testing remains
+  a recorded release-test limitation. Step 2 output clarity findings are recorded.
+- Owned audit services stopped, audit database/logs/screenshots retained; user
+  services unchanged. No dataset changes, commit or push.
+- Earlier automated checks are not counted as browser observations.
+
 ## Exclusion preferences versus verification (2026-10-25, verified)
 
 - Split the input choice into recipe ingredient preferences and verified-free-from

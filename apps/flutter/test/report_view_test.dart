@@ -1,5 +1,6 @@
 import 'package:algamask/src/algamask/report_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Map<String, dynamic> result(String status) => {
@@ -56,6 +57,41 @@ Map<String, dynamic> result(String status) => {
 };
 
 void main() {
+  testWidgets('denied clipboard write shows recovery feedback', (tester) async {
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          throw PlatformException(code: 'denied');
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ReportView(
+              result: result('report_ready'),
+              reportUri: Uri.parse('http://localhost/runs/test/report'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.ensureVisible(find.text('Copy run JSON'));
+    await tester.tap(find.text('Copy run JSON'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Could not copy the report'), findsOneWidget);
+    expect(find.text('Run JSON copied.'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
   for (final status in [
     'report_ready',
     'insufficient_data',
@@ -80,7 +116,10 @@ void main() {
           ),
         ),
       );
-      expect(find.textContaining('LOCAL RAG · development data'), findsOneWidget);
+      expect(
+        find.textContaining('LOCAL RAG · development data'),
+        findsOneWidget,
+      );
       expect(find.text('Source-scoped finding'), findsOneWidget);
       final tile = find.text('S25-1 · composition estimate');
       await tester.ensureVisible(tile);
