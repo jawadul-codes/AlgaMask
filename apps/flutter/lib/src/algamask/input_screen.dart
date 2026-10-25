@@ -149,6 +149,9 @@ class _InputScreenState extends State<InputScreen> {
     onNew: result == null ? null : () => setState(() => result = null),
     onHistory: loading ? null : openHistory,
     child: SingleChildScrollView(
+      key: ValueKey(
+        result == null ? 'experiment-builder' : 'experiment-report',
+      ),
       padding: const EdgeInsets.fromLTRB(28, 32, 28, 64),
       child: Center(
         child: ConstrainedBox(
@@ -680,7 +683,7 @@ class _InputScreenState extends State<InputScreen> {
           : () => change(() => isFlavour ? flavour = value : algae = value),
       child: Container(
         width: width,
-        height: 148,
+        height: 184,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: selected ? const Color(0xfff3f8f1) : Colors.white,
@@ -702,11 +705,20 @@ class _InputScreenState extends State<InputScreen> {
                   color: selected ? AlgaColors.forest : AlgaColors.muted,
                   size: 19,
                 ),
-                const Spacer(),
-                Icon(icon, color: AlgaColors.green, size: 37),
               ],
             ),
-            const Spacer(),
+            Expanded(
+              child: Center(
+                child: Image.asset(
+                  'assets/ingredients/$value.png',
+                  width: 124,
+                  height: 94,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, _, _) =>
+                      Icon(icon, color: AlgaColors.green, size: 42),
+                ),
+              ),
+            ),
             Text(
               title,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),

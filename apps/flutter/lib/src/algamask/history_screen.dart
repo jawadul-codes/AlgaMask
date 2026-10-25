@@ -116,6 +116,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     onNew: () => Navigator.of(context).pop(),
     onHistory: selected == null ? null : () => setState(() => selected = null),
     child: SingleChildScrollView(
+      key: ValueKey(selected == null ? 'history-list' : 'history-report'),
       padding: const EdgeInsets.fromLTRB(28, 32, 28, 64),
       child: Center(
         child: ConstrainedBox(
