@@ -99,7 +99,7 @@ TABLES = {
 "ingredient_nutrition": dict(pk="nutrition_id", prov="full", desc="Per-100 g nutrition; empty = unknown (never 0 for missing)", cols=[
   c("nutrition_id","id",AL),c("ingredient_form_id","fk:ingredient_forms.ingredient_form_id",AL),c("basis","str",A,"e.g. per_100g"),
   c("protein_g","float",N),c("energy_kcal","float",N),c("carbohydrate_g","float",N),c("fat_g","float",N),c("fibre_g","float",N),c("iron_mg","float",N),
-  c("omega3_g","float",N,"Only when supported"),c("nutrition_source_type","enum:nutrition_source_type",A),c("value_precision","enum:value_precision",A),
+  c("omega3_g","float",N,"Only when supported"),c("sugar_g","float",N,"Total sugars per 100 g; not added sugars. Empty is unknown."),c("nutrition_source_type","enum:nutrition_source_type",A),c("value_precision","enum:value_precision",A),
   c("fdc_id","int",N),c("fdc_food_type","str",N),c("fdc_data_release","str",N),c("match_rationale","str",N),c("transformation_record","str",N)]),
 "evidence_chunks": dict(pk="chunk_id", prov="full", desc="Reviewer-written evidence notes for retrieval (1-4 sentences)", cols=[
   c("chunk_id","id",AL),c("chunk_tag","enum:chunk_tag",AL),c("claim_summary","str",A,"Reviewer-written note"),c("support_class","enum:support_class",A),

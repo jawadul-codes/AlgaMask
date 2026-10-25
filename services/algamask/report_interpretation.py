@@ -64,8 +64,15 @@ def interpret(result):
     nutrition_notice = ('No candidate nutrition values are available.' if not result.formulations else
                         'Selected candidate has unknown ' + ', '.join(unavailable) + '. Unknown does not mean zero.'
                         if unavailable else 'Selected candidate nutrition values are composition estimates, not product measurements.')
+    ingredient_names = dict(INGREDIENT_NAMES)
+    for estimate in result.impact.get('nutrition', {}).values():
+        for record in estimate.get('records', []):
+            if record.get('nutrition_source_type') == 'supplier_label' and record.get('ingredient_name'):
+                ingredient_names[record['ingredient_form_id']] = record['ingredient_name']
+            elif record.get('nutrition_id') == 'NUT-CHL-ALGOMED-LABEL':
+                ingredient_names['IF-CHL-PWD'] = 'Algomed chlorella powder (reference)'
     return {'version': 'report-clarity-v1', 'title': title, 'reason': reason,
-            'ingredient_names': INGREDIENT_NAMES,
+            'ingredient_names': ingredient_names,
             'nutrition_notice': nutrition_notice,
             'blocking_reasons': list(dict.fromkeys(reasons)),
             'sensory': sensory,

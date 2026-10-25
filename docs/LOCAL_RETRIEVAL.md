@@ -1,7 +1,12 @@
 # Local evidence retrieval — Step 3
 
-Implemented on 2026-10-22; updated 2026-10-24. Active development index:
-`indexes/reviewed_evidence/0.1.0-dev.3`, paired with candidate rc.4.
+Implemented on 2026-10-22; updated 2026-10-25. Active development index:
+`indexes/reviewed_evidence/0.1.0-dev.4`, paired with candidate rc.5.
+
+Update 2026-10-25: rc.5 adds traceable sugar and a complete named chlorella label
+profile. The 23 evidence notes are unchanged; dev.4 binds them to the new dataset
+hash. All eight golden retrieval questions remain rank 1. Old artifacts are preserved.
+See [nutrition coverage](NUTRITION_COVERAGE.md).
 
 Update 2026-10-24: corrected rc.4/dev.3 is activated and verified through Flutter.
 See [activation results](DEVELOPMENT_ACTIVATION.md). The historical implementation
@@ -34,7 +39,7 @@ uv sync --locked --extra dev --extra rag
 # Initial download only; choose a NEW version if the output already exists.
 uv run --extra rag python tools/rag.py build \
   --dataset data/candidates/0.1.0-rc.1 --development \
-  --version 0.1.0-dev.4 --download-model
+  --version 0.1.0-dev.NEW --download-model
 
 # Existing dev.2 works offline after the initial model download.
 uv run --extra rag python tools/rag.py search \

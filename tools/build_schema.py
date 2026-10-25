@@ -14,16 +14,16 @@ for t in TABLES:   # Create missing templates only; never erase populated data.
         csv.writer(f).writerow([c[0] for c in full_cols(t)])
 
 with open(root/"data/dictionaries/columns.csv","w",newline="",encoding="utf-8") as f:
-    w = csv.writer(f); w.writerow(["table","column","type","required","references_or_enum","description"])
+    w = csv.writer(f, lineterminator="\n"); w.writerow(["table","column","type","required","references_or_enum","description"])
     for t in TABLES:
         for n,ty,req,_,desc in full_cols(t):
             ref = ty.split(":",1)[1] if ":" in ty else ""
             w.writerow([t,n,ty.split(":")[0],req,ref,desc])
 with open(root/"data/dictionaries/tables.csv","w",newline="",encoding="utf-8") as f:
-    w = csv.writer(f); w.writerow(["table","primary_key","provenance_mode","description"])
+    w = csv.writer(f, lineterminator="\n"); w.writerow(["table","primary_key","provenance_mode","description"])
     for t,m in TABLES.items(): w.writerow([t,m["pk"],m["prov"],m["desc"]])
 with open(root/"data/dictionaries/enums.csv","w",newline="",encoding="utf-8") as f:
-    w = csv.writer(f); w.writerow(["enum","value","description"])
+    w = csv.writer(f, lineterminator="\n"); w.writerow(["enum","value","description"])
     for e,vals in ENUMS.items():
         for v,d in vals: w.writerow([e,v,d])
 manifest = root/"data/manifests/source_manifest.csv"

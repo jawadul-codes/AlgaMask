@@ -141,15 +141,16 @@ def test_exact_chlorella_preflight_margins_and_adjustment(client):
                    min_protein_g=12, max_energy_kcal=426, max_sugar_g=0)
     result = api.post('/runs/preflight', json=payload).json()
     assert not result['can_run']
-    assert result['margins']['min_protein_g']['max'] == pytest.approx(5.01867)
-    assert result['margins']['max_energy_kcal']['min'] is None
-    assert result['margins']['max_sugar_g']['min'] is None
-    assert len(result['messages']) == 3
+    assert result['margins']['min_protein_g']['max'] == pytest.approx(5.17797)
+    assert result['margins']['max_energy_kcal']['min'] == pytest.approx(154.017)
+    assert result['margins']['max_sugar_g']['min'] == pytest.approx(7.508205)
+    assert len(result['messages']) == 2
+    assert 'required data is missing' not in str(result['messages'])
     assert not runtime._search.queries  # Failed arithmetic needs no retrieval.
     assert not app.state.run_store.history()
     assert api.post('/runs', json=payload).status_code == 422
     assert not app.state.run_store.history()
-    adjusted = {**payload, 'min_protein_g': 5.01, 'max_energy_kcal': None, 'max_sugar_g': None}
+    adjusted = {**payload, 'min_protein_g': 5.17, 'max_energy_kcal': 200, 'max_sugar_g': 10}
     preview = api.post('/runs/preflight', json=adjusted).json()
     assert preview['can_run'] and preview['candidate_count'] == 1
     run = api.post('/runs', json=adjusted).json()
@@ -229,13 +230,15 @@ def test_new_reports_do_not_invent_sensory_scores(client):
     summary = result['interpretation']
     assert 'computational checks' in summary['title']
     assert 'unmeasured' in summary['sensory']
-    assert 'unknown energy, sugar' in summary['nutrition_notice']
+    assert 'composition estimates' in summary['nutrition_notice']
+    assert summary['ingredient_names']['IF-CHL-PWD'] == 'Algomed chlorella powder (reference)'
     assert 'controls may exceed' in summary['controls']
     assert all(not scope['recipe_validated'] for scope in summary['evidence'].values())
     html = api.get(f"/runs/{result['run_id']}/report").text
     assert 'Evidence context and limits' in html
     assert 'comparison control' in html and 'targets apply to candidates only' in html
     assert 'Dried dates [IF-DATE-DRIED]' in html
+    assert 'Algomed chlorella powder (reference) [IF-CHL-PWD]' in html
     assert 'Study material: related matrix.' in html
 
 

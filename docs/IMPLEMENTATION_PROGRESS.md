@@ -2,6 +2,57 @@
 
 Updated: 2026-10-25
 
+## Release Step 3: nutrition coverage (2026-10-25, supported coverage verified)
+
+- Adding total sugar with exact USDA food/nutrient identifiers, units and derivations.
+  Missing and assumed-zero entries remain unknown, not numeric zero.
+- Using the complete manufacturer label for named Algomed chlorella powder as a
+  new reference profile; never grafting energy/sugar onto the old laboratory sample.
+- Keeping historical frozen candidates and indexes reproducible. New data stays
+  extracted, not scientifically approved; estimates are not prototype measurements.
+- Activated immutable rc.5/dev.4 (dataset hash
+  b05a800077d53b3bce3c63bdb527d30bf5b48f5c47e7182a0744f4c1c3f02076).
+  Working tables have the same record values; frozen bytes/hashes are unchanged.
+  292 records, 12 sources, 7 algae materials, 19 nutrition rows, 23 evidence notes.
+- Added exact per-serving/per-100-g total sugar; 15/19 profiles have supported
+  numeric sugar. All algae choices have protein/energy/sugar coverage with vanilla
+  and cocoa-spice. Raw orange peel sugar is absent, and coconut oil/salt/soy isolate
+  assumed-zero sugar remains unknown. Citrus sugar targets still block explicitly.
+  Fibre/iron/total omega-3 are not universally complete. Step 3 does not claim that
+  every ingredient/nutrient gap is closed.
+- Spreadsheet scientific-data guidance informed exact keys, units, source
+  attribution and missing-versus-zero handling; existing CSV generation was retained.
+- Chlorella uses a whole named supplier profile (51.9 g protein, 377 kcal,
+  0.6 g sugar per 100 g), not values grafted onto laboratory sample A. Manufacturer
+  sulfites and supplier/lot limitations are visible. Old sample stays in rc.4.
+- Browser reproduced the impossible chlorella/3%/45 g/vanilla/12 g protein/
+  426 kcal/zero-sugar inputs: disabled Run, numeric margins (protein max 5.17797 g,
+  sugar min 7.508205 g), no missing-energy error. Supported limits 5.17 g/200 kcal/
+  10 g produced run be12ec12-ddac-40c3-b1f4-47adbab5c835: S25-1, 5.17797 g protein,
+  159.201 kcal, 7.508205 g sugar. Clipboard export, print report, named ingredients
+  and persisted report reload were browser-verified. Citrus sugar 10 g blocked
+  with missing IF-ORANGE-PEEL identified. Screenshot: output/review/step3-nutrition-report.png.
+- Verification: 238 backend tests passed / 20 opt-in skipped; separately 20 real
+  offline RAG tests passed across historical/current pairs. All eight golden
+  retrieval questions remain rank 1. Thirty Flutter tests passed; analysis clean;
+  compiled web build passed. Full development release check (including temporary
+  database backup/restore) passed before the final three boundary-only tests.
+  Dataset validation: 292 rows / 21 tables / zero errors or warnings.
+- Independent USDA audit: five core foods, 36 exact numeric matches; four missing
+  ALA values preserved. Deliberately changed protein, changed sugar, wrong basis
+  and duplicate record all rejected. Eighteen USDA sugar decisions and the separate
+  manufacturer extraction are in output/review/nutrition_step3_sources.json.
+- Removed blanket UI claims that sugar/chlorella energy are always missing. Reports
+  retain supplier URLs, exact form names and qualifiers. Legacy manifest/header
+  compatibility, malformed headers, numeric validity, mixed constraints and dirty
+  working-copy preservation have regression coverage. No scientific approval granted.
+- Details/reproduction: NUTRITION_COVERAGE.md. Restart backend and Flutter together
+  to use defaults; explicit old dataset/index overrides must be updated together.
+  Browser tests used an isolated database; an initial readiness-only launch used
+  the default database before the override was corrected, with no runs submitted.
+  Owned audit services stopped; existing user services left running.
+  No commit/push performed.
+
 ## Release Step 2: output clarity (2026-10-25, verified)
 
 - Replacing numeric demo sensory risks with unknown/unmeasured values in new runs.

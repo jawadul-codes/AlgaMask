@@ -1,5 +1,25 @@
 # Data contract
 
+## Current state (2026-10-25)
+
+The working tables match frozen candidate `0.1.0-rc.5`; the development app reads
+that verified candidate with index `0.1.0-dev.4`. There are 292 rows, 12 sources,
+7 algae materials, 20 ingredient forms, 19 nutrition profiles and 23 evidence notes.
+No scientific approval was granted. Mock mode remains a separate synthetic fixture.
+
+Schema 1.1 adds optional total `sugar_g` per 100 g. Fifteen of nineteen nutrition
+profiles have a supported numeric total sugar; raw orange peel, coconut oil, salt
+and soy isolate remain unknown (absent or assumed zero). Chlorella now uses the
+whole named Algomed powder supplier label, not a mixture with the prior laboratory
+sample. Fibre and iron for that reference remain unknown. Supplier label rounding
+and generic USDA composition are not prototype-lot measurements.
+
+Frozen older candidates retain schema 1.0, original hashes and unknown sugar. Do
+not rerun the historical full extractor over the current tables: use the narrow
+versioned nutrition extension workflow in [coverage notes](../docs/NUTRITION_COVERAGE.md).
+
+## Historical original extract notes (superseded where noted above)
+
 `reviewed/` is the 21-table schema from the dataset plan. Rows currently in those files are `review_status=extracted`. None are approved. An empty numeric cell means unknown, never zero. Join records by IDs. The live app does not read these files yet; `services/algamask/fixtures.py` is still the synthetic demo data.
 
 `python tools/validate.py` checks headers, enums, types, and foreign keys. It passed on this extract.

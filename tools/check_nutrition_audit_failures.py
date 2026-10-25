@@ -15,7 +15,7 @@ def main():
     with (ROOT / 'data/reviewed/ingredient_nutrition.csv').open() as handle:
         reader = csv.DictReader(handle)
         fields, original = reader.fieldnames, list(reader)
-    cases = ('changed_protein', 'wrong_basis', 'duplicate_record')
+    cases = ('changed_protein', 'changed_sugar', 'wrong_basis', 'duplicate_record')
     with tempfile.TemporaryDirectory(prefix='algamask-nutrition-audit-') as directory:
         work = Path(directory)
         for case in cases:
@@ -23,6 +23,8 @@ def main():
             selected = next(r for r in rows if r['ingredient_form_id'] == 'IF-SPI-PWD')
             if case == 'changed_protein':
                 selected['protein_g'] = '999'
+            elif case == 'changed_sugar':
+                selected['sugar_g'] = '0'
             elif case == 'wrong_basis':
                 selected['basis'] = 'per_serving'
             else:

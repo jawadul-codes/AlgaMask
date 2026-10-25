@@ -1,13 +1,14 @@
 from html import escape
 
 from .schemas import RunResult
-from .report_interpretation import interpret, INGREDIENT_NAMES
+from .report_interpretation import interpret
 
 
 def render_report(result: RunResult) -> str:
     interpretation = interpret(result)
+    ingredient_names = interpretation['ingredient_names']
     controls = {f.id for f in result.controls}
-    rows = "".join(f"<tr><td>{escape(f.id)} ({'comparison control' if f.id in controls else 'candidate'})</td><td>{escape(f.name)}</td><td>{f.total_g:g} g</td><td>{escape(', '.join(f'{INGREDIENT_NAMES.get(i.ingredient_id, i.ingredient_id)} [{i.ingredient_id}]: {i.grams:g} g' for i in f.ingredients))}</td></tr>" for f in result.controls + result.formulations)
+    rows = "".join(f"<tr><td>{escape(f.id)} ({'comparison control' if f.id in controls else 'candidate'})</td><td>{escape(f.name)}</td><td>{f.total_g:g} g</td><td>{escape(', '.join(f'{ingredient_names.get(i.ingredient_id, i.ingredient_id)} [{i.ingredient_id}]: {i.grams:g} g' for i in f.ingredients))}</td></tr>" for f in result.controls + result.formulations)
     reasons = ''.join(f'<li>{escape(reason)}</li>' for reason in interpretation['blocking_reasons'])
     outcome = (f"<h2>{escape(interpretation['title'])}</h2><p>{escape(interpretation['reason'])}</p><ul>{reasons}</ul>"
                f"<p>{escape(interpretation['sensory'])}</p><p>{escape(interpretation['mass_basis'])}</p>"

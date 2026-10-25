@@ -8,7 +8,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .dataset import SCHEMA_VERSION, load_dataset
+from .dataset import SUPPORTED_SCHEMA_VERSIONS, dataset_schema_version, load_dataset
 from .dataset_schema import TABLES, full_cols
 
 RELEASE_MINIMUMS = {"sources": 10, "algae_materials": 2, "compounds": 15,
@@ -41,12 +41,15 @@ def extraction_review(packet: dict) -> str:
 
 def audit(directory: Path) -> dict:
     snapshot = load_dataset(directory)
+    schema_version = dataset_schema_version(directory)
     counts, records, blockers = {}, [], []
     for table in TABLES:
         rows = snapshot.records(table)
         counts[table] = dict(sorted(Counter(getattr(r, "review_status", "metadata") for r in rows).items()))
         for record in rows:
             values = record.model_dump(mode="json")
+            if table == "ingredient_nutrition" and schema_version == "1.0.0":
+                values.pop("sugar_g")  # Preserve historical audit bytes/semantics.
             status = values.get("review_status")
             missing = [name for name, _, required, _, _ in full_cols(table)
                        if required == "approved" and values.get(name) in (None, "", [])]
@@ -85,7 +88,7 @@ def audit(directory: Path) -> dict:
             coverage[key][table] = {"total": len(matches), "approved": sum(r.review_status == "approved" for r in matches)}
             if not any(r.review_status == "approved" for r in matches):
                 blockers.append(f"ingredient_forms:{key}: lacks approved {table}")
-    return {"schema_version": SCHEMA_VERSION, "row_counts": snapshot.row_counts,
+    return {"schema_version": schema_version, "row_counts": snapshot.row_counts,
             "status_counts": counts, "records": records, "ingredient_coverage": coverage,
             "warnings": [i.model_dump() for i in snapshot.issues],
             "release_blockers": blockers, "publication_ready": not blockers}
@@ -148,7 +151,7 @@ def build(directory: Path, output: Path, version: str, *, publish: bool = False,
         (temporary / "REVIEW.md").write_text(review_markdown(report), encoding="utf-8")
         files = {p.relative_to(temporary).as_posix(): digest(p.read_bytes())
                  for p in sorted(temporary.rglob("*")) if p.is_file()}
-        manifest = {"format_version": 1, "dataset_version": version, "schema_version": SCHEMA_VERSION,
+        manifest = {"format_version": 1, "dataset_version": version, "schema_version": report["schema_version"],
                     "kind": "release" if publish else "candidate", "runtime_eligible": publish,
                     "reviewer": reviewer.strip() or None, "created_at": datetime.now(timezone.utc).isoformat(),
                     "code_commit": code_commit, "row_counts": report["row_counts"],
@@ -169,7 +172,7 @@ def build(directory: Path, output: Path, version: str, *, publish: bool = False,
 def verify(directory: Path, *, require_release: bool = False) -> dict:
     """Verify bytes and rerun current gates before allowing runtime consumption."""
     manifest = json.loads((directory / "manifest.json").read_text())
-    if manifest.get("format_version") != 1 or manifest.get("schema_version") != SCHEMA_VERSION:
+    if manifest.get("format_version") != 1 or manifest.get("schema_version") not in SUPPORTED_SCHEMA_VERSIONS:
         raise ValueError("Unsupported manifest or schema version")
     expected = {f"reviewed/{t}.csv" for t in TABLES} | {"review.json", "REVIEW.md"}
     files = manifest["files"]
@@ -187,7 +190,7 @@ def verify(directory: Path, *, require_release: bool = False) -> dict:
     if manifest["content_hash"] != digest(canonical(files)) or manifest["validation_report_hash"] != files["review.json"]:
         raise ValueError("Manifest hash mismatch")
     report = audit(directory / "reviewed")
-    if report != json.loads((directory / "review.json").read_text()) or report["row_counts"] != manifest["row_counts"]:
+    if report["schema_version"] != manifest["schema_version"] or report != json.loads((directory / "review.json").read_text()) or report["row_counts"] != manifest["row_counts"]:
         raise ValueError("Review report does not match dataset")
     if require_release and (manifest.get("kind") != "release" or manifest.get("runtime_eligible") is not True or not manifest.get("reviewer") or not report["publication_ready"]):
         raise ValueError("Dataset is not an approved runtime release")

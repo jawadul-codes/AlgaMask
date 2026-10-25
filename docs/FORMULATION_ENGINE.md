@@ -19,9 +19,10 @@ ambiguous records do not contribute partial totals: the affected nutrient become
 unknown. Unknown energy also makes protein per 100 kcal unknown. Zero energy cannot
 produce a ratio. Negative or nonfinite inputs fail validation.
 
-Sugar is not available in this schema. Some omega-3 entries are ALA only, so no
-total omega-3 estimate is produced. Neither carbohydrate nor ALA is silently
-substituted for these missing quantities. Original record qualifications are retained.
+Schema 1.1 includes total sugar (not added sugar), calculated with the same exact-form
+mass weighting as other nutrients. Legacy schema 1.0 rows load sugar as unknown.
+Some omega-3 entries are ALA only, so no total omega-3 estimate is produced. Neither
+carbohydrate nor ALA is substituted. See [source coverage](NUTRITION_COVERAGE.md).
 
 ## Implemented: experimental screening workflow
 
@@ -36,8 +37,10 @@ not labelled date paste. No retrieved passage is assigned as dose support.
 
 The search checks serving mass, exact species inclusion, grid membership and
 exclusions. Optional per-serving request fields are `min_protein_g`,
-`max_energy_kcal` and `max_sugar_g`. A target with missing data cannot pass. Sugar
-targets currently block all candidates; energy targets block Chlorella/blend.
+`max_energy_kcal` and `max_sugar_g`. A target with missing data cannot pass. Active
+rc.5 supports protein/energy/sugar for vanilla and cocoa-spice across all three
+algae choices. Citrus sugar remains unknown because the raw-orange-peel record lacks
+total sugar. Chlorella refers to the named Algomed supplier-label profile.
 Candidates meeting the checks are ranked by estimated protein per serving, with
 stable ID tie-breaking; at most three are returned. Failure means **no verified
 candidate in this nine-point grid**, not proof that the user's goal is impossible.

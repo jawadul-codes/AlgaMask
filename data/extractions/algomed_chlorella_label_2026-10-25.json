@@ -1,0 +1,27 @@
+{
+  "source_id": "SRC-ALGOMED-POWDER-2026",
+  "url": "https://algomed.de/products/algomed-chlorella-pulver",
+  "retrieved_at": "2026-10-25",
+  "source_location": "Algomed Chlorella Pulver; Inhaltsstoffe and Nährwerte; pro 100 g",
+  "product": "Algomed Chlorella Pulver",
+  "supplier": "Algenfarm Klötze GmbH & Co. KG",
+  "species": "Chlorella vulgaris",
+  "ingredients": "100% Chlorella vulgaris powder",
+  "basis": "per_100g",
+  "values": {
+    "energy_kcal": "377",
+    "protein_g": "51.9",
+    "carbohydrate_g": "9.2",
+    "fat_g": "9.3",
+    "sugar_g": "0.6"
+  },
+  "other_label_facts": {
+    "energy_kj": "1585",
+    "saturated_fat_g": "2.9",
+    "salt_g": "0.06",
+    "naturally_occurring_sulfites_mg_per_kg": "<10 to approximately 30"
+  },
+  "limitations": "Rounded supplier label for this named reference product only; not the 2025 laboratory sample A, not generic chlorella, not a prototype-lot measurement. Fibre, iron and total omega-3 not supplied here. Naturally occurring sulfites are reported by the manufacturer; no allergen-safe claim.",
+  "rights": "Factual numerical extraction with attribution; full page, images and marketing text not redistributed.",
+  "scientific_approval": false
+}

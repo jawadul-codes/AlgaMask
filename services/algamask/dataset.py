@@ -13,7 +13,16 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, create_model
 
 from .dataset_schema import ENUMS, TABLES, full_cols
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
+SUPPORTED_SCHEMA_VERSIONS = {"1.0.0", SCHEMA_VERSION}
+
+
+def dataset_schema_version(directory: Path) -> str:
+    """The only legacy shape is the exact 1.0 nutrition header without sugar."""
+    with (directory / "ingredient_nutrition.csv").open(newline="", encoding="utf-8-sig") as handle:
+        header = next(csv.reader(handle))
+    current = [column[0] for column in full_cols("ingredient_nutrition")]
+    return "1.0.0" if header == [name for name in current if name != "sugar_g"] else SCHEMA_VERSION
 
 
 class DatasetRecord(BaseModel):
@@ -117,7 +126,9 @@ def load_dataset(directory: Path | str) -> DatasetSnapshot:
         try:
             with (directory / f"{table}.csv").open(newline="", encoding="utf-8-sig") as handle:
                 reader = csv.DictReader(handle)
-                if reader.fieldnames != [column[0] for column in full_cols(table)]:
+                expected = [column[0] for column in full_cols(table)]
+                legacy = table == "ingredient_nutrition" and reader.fieldnames == [n for n in expected if n != "sugar_g"]
+                if reader.fieldnames != expected and not legacy:
                     issue(table, None, "header mismatch")
                     continue
                 for number, row in enumerate(reader, 2):
@@ -163,7 +174,7 @@ def load_dataset(directory: Path | str) -> DatasetSnapshot:
                     fail("record_version must be positive")
                 if name in {"min_pct_ww", "max_pct_ww", "amount_pct_ww", "inclusion_default_pct_ww"} and not 0 <= value <= 100:
                     fail(f"{name} must be between 0 and 100")
-                if name in {"protein_g", "carbohydrate_g", "fat_g", "fibre_g", "omega3_g"} and not 0 <= value <= 100:
+                if name in {"protein_g", "carbohydrate_g", "fat_g", "fibre_g", "omega3_g", "sugar_g"} and not 0 <= value <= 100:
                     fail(f"{name} must be between 0 and 100 per 100 g")
                 if name in {"energy_kcal", "iron_mg", "reported_value", "odor_threshold_value", "spread", "exclusions_count"} and value < 0:
                     fail(f"{name} must be nonnegative")
@@ -191,6 +202,8 @@ def load_dataset(directory: Path | str) -> DatasetSnapshot:
                 if approved and r["identity_verification_status"] != "verified":
                     fail("approved compound requires verified identity")
             if table == "ingredient_nutrition":
+                if r["sugar_g"] is not None and r["carbohydrate_g"] is not None and r["sugar_g"] > r["carbohydrate_g"]:
+                    fail("total sugar exceeds total carbohydrate")
                 if r["basis"] not in {None, "per_100g"}:
                     fail("nutrition basis must be per_100g")
                 if approved:

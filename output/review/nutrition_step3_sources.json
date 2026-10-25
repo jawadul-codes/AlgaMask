@@ -1,0 +1,769 @@
+{
+  "archive_sha256": "b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0",
+  "archive_url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip",
+  "base_dataset_hash": "e999303a8afda5624002ec8ac27994c40b4ae9b9faf59fa72aecd70336c34432",
+  "label_extraction_sha256": "8b278713d641d3e7a9413ff5198a8c9c16fcd089713768f7a850bb8fa76abce3",
+  "nutrition_csv_sha256": "128a6d1bb76a560ba8bf2df912abde5aec157b5da9a1965023fad1d4d8d481a3",
+  "previous_chlorella_profile": {
+    "basis": "per_100g",
+    "carbohydrate_g": "18.6",
+    "energy_kcal": "",
+    "evidence_status": "literature_derived",
+    "fat_g": "6.0",
+    "fdc_data_release": "",
+    "fdc_food_type": "",
+    "fdc_id": "",
+    "fibre_g": "",
+    "ingredient_form_id": "IF-CHL-PWD",
+    "iron_mg": "",
+    "match_rationale": "Sample A only: Algomed Chlorella vulgaris, green, phototrophic commercial powder. Not the 2021 culture and not the Gracio biomass.",
+    "notes": "PENDING HUMAN REVIEW. Not approved. One commercial powder in an eight-powder comparison. Energy and iron were not in that table.",
+    "nutrition_id": "NUT-CHL-ALGOMED",
+    "nutrition_source_type": "other_reviewed",
+    "omega3_g": "",
+    "protein_g": "40.1",
+    "record_version": "1",
+    "review_status": "extracted",
+    "reviewed_at": "",
+    "reviewer": "",
+    "source_id": "SRC-FRONTIERS-2025-1534438",
+    "source_location": "Front. Food Sci. Technol. 2025, Table 3, column A. Protein SD 0.3, carbohydrate SD 0.4, lipid SD 0.3.",
+    "sugar_g": "",
+    "transformation_record": "Protein is Kjeldahl nitrogen times 4.78. Carbohydrate is HPLC after chemical hydrolysis. Fat is FAME lipid, not a total-fat method. The paper's residual was not entered as fibre.",
+    "value_precision": "laboratory"
+  },
+  "row_counts": {
+    "algae_compound_observations": 45,
+    "algae_materials": 7,
+    "allergens": 10,
+    "compound_features": 30,
+    "compound_sensory_links": 40,
+    "compounds": 30,
+    "dataset_versions": 0,
+    "evidence_chunks": 23,
+    "formulation_ingredients": 12,
+    "formulations": 3,
+    "ingredient_allergens": 5,
+    "ingredient_forms": 20,
+    "ingredient_nutrition": 19,
+    "metric_definitions": 2,
+    "prototype_processes": 0,
+    "retrieval_evaluations": 8,
+    "screening_bounds": 1,
+    "sensory_descriptors": 25,
+    "sensory_summaries": 0,
+    "sensory_trials": 0,
+    "sources": 12
+  },
+  "schema_version": "1.1.0",
+  "scientific_approval": false,
+  "supplier_extraction": {
+    "basis": "per_100g",
+    "ingredients": "100% Chlorella vulgaris powder",
+    "limitations": "Rounded supplier label for this named reference product only; not the 2025 laboratory sample A, not generic chlorella, not a prototype-lot measurement. Fibre, iron and total omega-3 not supplied here. Naturally occurring sulfites are reported by the manufacturer; no allergen-safe claim.",
+    "other_label_facts": {
+      "energy_kj": "1585",
+      "naturally_occurring_sulfites_mg_per_kg": "<10 to approximately 30",
+      "salt_g": "0.06",
+      "saturated_fat_g": "2.9"
+    },
+    "product": "Algomed Chlorella Pulver",
+    "retrieved_at": "2026-10-25",
+    "rights": "Factual numerical extraction with attribution; full page, images and marketing text not redistributed.",
+    "scientific_approval": false,
+    "source_id": "SRC-ALGOMED-POWDER-2026",
+    "source_location": "Algomed Chlorella Pulver; Inhaltsstoffe and Nährwerte; pro 100 g",
+    "species": "Chlorella vulgaris",
+    "supplier": "Algenfarm Klötze GmbH & Co. KG",
+    "url": "https://algomed.de/products/algomed-chlorella-pulver",
+    "values": {
+      "carbohydrate_g": "9.2",
+      "energy_kcal": "377",
+      "fat_g": "9.3",
+      "protein_g": "51.9",
+      "sugar_g": "0.6"
+    }
+  },
+  "usda_sugar": [
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "BFSN",
+        "description": "Based on another form of the food or similar food; Concentration adjustment; Solids; Retention factors not used",
+        "id": "16",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Seaweed, spirulina, dried",
+        "fdc_id": "170495",
+        "food_category_id": "11",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-SPI-PWD",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-SPI-PWD",
+      "source_record": {
+        "amount": "3.1",
+        "data_points": "0",
+        "derivation_id": "16",
+        "fdc_id": "170495",
+        "footnote": "",
+        "id": "1528280",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "3.1"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "A",
+        "description": "Analytical",
+        "id": "1",
+        "source_id": "1"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Cereals, oats, regular and quick, not fortified, dry",
+        "fdc_id": "173904",
+        "food_category_id": "8",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-OAT-DRY",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-OAT-DRY",
+      "source_record": {
+        "amount": "0.99",
+        "data_points": "4",
+        "derivation_id": "1",
+        "fdc_id": "173904",
+        "footnote": "",
+        "id": "1815009",
+        "max": "1.02",
+        "median": "",
+        "min": "0.93",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "0.99"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "A",
+        "description": "Analytical",
+        "id": "1",
+        "source_id": "1"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Dates, deglet noor",
+        "fdc_id": "171726",
+        "food_category_id": "9",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-DATE-DRIED",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-DATE-DRIED",
+      "source_record": {
+        "amount": "63.35",
+        "data_points": "7",
+        "derivation_id": "1",
+        "fdc_id": "171726",
+        "footnote": "",
+        "id": "1634422",
+        "max": "68.03",
+        "median": "",
+        "min": "61.51",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "63.35"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "BFCN",
+        "description": "Based on another form of the food or similar food; Concentration adjustment; Carbohydrate; Retention factors not used",
+        "id": "8",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Cocoa, dry powder, unsweetened",
+        "fdc_id": "169593",
+        "food_category_id": "19",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-COCOA-PWD",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-COCOA-PWD",
+      "source_record": {
+        "amount": "1.75",
+        "data_points": "0",
+        "derivation_id": "8",
+        "fdc_id": "169593",
+        "footnote": "",
+        "id": "1455400",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "1.75"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "A",
+        "description": "Analytical",
+        "id": "1",
+        "source_id": "1"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Spices, cinnamon, ground",
+        "fdc_id": "171320",
+        "food_category_id": "2",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-CINN-PWD",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-CINN-PWD",
+      "source_record": {
+        "amount": "2.17",
+        "data_points": "1",
+        "derivation_id": "1",
+        "fdc_id": "171320",
+        "footnote": "",
+        "id": "1600433",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "2.17"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "O",
+        "description": "Other procedure used from imputing",
+        "id": "52",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Vanilla extract",
+        "fdc_id": "173471",
+        "food_category_id": "2",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-VAN-EXT",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-VAN-EXT",
+      "source_record": {
+        "amount": "12.65",
+        "data_points": "0",
+        "derivation_id": "52",
+        "fdc_id": "173471",
+        "footnote": "",
+        "id": "1781680",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "12.65"
+    },
+    {
+      "decision": "unknown_preserved",
+      "derivation": {},
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Orange peel, raw",
+        "fdc_id": "169103",
+        "food_category_id": "9",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-ORANGE-PEEL",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-ORANGE-PEEL",
+      "source_record": {},
+      "value": ""
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "LC",
+        "description": "Label claim (back calculated from label by NDL staff; Calculated from label claim/serving (g or %RDI)",
+        "id": "44",
+        "source_id": "6"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Beverages, Whey protein powder isolate",
+        "fdc_id": "173177",
+        "food_category_id": "14",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-WHEY-PWD",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-WHEY-PWD",
+      "source_record": {
+        "amount": "1.16",
+        "data_points": "0",
+        "derivation_id": "44",
+        "fdc_id": "173177",
+        "footnote": "",
+        "id": "1757345",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "1.16"
+    },
+    {
+      "decision": "unknown_preserved",
+      "derivation": {
+        "code": "Z",
+        "description": "Assumed zero (Insignificant amount or not naturally occurring in a food, such as fiber in meat)",
+        "id": "68",
+        "source_id": "5"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Soy protein isolate",
+        "fdc_id": "174276",
+        "food_category_id": "16",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-SOY-ISO",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-SOY-ISO",
+      "source_record": {
+        "amount": "0",
+        "data_points": "0",
+        "derivation_id": "68",
+        "fdc_id": "174276",
+        "footnote": "",
+        "id": "1845661",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": ""
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "A",
+        "description": "Analytical",
+        "id": "1",
+        "source_id": "1"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Peanut butter, smooth style, without salt",
+        "fdc_id": "172470",
+        "food_category_id": "16",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-PEANUT-BUTTER",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-PEANUT-BUTTER",
+      "source_record": {
+        "amount": "10.49",
+        "data_points": "9",
+        "derivation_id": "1",
+        "fdc_id": "172470",
+        "footnote": "",
+        "id": "1697659",
+        "max": "11.01",
+        "median": "",
+        "min": "9.48",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "10.49"
+    },
+    {
+      "decision": "used",
+      "derivation": {},
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Nuts, almond butter, plain, without salt added",
+        "fdc_id": "168588",
+        "food_category_id": "12",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-ALMOND-BUTTER",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-ALMOND-BUTTER",
+      "source_record": {
+        "amount": "4.43",
+        "data_points": "0",
+        "derivation_id": "",
+        "fdc_id": "168588",
+        "footnote": "",
+        "id": "1372110",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "4.43"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "BFSN",
+        "description": "Based on another form of the food or similar food; Concentration adjustment; Solids; Retention factors not used",
+        "id": "16",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Seeds, sesame butter, tahini, from roasted and toasted kernels (most common type)",
+        "fdc_id": "170189",
+        "food_category_id": "12",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-TAHINI",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-TAHINI",
+      "source_record": {
+        "amount": "0.49",
+        "data_points": "0",
+        "derivation_id": "16",
+        "fdc_id": "170189",
+        "footnote": "",
+        "id": "1502031",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "0.49"
+    },
+    {
+      "decision": "unknown_preserved",
+      "derivation": {
+        "code": "Z",
+        "description": "Assumed zero (Insignificant amount or not naturally occurring in a food, such as fiber in meat)",
+        "id": "68",
+        "source_id": "5"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Oil, coconut",
+        "fdc_id": "171412",
+        "food_category_id": "4",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-COCO-OIL",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-COCO-OIL",
+      "source_record": {
+        "amount": "0",
+        "data_points": "0",
+        "derivation_id": "68",
+        "fdc_id": "171412",
+        "footnote": "",
+        "id": "1607759",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": ""
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "NR",
+        "description": "Nutrient that is based on other nutrient/s; value used directly, ex. Nut.#204 from Nut.#298",
+        "id": "51",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Honey",
+        "fdc_id": "169640",
+        "food_category_id": "19",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-HONEY",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-HONEY",
+      "source_record": {
+        "amount": "82.12",
+        "data_points": "0",
+        "derivation_id": "51",
+        "fdc_id": "169640",
+        "footnote": "",
+        "id": "1458604",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "82.12"
+    },
+    {
+      "decision": "unknown_preserved",
+      "derivation": {
+        "code": "Z",
+        "description": "Assumed zero (Insignificant amount or not naturally occurring in a food, such as fiber in meat)",
+        "id": "68",
+        "source_id": "5"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Salt, table",
+        "fdc_id": "173468",
+        "food_category_id": "2",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-SALT",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-SALT",
+      "source_record": {
+        "amount": "0",
+        "data_points": "0",
+        "derivation_id": "68",
+        "fdc_id": "173468",
+        "footnote": "",
+        "id": "1781458",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": ""
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "BFSN",
+        "description": "Based on another form of the food or similar food; Concentration adjustment; Solids; Retention factors not used",
+        "id": "16",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Seeds, sunflower seed kernels, dried",
+        "fdc_id": "170562",
+        "food_category_id": "12",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-SUNFLOWER",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-SUNFLOWER",
+      "source_record": {
+        "amount": "2.62",
+        "data_points": "0",
+        "derivation_id": "16",
+        "fdc_id": "170562",
+        "footnote": "",
+        "id": "1533448",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "2.62"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "NR",
+        "description": "Nutrient that is based on other nutrient/s; value used directly, ex. Nut.#204 from Nut.#298",
+        "id": "51",
+        "source_id": "2"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Syrups, maple",
+        "fdc_id": "169661",
+        "food_category_id": "19",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-MAPLE",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-MAPLE",
+      "source_record": {
+        "amount": "60.46",
+        "data_points": "0",
+        "derivation_id": "51",
+        "fdc_id": "169661",
+        "footnote": "",
+        "id": "1459736",
+        "max": "",
+        "median": "",
+        "min": "",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "60.46"
+    },
+    {
+      "decision": "used",
+      "derivation": {
+        "code": "A",
+        "description": "Analytical",
+        "id": "1",
+        "source_id": "1"
+      },
+      "food": {
+        "data_type": "sr_legacy_food",
+        "description": "Seeds, pumpkin and squash seed kernels, dried",
+        "fdc_id": "170556",
+        "food_category_id": "12",
+        "publication_date": "2019-04-01"
+      },
+      "ingredient_form_id": "IF-PUMPKIN",
+      "nutrient": {
+        "id": "2000",
+        "name": "Sugars, Total",
+        "nutrient_nbr": "269",
+        "rank": "1510.0",
+        "unit_name": "G"
+      },
+      "nutrition_id": "NUT-PUMPKIN",
+      "source_record": {
+        "amount": "1.4",
+        "data_points": "3",
+        "derivation_id": "1",
+        "fdc_id": "170556",
+        "footnote": "",
+        "id": "1532972",
+        "max": "1.53",
+        "median": "",
+        "min": "1.32",
+        "min_year_acquired": "",
+        "nutrient_id": "2000"
+      },
+      "value": "1.4"
+    }
+  ]
+}

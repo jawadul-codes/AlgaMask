@@ -6,7 +6,7 @@ from .dataset import DatasetSnapshot
 from .schemas import Formulation
 
 
-NUTRIENTS = ("protein_g", "energy_kcal", "carbohydrate_g", "fat_g", "fibre_g", "iron_mg")
+NUTRIENTS = ("protein_g", "energy_kcal", "carbohydrate_g", "fat_g", "fibre_g", "iron_mg", "sugar_g")
 
 
 def calculate_nutrient(amounts: list[tuple[float, float | None]]) -> float | None:
@@ -54,8 +54,9 @@ def estimate_nutrition(formula: Formulation, snapshot: DatasetSnapshot,
         if row.basis == "per_100g" and row.review_status in {"approved", "verified", "extracted"}:
             rows.setdefault(row.ingredient_form_id, []).append(row)
     selected = {}
-    warnings = ["Database/literature composition is not a measurement of the prototype lot.",
-                "Sugar and total omega-3 are not calculated: sugar is absent and some omega-3 entries describe ALA only."]
+    warnings = ["Database/literature/supplier-label composition is not a measurement of the prototype lot.",
+                "Total omega-3 is not calculated: some entries describe ALA only.",
+                "Total sugar includes naturally occurring sugar; it is not an added-sugar estimate."]
     for ingredient in formula.ingredients:
         candidates = rows.get(ingredient.ingredient_id, [])
         selected[ingredient.ingredient_id] = candidates[0] if len(candidates) == 1 else None
@@ -71,10 +72,26 @@ def estimate_nutrition(formula: Formulation, snapshot: DatasetSnapshot,
             (i.grams, getattr(selected[i.ingredient_id], nutrient) if selected[i.ingredient_id] else None)
             for i in formula.ingredients])
     # These fields cannot be inferred from carbohydrate or component fatty acids.
-    for nutrient in ("sugar_g", "total_omega3_g"):
+    for nutrient in ("total_omega3_g",):
         totals[nutrient] = None
         missing[nutrient] = [i.ingredient_id for i in formula.ingredients]
-    records = [row.model_dump(mode="json") for row in selected.values() if row is not None]
+    form_records = {r.ingredient_form_id: r for r in snapshot.records('ingredient_forms')}
+    sources = {r.source_id: r for r in snapshot.records('sources')}
+    records = []
+    for row in selected.values():
+        if row is None:
+            continue
+        item = row.model_dump(mode="json")
+        form = form_records[row.ingredient_form_id]
+        source = sources.get(row.source_id)
+        item.update(ingredient_name=form.ingredient_name, supplier=form.supplier,
+                    product_code=form.product_code, source_url=source.url if source else None)
+        records.append(item)
+    if missing["sugar_g"]:
+        warnings.append("Total sugar is unknown: missing composition for " + ", ".join(missing["sugar_g"]) + ".")
+    for row in records:
+        if row["nutrition_source_type"] == "supplier_label":
+            warnings.append(f"{row['ingredient_form_id']}: named supplier reference, not a generic species value or purchased-lot measurement. {row['match_rationale'] or ''}")
     if any(row["review_status"] != "approved" for row in records):
         warnings.append("Development calculation includes records not yet approved at row level.")
     energy, protein = totals["energy_kcal"], totals["protein_g"]

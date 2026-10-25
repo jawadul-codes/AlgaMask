@@ -7,6 +7,9 @@ from .nutrition import estimate_nutrition
 
 
 def check_inputs(request, snapshot):
+    reference_notes = [f"Chlorella nutrition uses {r.ingredient_name}; supplier-label values apply to this reference product only, not every chlorella powder. Manufacturer reports naturally occurring sulfites; allergy safety is not verified."
+                       for r in snapshot.records('ingredient_forms')
+                       if request.algae.value in {'chlorella', 'blend'} and r.ingredient_form_id == 'IF-CHL-PWD' and r.supplier]
     proof = request.experiment == PROOF_VERSION
     candidates = ([make_formula('A1', proof_amounts('A1'), 45)] if proof else
                   [candidate(request, f'S{d}-{f}', d, f) for d in (25, 30, 35) for f in (1, 2, 3)])
@@ -28,7 +31,9 @@ def check_inputs(request, snapshot):
                     'No recipes remain after applying your exclusions. Nutrition targets have not been evaluated.'],
                 'margins': {}, 'candidate_count': 0,
                 'notes': ['Review the exclusion requirements. Keep a verified-free-from requirement if you need allergy assurance.']}
-    estimates = {f.id: estimate_nutrition(f, snapshot, approved_only=False).per_serving for f in eligible}
+    nutrition = {f.id: estimate_nutrition(f, snapshot, approved_only=False) for f in eligible}
+    estimates = {key: estimate.per_serving for key, estimate in nutrition.items()}
+    form_names = {r.ingredient_form_id: r.ingredient_name for r in snapshot.records('ingredient_forms')}
     margins = {}
     for field, nutrient, label, minimum in (
         ('min_protein_g', 'protein_g', 'Protein (g)', True),
@@ -43,7 +48,10 @@ def check_inputs(request, snapshot):
         if target is None:
             continue
         if not values:
+            missing_forms = sorted({form for estimate in nutrition.values() for form in estimate.missing[nutrient]})
+            missing_names = ', '.join(f'{form_names.get(form, form)} [{form}]' for form in missing_forms)
             messages.append(f'{label}: required data is missing. No numeric limit can be verified. '
+                            f'Missing composition: {missing_names}. '
                             'Leave this target blank only if it is optional, or add the missing ingredient data.')
         elif minimum and max(values) < target - 1e-8:
             limit = floor(max(values) * 100) / 100
@@ -58,7 +66,7 @@ def check_inputs(request, snapshot):
         messages.append('No single candidate meets all targets together. Adjust the combination of targets; individual ranges do not guarantee a match.')
     return {'can_run': bool(passing) and not messages, 'messages': messages, 'margins': margins,
             'candidate_count': len(passing),
-            'notes': ([ 'Ingredient preferences omit selected foods from the recipe; supplier cross-contact and allergy safety are not verified.']
+            'notes': reference_notes + ([ 'Ingredient preferences omit selected foods from the recipe; supplier cross-contact and allergy safety are not verified.']
                       if request.exclusions and request.exclusion_mode == 'ingredient_preference' else []) +
                      ['Ranges describe the current experimental recipes, not every possible recipe. Missing values are never treated as zero.',
                       'Inclusion supports 1–15% in this screen (fixed proof: 2%); serving supports 40–50 g (fixed proof: 45 g). These are software limits, not validated dose limits.',

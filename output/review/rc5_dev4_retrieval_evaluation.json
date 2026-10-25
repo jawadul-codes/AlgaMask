@@ -1,0 +1,215 @@
+{
+  "dataset_hash": "b05a800077d53b3bce3c63bdb527d30bf5b48f5c47e7182a0744f4c1c3f02076",
+  "development_only": true,
+  "index_version": "0.1.0-dev.4",
+  "mean_reciprocal_rank": 1.0,
+  "passed": 8,
+  "question_count": 8,
+  "reranker": null,
+  "results": [
+    {
+      "eval_id": "EV-01",
+      "expected_chunk_ids": [
+        "CHK-SPI-PROFILE"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "Which volatile classes were reported in commercial spirulina supplements, and were they concentrations?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-SPI-PROFILE",
+        "CHK-AEDA-POTENT",
+        "CHK-SPI-CYCLO",
+        "CHK-SPI-IONONE",
+        "CHK-SPI-OCTENOL",
+        "CHK-SPI-HEXANAL",
+        "CHK-NOT-A-BAR",
+        "CHK-SPI-HYDROCARBON",
+        "CHK-GEOSMIN-GAP",
+        "CHK-AEDA-THIOL",
+        "CHK-NUTRITION-GAP",
+        "CHK-CHL-GRACIO",
+        "CHK-CHL-HEXANAL",
+        "CHK-TWO-CHLORELLA",
+        "CHK-CHL-SEAWEED",
+        "CHK-CHL-MUSHROOM",
+        "CHK-BISCUIT-FLOUR",
+        "CHK-ALLERGEN-IDENTITY"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-02",
+      "expected_chunk_ids": [
+        "CHK-AEDA-POTENT"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "What odorants had the highest FD factors in the spirulina supplement AEDA?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-AEDA-POTENT",
+        "CHK-GEOSMIN-GAP",
+        "CHK-AEDA-THIOL",
+        "CHK-SPI-HEXANAL",
+        "CHK-SPI-OCTENOL",
+        "CHK-SPI-HYDROCARBON",
+        "CHK-SPI-IONONE",
+        "CHK-SPI-CYCLO",
+        "CHK-NOT-A-BAR",
+        "CHK-SPI-PROFILE",
+        "CHK-NUTRITION-GAP",
+        "CHK-CHL-SEAWEED",
+        "CHK-ALLERGEN-IDENTITY",
+        "CHK-CHL-HEXANAL",
+        "CHK-CHL-GRACIO",
+        "CHK-CHL-MUSHROOM",
+        "CHK-BISCUIT-FLOUR",
+        "CHK-TWO-CHLORELLA"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-03",
+      "expected_chunk_ids": [
+        "CHK-GEOSMIN-GAP"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "What geosmin result does this extract store for the spirulina supplement?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-GEOSMIN-GAP",
+        "CHK-AEDA-POTENT",
+        "CHK-NOT-A-BAR",
+        "CHK-SPI-PROFILE",
+        "CHK-SPI-CYCLO",
+        "CHK-SPI-IONONE",
+        "CHK-SPI-OCTENOL",
+        "CHK-SPI-HYDROCARBON",
+        "CHK-AEDA-THIOL",
+        "CHK-NUTRITION-GAP",
+        "CHK-SPI-HEXANAL",
+        "CHK-BISCUIT-FLOUR",
+        "CHK-ALLERGEN-IDENTITY",
+        "CHK-CHL-SEAWEED",
+        "CHK-CHL-GRACIO"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-04",
+      "expected_chunk_ids": [
+        "CHK-CHL-HEXANAL"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "What relative area did the chlorella culture paper report for hexanal?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-CHL-HEXANAL",
+        "CHK-CHL-GRACIO",
+        "CHK-CHL-MUSHROOM",
+        "CHK-CHL-SEAWEED",
+        "CHK-TWO-CHLORELLA",
+        "CHK-SPI-HEXANAL",
+        "CHK-AEDA-THIOL",
+        "CHK-SPI-PROFILE",
+        "CHK-SPI-HYDROCARBON",
+        "CHK-GEOSMIN-GAP",
+        "CHK-SPI-CYCLO",
+        "CHK-AEDA-POTENT",
+        "CHK-SPI-OCTENOL",
+        "CHK-NOT-A-BAR"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-05",
+      "expected_chunk_ids": [
+        "CHK-NOT-A-BAR"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "Can a GC-MS odor word be used as proof of a protein-bar off-note?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-NOT-A-BAR",
+        "CHK-GEOSMIN-GAP",
+        "CHK-AEDA-POTENT",
+        "CHK-SPI-HEXANAL",
+        "CHK-SPI-CYCLO",
+        "CHK-SPI-OCTENOL",
+        "CHK-SPI-HYDROCARBON",
+        "CHK-SPI-IONONE",
+        "CHK-AEDA-THIOL",
+        "CHK-SPI-PROFILE",
+        "CHK-ALLERGEN-IDENTITY",
+        "CHK-NUTRITION-GAP"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-06",
+      "expected_chunk_ids": [
+        "CHK-SNACK-RANGE"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "What spirulina addition levels does the snack-bar abstract report?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-SNACK-RANGE",
+        "CHK-BOUND-LIMIT",
+        "CHK-NO-MASK",
+        "CHK-CIN-OTHER-FOODS",
+        "CHK-DATE-FORM"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-07",
+      "expected_chunk_ids": [
+        "CHK-NO-MASK"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "Is there a cocoa, cinnamon, vanilla or citrus masking trial in this extract?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-NO-MASK",
+        "CHK-CIN-OTHER-FOODS",
+        "CHK-SNACK-RANGE",
+        "CHK-DATE-FORM",
+        "CHK-BOUND-LIMIT"
+      ],
+      "review_status": "extracted"
+    },
+    {
+      "eval_id": "EV-08",
+      "expected_chunk_ids": [
+        "CHK-NUTRITION-GAP"
+      ],
+      "first_relevant_rank": 1,
+      "passed": true,
+      "query": "Can the USDA spirulina row stand in for a chosen supplement lot?",
+      "required_rank": 1,
+      "returned_chunk_ids": [
+        "CHK-NUTRITION-GAP",
+        "CHK-AEDA-POTENT",
+        "CHK-GEOSMIN-GAP",
+        "CHK-NOT-A-BAR",
+        "CHK-SPI-PROFILE",
+        "CHK-AEDA-THIOL",
+        "CHK-SPI-CYCLO",
+        "CHK-SPI-IONONE",
+        "CHK-SPI-HEXANAL",
+        "CHK-SPI-HYDROCARBON",
+        "CHK-SPI-OCTENOL",
+        "CHK-ALLERGEN-IDENTITY",
+        "CHK-BISCUIT-FLOUR"
+      ],
+      "review_status": "extracted"
+    }
+  ]
+}

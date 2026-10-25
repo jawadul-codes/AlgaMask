@@ -24,6 +24,7 @@ FIELDS = {
     'carbohydrate_g': ('1005', 'G'), 'fat_g': ('1004', 'G'),
     'fibre_g': ('1079', 'G'), 'iron_mg': ('1089', 'MG'),
     'omega3_g': ('1404', 'G'),
+    'sugar_g': ('2000', 'G'),
 }
 
 
@@ -71,7 +72,7 @@ def main():
                 source = found[0] if len(found) == 1 else {}
                 derivation = derivations.get(source.get('derivation_id'), {})
                 amount = source.get('amount', '')
-                recorded = local[field]
+                recorded = local.get(field, '')
                 assumed = 'assumed' in derivation.get('description', '').lower()
                 metadata = nutrients.get(nid, {})
                 if len(found) > 1:

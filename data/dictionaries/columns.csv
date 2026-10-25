@@ -195,6 +195,7 @@ ingredient_nutrition,fat_g,float,no,,
 ingredient_nutrition,fibre_g,float,no,,
 ingredient_nutrition,iron_mg,float,no,,
 ingredient_nutrition,omega3_g,float,no,,Only when supported
+ingredient_nutrition,sugar_g,float,no,,Total sugars per 100 g; not added sugars. Empty is unknown.
 ingredient_nutrition,nutrition_source_type,enum,approved,nutrition_source_type,
 ingredient_nutrition,value_precision,enum,approved,value_precision,
 ingredient_nutrition,fdc_id,int,no,,

@@ -26,6 +26,15 @@ uses 2% and 45 g. These interface limits do not establish effective or safe dose
 
 ## Reproduced example
 
+Current rc.5: chlorella means the named Algomed powder reference. At 3%, 45 g and
+vanilla, ranges are protein 4.57866–5.17797 g, energy 154.017–159.201 kcal,
+total sugar 7.508205–10.419345 g. Minimum protein 12 g plus maximum sugar 0 g
+blocks with numeric adjustment margins, not missing-data errors. With minimum
+protein 5.17 g, maximum energy 200 kcal and maximum sugar 10 g, one candidate passes:
+protein 5.17797 g, energy 159.201 kcal, sugar 7.508205 g. These remain estimates.
+
+The following is the preserved historical rc.4 result, not the active data:
+
 Chlorella, 3%, 45 g, vanilla, minimum protein 12 g, maximum energy 426 kcal,
 maximum sugar 0 g, on dataset 0.1.0-rc.4:
 

@@ -112,6 +112,7 @@ NUTRIENT_IDS = {
     1079: "fibre_g",
     1089: "iron_mg",
     1404: "omega3_g",  # PUFA 18:3 n-3 (ALA) only
+    2000: "sugar_g",  # Total sugars, not added sugars
 }
 
 

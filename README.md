@@ -102,10 +102,15 @@ check production gates; the current candidate correctly fails that check.
 
 - `apps/flutter/`: local web client and tests.
 - `services/algamask/`: API, six-agent workflow, retrieval, generation, screening and storage.
-- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.4`.
-- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.3`.
+- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.5`.
+- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.4`.
 - `tools/`: dataset/index operations, database recovery and release verification.
 - `var/`: ignored local databases and verification artifacts.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): completed work and remaining gates.
 
 No deployment or scientific publication is implied by a successful local run.
+
+Total-sugar and chlorella-energy estimates are now available for vanilla and
+cocoa-spice recipes. Chlorella uses the explicitly named Algomed powder label,
+not a generic species composition. Citrus sugar still lacks a supported raw-peel
+value and blocks requested sugar targets. See [nutrition coverage](docs/NUTRITION_COVERAGE.md).

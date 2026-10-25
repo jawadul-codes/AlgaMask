@@ -19,12 +19,12 @@ pytestmark = pytest.mark.skipif(
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.fixture(scope="module")
-def reviewed_runtime():
+@pytest.fixture(scope="module", params=[('0.1.0-rc.4', '0.1.0-dev.3'), ('0.1.0-rc.5', '0.1.0-dev.4')])
+def reviewed_runtime(request):
     runtime = RetrievalRuntime(Settings(
         mode="development",
-        dataset_path=ROOT / "data/candidates/0.1.0-rc.4",
-        index_path=ROOT / "indexes/reviewed_evidence/0.1.0-dev.3",
+        dataset_path=ROOT / "data/candidates" / request.param[0],
+        index_path=ROOT / "indexes/reviewed_evidence" / request.param[1],
     ))
     runtime.get_search()
     return runtime
@@ -47,15 +47,15 @@ def test_corrected_claims_retrievable(reviewed_runtime, query, source, chunk, qu
     assert qualification in hit.claim_summary
     assert hit.review_status == "extracted"
     assert result.development_only
-    assert result.dataset_version == "0.1.0-rc.4"
-    assert result.index_version == "0.1.0-dev.3"
+    assert result.dataset_version == reviewed_runtime.settings.dataset_path.name
+    assert result.index_version == reviewed_runtime.settings.index_path.name
 
 
 @pytest.mark.parametrize("algae", ["spirulina", "chlorella", "blend"])
 def test_real_api_generation_reports_and_persistence(reviewed_runtime, monkeypatch, algae):
     monkeypatch.setattr(app.state, "retrieval_runtime", reviewed_runtime)
     client = TestClient(app)
-    assert client.get("/rag/ready").json()["index_version"] == "0.1.0-dev.3"
+    assert client.get("/rag/ready").json()["index_version"] == reviewed_runtime.settings.index_path.name
     response = client.post("/runs", json={"algae": algae, "inclusion_pct": 2})
     assert response.status_code == 200
     run = response.json()
@@ -72,7 +72,7 @@ def test_real_api_generation_reports_and_persistence(reviewed_runtime, monkeypat
     assert client.get(f"/runs/{run['run_id']}").json() == run
     report = client.get(f"/runs/{run['run_id']}/report")
     assert report.status_code == 200
-    for text in ["0.1.0-rc.4", "0.1.0-dev.3", "Development data",
+    for text in [reviewed_runtime.settings.dataset_path.name, reviewed_runtime.settings.index_path.name, "Development data",
                  "not production eligible", "Sensory change: unknown", "NUT-OAT-DRY"]:
         assert text in report.text
     assert run["impact"]["dataset_hash"] == run["retrieval"]["dataset_hash"]

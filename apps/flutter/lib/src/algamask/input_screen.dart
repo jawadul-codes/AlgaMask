@@ -496,7 +496,7 @@ class _InputScreenState extends State<InputScreen> {
         _target('Maximum energy', 'kcal', energy, 1000, positive: true),
         _target('Maximum sugar', 'g', sugar, 50),
         const Text(
-          'Sugar data is missing. Chlorella and blend energy are incomplete; targets needing those values cannot currently pass.',
+          'Targets use reference ingredient composition, not lab measurements. The check below shows available ranges and any missing data. Total sugar includes sugar naturally present in ingredients.',
           style: TextStyle(fontSize: 11, color: AlgaColors.muted, height: 1.45),
         ),
         const SizedBox(height: 21),
