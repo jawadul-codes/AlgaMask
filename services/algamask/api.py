@@ -26,6 +26,7 @@ from .schemas import RunRequest, RunResult
 from .runtime import RetrievalRuntime, RetrievalUnavailable, Settings
 from .search_schemas import SearchRequest, SearchResult
 from .run_store import RunStore, SubmissionConflict, LeaseLost
+from .preflight import check_inputs
 
 app = FastAPI(title="AlgaMask API", version="0.2.0")
 app.state.retrieval_runtime = RetrievalRuntime(Settings.from_env())
@@ -138,11 +139,42 @@ def execute(job, token, request):
             worker.join(timeout=6)
 
 
+@app.post('/runs/preflight')
+def preflight(payload: RunRequest, request: Request):
+    runtime = request.app.state.retrieval_runtime
+    if runtime.settings.mode != 'development':
+        return {'can_run': False, 'messages': ['Select the development backend to check real ingredient data.'],
+                'margins': {}, 'notes': [], 'candidate_count': 0}
+    search = configured_search(request)
+    result = check_inputs(payload, search.snapshot)
+    result['dataset_hash'] = search.manifest['dataset_hash']
+    if result['can_run']:
+        from .agents.retrieve import run as retrieve
+        try:
+            _, searches = retrieve(payload, search)
+        except (ValueError, RuntimeError, OSError) as exc:
+            raise HTTPException(503, detail={'code': 'retrieval_failed'}) from exc
+        if not all(item['result']['hits'] for item in searches):
+            result['can_run'] = False
+            result['messages'].append('Required evidence context is missing for this configuration. Change the configuration or add the missing evidence.')
+    return result
+
+
+def require_feasible(payload, request):
+    # Legacy mock API remains available for fixture tests; the UI preflight blocks it.
+    if request.app.state.retrieval_runtime.settings.mode == 'mock':
+        return
+    result = preflight(payload, request)
+    if not result['can_run']:
+        raise HTTPException(422, detail={'code': 'configuration_blocked', 'preflight': result})
+
+
 @app.post("/runs", response_model=RunResult)
 def create_run(payload: RunRequest, request: Request,
                idempotency_key: Annotated[str | None, Header(pattern=r'^[A-Za-z0-9_-]{16,128}$')] = None):
     try:
-        job, token = storage(request.app.state.run_store.reserve, idempotency_key or str(uuid4()), payload, execution_context(request))
+        job, token = storage(request.app.state.run_store.reserve, idempotency_key or str(uuid4()), payload, execution_context(request),
+                             lambda: require_feasible(payload, request))
     except SubmissionConflict as exc:
         raise HTTPException(409, detail={'code': 'submission_conflict', 'message': str(exc)}) from exc
     return execute(job, token, request)
@@ -162,7 +194,8 @@ class RetryRequest(BaseModel):
 
 @app.post('/jobs/{job_id}/retry', response_model=RunResult)
 def retry_job(job_id: str, payload: RetryRequest, request: Request):
-    job, token = storage(request.app.state.run_store.retry, job_id, payload.expected_attempt, execution_context(request))
+    job, token = storage(request.app.state.run_store.retry, job_id, payload.expected_attempt, execution_context(request),
+                         lambda original: require_feasible(original, request))
     if job is None:
         raise HTTPException(404, 'Execution not found.')
     return execute(job, token, request)

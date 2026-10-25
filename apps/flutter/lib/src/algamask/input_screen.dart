@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'api_client.dart';
@@ -21,12 +23,86 @@ class _InputScreenState extends State<InputScreen> {
   String algae = 'spirulina', flavour = 'cocoa-spice';
   double inclusion = 5, serving = 45;
   final exclusions = <String>{};
+  String exclusionMode = 'ingredient_preference';
   bool loading = false, fixedProof = false;
   String? error;
   Map<String, dynamic>? result;
+  Map<String, dynamic>? feasibility;
+  String? checkError;
+  bool checking = true;
+  Timer? debounce;
+  int revision = 0;
+
+  Map<String, dynamic> inputs() => {
+    if (fixedProof) 'experiment': 'spirulina-proof-v1',
+    'algae': fixedProof ? 'spirulina' : algae,
+    'inclusion_pct': fixedProof ? 2.0 : inclusion,
+    'serving_g': fixedProof ? 45.0 : serving,
+    'flavour': fixedProof ? 'cocoa-spice' : flavour,
+    'exclusions': exclusions.toList(),
+    if (exclusions.isNotEmpty) 'exclusion_mode': exclusionMode,
+    if (protein.text.trim().isNotEmpty)
+      'min_protein_g': double.parse(protein.text.trim()),
+    if (energy.text.trim().isNotEmpty)
+      'max_energy_kcal': double.parse(energy.text.trim()),
+    if (sugar.text.trim().isNotEmpty)
+      'max_sugar_g': double.parse(sugar.text.trim()),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    for (final field in [protein, energy, sugar]) {
+      field.addListener(scheduleCheck);
+    }
+    scheduleCheck();
+  }
+
+  void change(VoidCallback update) {
+    setState(update);
+    scheduleCheck();
+  }
+
+  void scheduleCheck() {
+    debounce?.cancel();
+    final current = ++revision;
+    setState(() {
+      checking = true;
+      feasibility = null;
+      checkError = null;
+    });
+    debounce = Timer(const Duration(milliseconds: 350), () async {
+      if (!mounted) return;
+      if (!(form.currentState?.validate() ?? false)) {
+        setState(() {
+          checking = false;
+          checkError = 'Correct the highlighted input values to check this configuration.';
+        });
+        return;
+      }
+      try {
+        final check = await client.preflight(inputs());
+        if (mounted && current == revision) {
+          setState(() {
+            feasibility = check;
+            checking = false;
+          });
+        }
+      } catch (e) {
+        if (mounted && current == revision) {
+          setState(() {
+            checking = false;
+            checkError = e is ApiFailure ? e.message : 'Could not check the configuration. Check your backend connection and try again.';
+          });
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
+    debounce?.cancel();
+    revision++;
     protein.dispose();
     energy.dispose();
     sugar.dispose();
@@ -35,27 +111,19 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   Future<void> submit() async {
-    if (loading || !form.currentState!.validate()) return;
+    if (loading ||
+        checking ||
+        feasibility?['can_run'] != true ||
+        !form.currentState!.validate()) {
+      return;
+    }
     setState(() {
       loading = true;
       error = null;
       result = null;
     });
     try {
-      final response = await client.run({
-        if (fixedProof) 'experiment': 'spirulina-proof-v1',
-        'algae': fixedProof ? 'spirulina' : algae,
-        'inclusion_pct': fixedProof ? 2.0 : inclusion,
-        'serving_g': fixedProof ? 45.0 : serving,
-        'flavour': fixedProof ? 'cocoa-spice' : flavour,
-        'exclusions': exclusions.toList(),
-        if (protein.text.trim().isNotEmpty)
-          'min_protein_g': double.parse(protein.text.trim()),
-        if (energy.text.trim().isNotEmpty)
-          'max_energy_kcal': double.parse(energy.text.trim()),
-        if (sugar.text.trim().isNotEmpty)
-          'max_sugar_g': double.parse(sugar.text.trim()),
-      });
+      final response = await client.run(inputs());
       if (mounted) setState(() => result = response);
     } on ApiFailure catch (failure) {
       if (mounted) setState(() => error = failure.message);
@@ -241,7 +309,7 @@ class _InputScreenState extends State<InputScreen> {
                 1,
                 15,
                 14,
-                (v) => setState(() => inclusion = v),
+                (v) => change(() => inclusion = v),
               );
               final b = _rangeControl(
                 'Serving size',
@@ -250,7 +318,7 @@ class _InputScreenState extends State<InputScreen> {
                 40,
                 50,
                 10,
-                (v) => setState(() => serving = v),
+                (v) => change(() => serving = v),
               );
               return c.maxWidth < 510
                   ? Column(children: [a, const SizedBox(height: 12), b])
@@ -331,7 +399,7 @@ class _InputScreenState extends State<InputScreen> {
             style: TextStyle(fontSize: 12),
           ),
           value: fixedProof,
-          onChanged: loading ? null : (v) => setState(() => fixedProof = v),
+          onChanged: loading ? null : (v) => change(() => fixedProof = v),
         ),
         if (fixedProof)
           const Padding(
@@ -427,10 +495,28 @@ class _InputScreenState extends State<InputScreen> {
         ),
         const SizedBox(height: 3),
         const Text(
-          'Ingredients to exclude from screening',
+          'Choose how to apply your exclusions',
           style: TextStyle(fontSize: 12, color: AlgaColors.muted),
         ),
         const SizedBox(height: 12),
+        DropdownButton<String>(
+          key: const Key('exclusion-mode'),
+          value: exclusionMode,
+          isExpanded: true,
+          items: const [
+            DropdownMenuItem(
+              value: 'ingredient_preference',
+              child: Text('Omit ingredients (preference)'),
+            ),
+            DropdownMenuItem(
+              value: 'verified_free_from',
+              child: Text('Require verified free-from'),
+            ),
+          ],
+          onChanged: loading
+              ? null
+              : (value) => change(() => exclusionMode = value!),
+        ),
         Wrap(
           spacing: 6,
           runSpacing: 4,
@@ -452,7 +538,7 @@ class _InputScreenState extends State<InputScreen> {
                 selected: exclusions.contains(value),
                 onSelected: loading
                     ? null
-                    : (v) => setState(
+                    : (v) => change(
                         () => v
                             ? exclusions.add(value)
                             : exclusions.remove(value),
@@ -464,15 +550,25 @@ class _InputScreenState extends State<InputScreen> {
           ],
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Exclusions may block screening because free-from coverage is incomplete. No result certifies allergen safety.',
-          style: TextStyle(fontSize: 11, color: AlgaColors.muted, height: 1.4),
+        Text(
+          exclusionMode == 'ingredient_preference'
+              ? 'Omits the selected foods from the recipe. For an allergy, choose verified free-from; preferences do not check supplier cross-contact.'
+              : 'Requires verified absence, including supplier cross-contact. Current supplier data cannot confirm this for selected exclusions.',
+          style: const TextStyle(
+            fontSize: 11,
+            color: AlgaColors.muted,
+            height: 1.4,
+          ),
         ),
         const SizedBox(height: 18),
+        _feasibilityNotice(),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: loading ? null : submit,
+            onPressed: loading || checking || feasibility?['can_run'] != true
+                ? null
+                : submit,
             icon: Icon(
               loading ? Icons.hourglass_top : Icons.play_arrow_rounded,
             ),
@@ -486,6 +582,44 @@ class _InputScreenState extends State<InputScreen> {
       ],
     ),
   );
+
+  Widget _feasibilityNotice() {
+    final messages = <String>[
+      if (checking) 'Checking available data and targets…',
+      ?checkError,
+      if (feasibility != null)
+        feasibility!['can_run'] == true
+            ? 'Configuration can be screened with current data.'
+            : 'Adjust your configuration before running.',
+      ...?((feasibility?['messages'] as List?)?.map((e) => '$e')),
+    ];
+    final ranges = feasibility?['margins'] as Map? ?? {};
+    for (final entry in ranges.entries) {
+      final value = entry.value as Map;
+      final label = switch (entry.key) {
+        'min_protein_g' => 'Protein (g)',
+        'max_energy_kcal' => 'Energy (kcal)',
+        _ => 'Sugar (g)',
+      };
+      messages.add(
+        value['min'] == null
+            ? '$label: unknown for this configuration.'
+            : '$label: ${(value['min'] as num).toStringAsFixed(4)}–${(value['max'] as num).toStringAsFixed(4)} per serving in current recipes.',
+      );
+    }
+    messages.addAll((feasibility?['notes'] as List? ?? []).map((e) => '$e'));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AlgaNotice(text: messages.join('\n\n')),
+        if (checkError != null)
+          TextButton(
+            onPressed: scheduleCheck,
+            child: const Text('Check again'),
+          ),
+      ],
+    );
+  }
 
   Widget _step(String number, String title, String subtitle) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -543,7 +677,7 @@ class _InputScreenState extends State<InputScreen> {
       borderRadius: BorderRadius.circular(9),
       onTap: loading
           ? null
-          : () => setState(() => isFlavour ? flavour = value : algae = value),
+          : () => change(() => isFlavour ? flavour = value : algae = value),
       child: Container(
         width: width,
         height: 148,

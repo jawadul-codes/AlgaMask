@@ -54,7 +54,7 @@ def test_real_retrieval_runs_and_trace(client, algae, expected):
     assert len(run["formulations"]) == 3
     assert run["impact"]["nutrition"]
     assert run["impact"]["dataset_hash"] == run["retrieval"]["dataset_hash"]
-    assert [q.species for q in runtime._search.queries if q.chunk_tag == "diagnosis"] == expected
+    assert [q.species for q in runtime._search.queries if q.chunk_tag == "diagnosis"] == expected * 2
     assert runtime._search.queries[-1].chunk_tag == "intervention"
     assert run["retrieval"]["dataset_hash"] == "a" * 64
     assert all(e["source_id"] == "SRC-TEST" for e in run["evidence"])
@@ -68,25 +68,22 @@ def test_real_retrieval_runs_and_trace(client, algae, expected):
     assert "NUT-OAT-DRY" in report
 
 
-def test_unverifiable_targets_are_inspectable(client):
+def test_unverifiable_targets_block_before_creating_job(client):
     api, _ = client
     response = api.post("/runs", json={"max_sugar_g": 5})
-    assert response.status_code == 200
-    result = response.json()
-    assert result["status"] == "insufficient_data"
-    assert not result["formulations"] and not result["controls"]
-    assert "unknown" in str(result["trace"][3]["output"])
-    assert "Cannot verify" in api.get(f"/runs/{result['run_id']}/report").text
+    assert response.status_code == 422
+    assert not response.json()['detail']['preflight']['can_run']
+    assert not app.state.run_store.history()
 
 
 @pytest.mark.parametrize("missing", ["diagnosis", "intervention"])
 def test_missing_evidence_blocks_downstream(client, missing):
     api, runtime = client
     runtime._search = SearchDouble(empty_tag=missing)
-    result = api.post("/runs", json={}).json()
-    assert result["status"] == "insufficient_data"
-    assert not result["formulations"] and not result["controls"]
-    assert all(s["status"] == "blocked" for s in result["trace"][1:])
+    response = api.post("/runs", json={})
+    assert response.status_code == 422
+    assert not response.json()['detail']['preflight']['can_run']
+    assert not app.state.run_store.history()
 
 
 def test_api_readiness_search_validation_and_failures(client):
@@ -99,8 +96,7 @@ def test_api_readiness_search_validation_and_failures(client):
     before = app.state.run_store.history()
     assert api.post("/runs", json={}).status_code == 503
     after = app.state.run_store.history()
-    assert len(after) == len(before) + 1
-    assert after[0]['state'] == 'failed'
+    assert after == before
     assert api.post("/rag/search", json={"query": "hexanal"}).status_code == 503
 
 
@@ -137,3 +133,89 @@ def test_generation_failure_is_stored_without_mock_result(client, monkeypatch):
     assert result["generation"]["attempts"] == 2
     assert api.get(f"/runs/{result['run_id']}").json() == result
     assert "blocked" in api.get(f"/runs/{result['run_id']}/report").text
+
+
+def test_exact_chlorella_preflight_margins_and_adjustment(client):
+    api, runtime = client
+    payload = dict(algae='chlorella', inclusion_pct=3, serving_g=45, flavour='vanilla',
+                   min_protein_g=12, max_energy_kcal=426, max_sugar_g=0)
+    result = api.post('/runs/preflight', json=payload).json()
+    assert not result['can_run']
+    assert result['margins']['min_protein_g']['max'] == pytest.approx(5.01867)
+    assert result['margins']['max_energy_kcal']['min'] is None
+    assert result['margins']['max_sugar_g']['min'] is None
+    assert len(result['messages']) == 3
+    assert not runtime._search.queries  # Failed arithmetic needs no retrieval.
+    assert not app.state.run_store.history()
+    assert api.post('/runs', json=payload).status_code == 422
+    assert not app.state.run_store.history()
+    adjusted = {**payload, 'min_protein_g': 5.01, 'max_energy_kcal': None, 'max_sugar_g': None}
+    preview = api.post('/runs/preflight', json=adjusted).json()
+    assert preview['can_run'] and preview['candidate_count'] == 1
+    run = api.post('/runs', json=adjusted).json()
+    assert run['status'] == 'report_ready'
+    assert len(run['formulations']) == 1
+
+
+def test_replay_does_not_repeat_preflight(client):
+    api, runtime = client
+    headers = {'Idempotency-Key': 'preflight-replay-key-001'}
+    first = api.post('/runs', json={'algae': 'spirulina'}, headers=headers)
+    assert first.status_code == 200
+    runtime._search = SearchDouble(fail=True)
+    again = api.post('/runs', json={'algae': 'spirulina'}, headers=headers)
+    assert again.json() == first.json()
+
+
+def test_preflight_exclusion_and_fixed_controls(client):
+    api, _ = client
+    for payload in ({'exclusions': ['oats']}, {'exclusions': ['milk']},
+                    {'experiment': 'spirulina-proof-v1', 'algae': 'spirulina',
+                     'inclusion_pct': 2, 'exclusions': ['oats']}):
+        result = api.post('/runs/preflight', json=payload).json()
+        assert not result['can_run'] and result['messages']
+    assert not app.state.run_store.history()
+
+
+def test_invalid_old_attempt_cannot_be_retried(client):
+    from algamask.schemas import RunRequest
+    api, _ = client
+    store = app.state.run_store
+    job, token = store.reserve('old-invalid-submission', RunRequest(max_sugar_g=0), {})
+    store.start(job['job_id'], token)
+    store.finish(job['job_id'], token, None, 'run_failed')
+    response = api.post(f"/jobs/{job['job_id']}/retry", json={'expected_attempt': 1})
+    assert response.status_code == 422
+    assert store.job(job['job_id'])['attempt'] == 1
+    assert store.job(job['job_id'])['state'] == 'failed'
+
+
+@pytest.mark.parametrize('excluded', ['peanut', 'tree_nut', 'sesame', 'milk', 'soy', 'coconut'])
+def test_screenshot_preferences_pass_but_verified_exclusions_block(client, excluded):
+    api, _ = client
+    payload = dict(algae='spirulina', inclusion_pct=5, serving_g=50, flavour='vanilla',
+                   min_protein_g=5, max_energy_kcal=175, exclusions=[excluded])
+    strict = api.post('/runs/preflight', json=payload).json()
+    assert not strict['can_run']
+    assert not strict['margins']
+    assert 'required data is missing' not in str(strict)
+    preference = {**payload, 'exclusion_mode': 'ingredient_preference'}
+    check = api.post('/runs/preflight', json=preference).json()
+    assert check['can_run']
+    assert check['margins']['min_protein_g']['min'] == pytest.approx(5.61415)
+    assert check['margins']['max_energy_kcal']['max'] == pytest.approx(174.695)
+    result = api.post('/runs', json=preference).json()
+    assert result['status'] == 'report_ready'
+    assert result['request']['exclusion_mode'] == 'ingredient_preference'
+    assert 'allergy safety are not verified' in str(result['limitations'])
+    assert 'Ingredient preferences (allergy safety not verified)' in api.get(f"/runs/{result['run_id']}/report").text
+
+
+def test_oat_preference_explains_no_remaining_recipes(client):
+    api, _ = client
+    result = api.post('/runs/preflight', json=dict(exclusions=['oats'],
+        exclusion_mode='ingredient_preference', min_protein_g=5, max_energy_kcal=175)).json()
+    assert not result['can_run'] and not result['margins']
+    assert 'no oat-free recipe' in str(result['messages'])
+    assert 'Nutrition targets have not been evaluated' in str(result['messages'])
+    assert 'required data is missing' not in str(result)

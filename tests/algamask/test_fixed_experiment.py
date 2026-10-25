@@ -79,7 +79,7 @@ def test_mutated_mass_balanced_arm_rejected(snapshot):
 def test_legacy_submission_hash_unchanged(tmp_path):
     store = RunStore(tmp_path / "runs.db")
     original = RunRequest()
-    legacy = original.model_dump(mode="json", exclude={"experiment"})
+    legacy = original.model_dump(mode="json", exclude={"experiment", "exclusion_mode"})
     digest = hashlib.sha256(json.dumps(legacy, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     job, _ = store.reserve("old-client-submission", original, {})
     with store.connection() as db:

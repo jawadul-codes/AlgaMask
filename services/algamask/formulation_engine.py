@@ -10,6 +10,10 @@ FLAVOURS = {"cocoa-spice": ("IF-COCOA-PWD", "IF-CINN-PWD"),
             "vanilla": ("IF-VAN-EXT",), "citrus": ("IF-ORANGE-PEEL",)}
 ALLERGENS = {"milk": {"ALG-MILK"}, "soy": {"ALG-SOY"}, "peanut": {"ALG-PEANUT"},
              "tree_nut": {"ALG-ALMOND"}, "sesame": {"ALG-SESAME"}}
+EXCLUDED_FORMS = {'oats': {'IF-OAT-DRY'}, 'coconut': {'IF-COCO-OIL'},
+                  'milk': {'IF-WHEY-PWD'}, 'soy': {'IF-SOY-ISO'},
+                  'peanut': {'IF-PEANUT-BUTTER'}, 'tree_nut': {'IF-ALMOND-BUTTER'},
+                  'sesame': {'IF-TAHINI'}}
 
 
 def candidate(request, code, date_pct, flavour_pct):
@@ -75,17 +79,18 @@ def check_formula(formula, request, snapshot, *, baseline=False, check_targets=T
         expected = request.serving_g * request.inclusion_pct / 100 / len(species) if species_name in species and not baseline else 0
         if abs(amounts.get(form_id, 0) - expected) > 1e-6:
             errors.append(f"Algae inclusion constraint failed: {form_id}.")
-    for exclusion, form_id in {"oats": "IF-OAT-DRY", "coconut": "IF-COCO-OIL"}.items():
-        if exclusion in request.exclusions and form_id in amounts:
-            errors.append(f"Excluded ingredient: {form_id}.")
-    # The current corpus has no complete, supplier-specific free-from coverage.
-    # Even absence of a contains relationship cannot satisfy an allergy exclusion.
-    for exclusion in sorted(set(request.exclusions) & ALLERGENS.keys()):
-        known = [r.ingredient_form_id for r in snapshot.records("ingredient_allergens")
-                 if r.ingredient_form_id in amounts and r.allergen_id in ALLERGENS[exclusion]
-                 and r.relationship in {"contains", "may_contain"}]
-        errors.append(f"Allergen exclusion {exclusion}: " +
-                      (f"recorded relationship for {', '.join(known)}." if known else "free-from coverage unknown; cannot certify exclusion."))
+    for exclusion in sorted(set(request.exclusions)):
+        known = set(amounts) & EXCLUDED_FORMS[exclusion]
+        known.update(r.ingredient_form_id for r in snapshot.records('ingredient_allergens')
+                     if r.ingredient_form_id in amounts and r.allergen_id in ALLERGENS.get(exclusion, set())
+                     and r.relationship == 'contains')
+        if known:
+            errors.append(f"Excluded ingredient: {', '.join(sorted(known))}." +
+                          (' Every current recipe uses oats; no oat-free recipe is available.' if exclusion == 'oats' else ''))
+        elif request.exclusion_mode == 'verified_free_from':
+            # No complete supplier/lot verification exists for ANY selected group.
+            errors.append(f"Verified exclusion {exclusion.replace('_', ' ')}: free-from coverage unknown; "
+                          'supplier verification is needed. Changing nutrition targets will not resolve this.')
     if check_targets:
         estimate = estimate_nutrition(formula, snapshot, approved_only=False)
         for field, nutrient, minimum in (("min_protein_g", "protein_g", True),

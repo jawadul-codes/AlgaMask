@@ -35,6 +35,9 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
                        "Manufacturing, complete allergen coverage and human sensory outcomes remain unverified."]
         if metadata["development_only"]:
             limitations.insert(0, "Development candidate data: record-level review and publication checks remain unresolved.")
+        if request.exclusions and request.exclusion_mode == 'ingredient_preference':
+            limitations.append('Ingredient preferences: ' + ', '.join(request.exclusions) +
+                               '. Selected foods are omitted from the recipe; supplier cross-contact and allergy safety are not verified.')
         if request.experiment == "spirulina-proof-v1":
             limitations[limitations.index("Recipe search uses an explicit experimental grid, not scientifically validated protein-bar bounds.")] = (
                 "spirulina-proof-v1 is a fixed engineering assumption, not an optimized or approved recipe."

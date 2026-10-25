@@ -18,6 +18,9 @@ class RunRequest(BaseModel):
     inclusion_pct: float = Field(default=5, gt=0, le=15)
     serving_g: float = Field(default=45, ge=40, le=50)
     exclusions: list[Literal["peanut", "tree_nut", "sesame", "oats", "coconut", "milk", "soy"]] = Field(default_factory=list)
+    # Preserve historical requests as strict requirements; the UI explicitly opts
+    # into recipe preferences. Never silently downgrade a saved allergy request.
+    exclusion_mode: Literal['ingredient_preference', 'verified_free_from'] = 'verified_free_from'
     flavour: Literal["cocoa-spice", "vanilla", "citrus"] = "cocoa-spice"
     min_protein_g: float | None = Field(default=None, ge=0, le=50)
     max_energy_kcal: float | None = Field(default=None, gt=0, le=1000)

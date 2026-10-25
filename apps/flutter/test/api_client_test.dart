@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:algamask/src/algamask/api_client.dart';
@@ -62,7 +63,7 @@ void main() {
       keys: FakeKeys(),
       client: MockClient((_) async => http.Response('{}', 200)),
     );
-    await expectLater(client.run({}), throwsFormatException);
+    await expectLater(client.run({}), throwsA(isA<ApiFailure>()));
     client.close();
   });
   test(
@@ -106,6 +107,105 @@ void main() {
       ),
     );
     expect(keys.entries, isNotEmpty);
+    client.close();
+  });
+
+  for (final response in [
+    http.Response('<html>Bad gateway</html>', 502),
+    http.Response('not json', 200),
+    http.Response('[]', 200),
+    http.Response('{"detail":[{"msg":"invalid"}]}', 422),
+    http.Response('{"job":null}', 202),
+  ]) {
+    test('safe failure for ${response.statusCode}: ${response.body}', () async {
+      final keys = FakeKeys();
+      final client = ApiClient(
+        keys: keys,
+        client: MockClient((_) async => response),
+      );
+      await expectLater(client.run({}), throwsA(isA<ApiFailure>()));
+      expect(keys.entries, isNotEmpty);
+      client.close();
+    });
+  }
+
+  test(
+    'timeout retains original key and does not automatically resubmit',
+    () async {
+      final keys = FakeKeys();
+      final requests = <String>[];
+      final client = ApiClient(
+        keys: keys,
+        writeTimeout: const Duration(milliseconds: 1),
+        client: MockClient((request) {
+          requests.add(request.headers['Idempotency-Key']!);
+          return Completer<http.Response>().future;
+        }),
+      );
+      for (var i = 0; i < 2; i++) {
+        await expectLater(
+          client.run({}),
+          throwsA(
+            isA<ApiFailure>().having(
+              (e) => e.message,
+              'recovery guidance',
+              contains('may still be running'),
+            ),
+          ),
+        );
+        expect(requests.length, i + 1);
+      }
+      expect(requests.first, requests.last);
+      expect(keys.issued, 1);
+      client.close();
+    },
+  );
+
+  test('offline history has actionable message', () async {
+    final client = ApiClient(
+      client: MockClient((_) async {
+        throw http.ClientException('internal transport details');
+      }),
+    );
+    await expectLater(
+      client.history(),
+      throwsA(
+        isA<ApiFailure>().having(
+          (e) => e.message,
+          'connection guidance',
+          contains('Cannot connect'),
+        ),
+      ),
+    );
+    client.close();
+  });
+
+  test('malformed history and job shapes are rejected', () async {
+    final client = ApiClient(
+      client: MockClient((_) async => http.Response('{"runs":[42]}', 200)),
+    );
+    await expectLater(client.history(), throwsA(isA<ApiFailure>()));
+    await expectLater(client.job('j'), throwsA(isA<ApiFailure>()));
+    client.close();
+  });
+
+  test('retry conflict keeps job details without exposing server internals', () async {
+    final client = ApiClient(
+      client: MockClient(
+        (_) async => http.Response(
+          '{"detail":{"message":"internal detail","job":{"state":"running"}}}',
+          409,
+        ),
+      ),
+    );
+    await expectLater(
+      client.retry('j', 1),
+      throwsA(
+        isA<ApiFailure>()
+            .having((e) => e.job?['state'], 'job', 'running')
+            .having((e) => e.message, 'guidance', contains('Refresh history')),
+      ),
+    );
     client.close();
   });
 }

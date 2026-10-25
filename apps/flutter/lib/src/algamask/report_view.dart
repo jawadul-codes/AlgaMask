@@ -153,6 +153,13 @@ class ReportView extends StatelessWidget {
           style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
         ),
         const SizedBox(height: 15),
+        if ((result['request']?['exclusions'] as List? ?? []).isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              '${result['request']?['exclusion_mode'] == 'ingredient_preference' ? 'Ingredient preferences (allergy safety not verified)' : 'Verified-free-from requirements'}: ${(result['request']['exclusions'] as List).map(label).join(', ')}',
+            ),
+          ),
         const AlgaNotice(
           text: 'Experimental screening only. Arithmetic checks do not establish scientific or allergen safety approval.',
         ),

@@ -99,11 +99,13 @@ class RunStore:
             self._expire(db)
             return self._job(db, job_id)
 
-    def reserve(self, key: str, request: RunRequest, context: dict):
+    def reserve(self, key: str, request: RunRequest, context: dict, validate_new=None):
         values = request.model_dump(mode='json')
         # Preserve pre-preset submission hashes and same-key retry semantics.
         if values['experiment'] == 'engineering_grid':
             values.pop('experiment')
+        if values['exclusion_mode'] == 'verified_free_from':
+            values.pop('exclusion_mode')
         values['exclusions'] = sorted(set(values['exclusions']))
         payload = json.dumps(values, sort_keys=True, separators=(',', ':'))
         digest = hashlib.sha256(payload.encode()).hexdigest()
@@ -114,6 +116,8 @@ class RunStore:
                 if row[1] != digest:
                     raise SubmissionConflict('Submission key already belongs to different inputs.')
                 return self._job(db, row[0]), None
+            if validate_new is not None:
+                validate_new()
             job_id, token, stamp = str(uuid4()), str(uuid4()), now_iso()
             encoded_context = json.dumps(context, sort_keys=True)
             db.execute("INSERT INTO jobs VALUES (?,?,?,?,?,?,'queued',1,?,?,NULL,?)",
@@ -121,7 +125,7 @@ class RunStore:
             db.execute("INSERT INTO attempts VALUES (?,1,?,NULL,'queued',NULL,?)", (job_id, stamp, encoded_context))
             return self._job(db, job_id), token
 
-    def retry(self, job_id: str, expected_attempt: int, context: dict):
+    def retry(self, job_id: str, expected_attempt: int, context: dict, validate_retry=None):
         with self.connection() as db:
             self._expire(db)
             job = self._job(db, job_id)
@@ -131,6 +135,8 @@ class RunStore:
             # already failed: caller must explicitly name the newer attempt.
             if job['attempt'] != expected_attempt or job['state'] not in ('failed', 'interrupted'):
                 return job, None
+            if validate_retry is not None:
+                validate_retry(RunRequest.model_validate(job['request']))
             attempt, token, stamp = job['attempt'] + 1, str(uuid4()), now_iso()
             encoded_context = json.dumps(context, sort_keys=True)
             db.execute("UPDATE jobs SET state='queued', attempt=?, token=?, lease_until=?, updated_at=?, error_code=NULL, context_json=? WHERE job_id=?",

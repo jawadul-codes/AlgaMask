@@ -78,3 +78,15 @@ def test_critic_rejects_off_grid_proportions(snapshot):
     next(i for i in formula.ingredients if i.ingredient_id == "IF-DATE-DRIED").grams += 1
     next(i for i in formula.ingredients if i.ingredient_id == "IF-OAT-DRY").grams -= 1
     assert any("Date proportion" in e for e in check_formula(formula, request, snapshot))
+
+
+@pytest.mark.parametrize('excluded,form_id', [
+    ('milk', 'IF-WHEY-PWD'), ('soy', 'IF-SOY-ISO'), ('peanut', 'IF-PEANUT-BUTTER'),
+    ('tree_nut', 'IF-ALMOND-BUTTER'), ('sesame', 'IF-TAHINI'), ('coconut', 'IF-COCO-OIL'),
+])
+def test_preferences_reject_actual_excluded_ingredients(snapshot, excluded, form_id):
+    from algamask.formulation_engine import make_formula
+    request = RunRequest(algae='spirulina', exclusions=[excluded], exclusion_mode='ingredient_preference')
+    formula = make_formula('test', {'IF-SPI-PWD': 2.25, 'IF-OAT-DRY': 41.75, form_id: 1}, 45)
+    errors = check_formula(formula, request, snapshot, check_grid=False)
+    assert any('Excluded ingredient:' in e and form_id in e for e in errors)

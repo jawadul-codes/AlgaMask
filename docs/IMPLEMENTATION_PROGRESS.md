@@ -1,6 +1,66 @@
 # AlgaMask implementation progress
 
-Updated: 2026-10-24
+Updated: 2026-10-25
+
+## Exclusion preferences versus verification (2026-10-25, verified)
+
+- Split the input choice into recipe ingredient preferences and verified-free-from
+  requirements. UI explicitly sends the selected mode; historical requests retain
+  strict semantics and their submission hashes remain compatible.
+- Preferences reject known excluded foods and recorded contains relationships.
+  They do not claim supplier cross-contact verification. Strict mode requires
+  unavailable supplier verification for all selected groups, including coconut.
+- No remaining recipes now yields an exclusion explanation and no nutrition ranges;
+  it no longer incorrectly reports missing protein/energy data.
+- Saved requests, HTML reports and Flutter reports identify the chosen mode.
+- Screenshot configuration (spirulina/5%/50 g/vanilla, protein >=5 g,
+  energy <=175 kcal) passes with tree-nut preference; strict mode blocks.
+- Verification: 206 backend tests passed / 10 opt-in skipped; separately all 10
+  real offline RAG integration tests passed; 27 Flutter tests passed; analysis
+  clean and web build successful. Tests cover all six non-oat preferences, actual
+  excluded ingredients, absent candidates, mode switching and report labelling.
+- Backend and Flutter must be restarted/relaunched to load the changes. Existing
+  services and scientific dataset values unchanged; no commit/push made.
+
+## Configuration preflight (2026-10-25, verified)
+
+- Added a read-only feasibility endpoint using the same recipe candidates,
+  ingredient data, exclusions and target checks as execution. It reports numeric
+  ranges, missing values and conservative adjustment boundaries.
+- Flutter checks on input changes, discards stale responses and disables Run while
+  checking, blocked or offline. No experiment is submitted by this preview.
+- New real-data submissions are checked before a job is created; same-key replay
+  keeps its existing recovery semantics. Missing retrieval context also blocks.
+- Passing preflight only establishes computational eligibility; it does not
+  establish sensory efficacy, global recipe feasibility or laboratory accuracy.
+- Exact chlorella/3%/45 g/vanilla/12 g protein/426 kcal/0 g sugar case
+  blocks before creating a job: protein maximum 5.01867 g, energy and sugar
+  unknown. Suggested protein minimum ceiling is 5.01 g; other targets still apply.
+- Tests cover absent evidence, exclusions, fixed controls, old-attempt retry,
+  same-key replay, input edits and stale asynchronous results.
+- Verification: 193 backend tests passed / 10 opt-in skipped; all 10 real offline
+  RAG integration tests passed separately; 26 Flutter tests passed; analysis clean;
+  web build succeeded. No new browser-interaction test was performed.
+- Added CONFIGURATION_PREFLIGHT.md with semantics and activation instructions.
+  Restart backend and rebuild/relaunch Flutter together. Existing services were
+  not restarted; no dataset values changed; no commit/push made.
+
+## Client failure recovery (2026-10-25, verified)
+
+- Centralized timeout, connection and HTTP error handling for submission, history,
+  saved reports, execution details and explicit retries.
+- Non-JSON proxy errors and unexpected response envelopes now produce readable
+  guidance instead of raw parsing exceptions. Server error internals are not shown.
+- Uncertain submissions keep their original idempotency key; no automatic POST
+  retries were added. Timeout guidance asks users to check history first.
+- Added regression coverage for malformed responses, offline history, timeouts,
+  retained submission keys and retry conflicts. Dataset and RAG content unchanged.
+- Verification: Flutter analysis clean; all 25 Flutter tests passed (nine new
+  regression cases); git diff whitespace validation passed.
+- This verifies client recovery contracts with simulated failures, not every
+  network environment or end-to-end outage. Backend unchanged; its suite was not
+  rerun for this client-only increment. Existing services were not restarted.
+- Rebuild/relaunch the Flutter app to pick up the changes. No commit or push made.
 
 ## One-command local launcher (2026-10-24, verified)
 

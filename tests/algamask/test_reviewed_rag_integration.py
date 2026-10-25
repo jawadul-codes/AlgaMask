@@ -114,6 +114,6 @@ def test_fixed_experiment_api_report_and_history(reviewed_runtime, monkeypatch):
     assert 'not verified finished serving' in report
     assert 'Not approved for physical testing' in report
     assert client.post('/runs', json={**payload, 'inclusion_pct': 5}).status_code == 422
-    blocked = client.post('/runs', json={**payload, 'max_sugar_g': 5}).json()
-    assert blocked['status'] == 'insufficient_data'
-    assert not blocked['controls'] and not blocked['formulations']
+    blocked = client.post('/runs', json={**payload, 'max_sugar_g': 5})
+    assert blocked.status_code == 422
+    assert not blocked.json()['detail']['preflight']['can_run']

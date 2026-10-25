@@ -17,6 +17,10 @@ def render_report(result: RunResult) -> str:
     provenance = ""
     if result.retrieval:
         provenance = f"<p>Dataset: {escape(result.retrieval['dataset_version'])}; index: {escape(result.retrieval['index_version'])}</p>"
+    if result.request.exclusions:
+        exclusion_label = ('Ingredient preferences (allergy safety not verified)' if
+                           result.request.exclusion_mode == 'ingredient_preference' else 'Verified-free-from requirements')
+        provenance += f"<p>{exclusion_label}: {escape(', '.join(result.request.exclusions))}</p>"
     if result.request.experiment == "spirulina-proof-v1":
         provenance += "<p>Experiment: spirulina-proof-v1. 45 g ingredient input, not verified finished serving. Nutrition per serving refers to this input mass. Scientific and physical-trial approval pending.</p>"
     explanation = ""
