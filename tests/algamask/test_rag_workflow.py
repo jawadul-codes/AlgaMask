@@ -141,8 +141,9 @@ def test_exact_chlorella_preflight_margins_and_adjustment(client):
                    min_protein_g=12, max_energy_kcal=426, max_sugar_g=0)
     result = api.post('/runs/preflight', json=payload).json()
     assert not result['can_run']
-    assert result['margins']['min_protein_g']['max'] == pytest.approx(5.17797)
-    assert result['margins']['max_energy_kcal']['min'] == pytest.approx(154.017)
+    assert result['search_version'] == 'protein-base-grid-v2'
+    assert result['grid_size'] == 27
+    assert result['margins']['min_protein_g']['max'] > 5.17797
     assert result['margins']['max_sugar_g']['min'] == pytest.approx(7.508205)
     assert len(result['messages']) == 2
     assert 'required data is missing' not in str(result['messages'])
@@ -150,12 +151,16 @@ def test_exact_chlorella_preflight_margins_and_adjustment(client):
     assert not app.state.run_store.history()
     assert api.post('/runs', json=payload).status_code == 422
     assert not app.state.run_store.history()
-    adjusted = {**payload, 'min_protein_g': 5.17, 'max_energy_kcal': 200, 'max_sugar_g': 10}
+    adjusted = {**payload, 'min_protein_g': 8, 'max_energy_kcal': 200, 'max_sugar_g': 10}
     preview = api.post('/runs/preflight', json=adjusted).json()
-    assert preview['can_run'] and preview['candidate_count'] == 1
+    assert preview['can_run'] and preview['candidate_count'] >= 1
+    assert preview['passing_ids'][0] == 'S25-1-W20'
     run = api.post('/runs', json=adjusted).json()
     assert run['status'] == 'report_ready'
-    assert len(run['formulations']) == 1
+    assert run['formulations'][0]['id'] == 'S25-1-W20'
+    assert run['impact']['screening']['search_version'] == 'protein-base-grid-v2'
+    whey = next(item for item in run['formulations'][0]['ingredients'] if item['ingredient_id'] == 'IF-WHEY-PWD')
+    assert whey['grams'] == pytest.approx(9)
 
 
 def test_replay_does_not_repeat_preflight(client):

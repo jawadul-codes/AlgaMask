@@ -2,6 +2,41 @@
 
 Updated: 2026-10-25
 
+## Release Step 5: reliability and local verification (2026-10-26, verified with a recorded browser gap)
+
+Windows port reservation no longer lets a second socket take a live listener.
+The one-command launcher still runs only on macOS and Linux; Windows uses the
+manual steps in the README. The release check can start Flutter when its batch
+file is on PATH. Existing retry, backup, grounding, and client-recovery tests
+were kept. Details: RELEASE_STEP5_VERIFICATION.md.
+
+- Release check passed: 267 backend tests, 20 ordinary skips, Flutter analyze,
+  30 Flutter tests, web build, real rc.5/dev.4 retrieval smoke, and temporary
+  backup/restore. Production remains blocked.
+- Separate offline retrieval suite: 20 passed.
+- No browser tool was available, so the ten live browser scenarios were not
+  executed. The services on ports 8000 and 3000 were left running.
+- No commit or push.
+
+## Release Step 4: constraint-aware recipe screening (2026-10-25, verified)
+
+The live screen is `protein-base-grid-v2`: dates, flavour, and USDA beverage
+whey isolate at 0/10/20% of input mass, with oats as the remainder. Preflight
+and execution share that generator. The Critic checks the returned candidates
+and controls again. The old nine-recipe policy `exact-form-grid-v1` still runs
+for saved jobs that have no policy field, and its chlorella reference numbers
+still match. Completed results are not recalculated. `spirulina-proof-v1` is
+unchanged. Soy isolate and oat-free recipes stay unavailable. Details and the
+measured recipe are in RELEASE_STEP4_RECIPE_SCREENING.md.
+
+- Default spirulina / 5% / 45 g / cocoa-spice: protein 5.211158–9.753953 g,
+  energy 149.55975–156.99825 kcal, sugar 7.51284–10.34307 g.
+- An 8 g protein minimum, which the old grid cannot meet, returns S25-1-W20:
+  9 g whey, 9.7539525 g protein, 155.19825 kcal, 7.52814 g sugar.
+- Verification: 264 backend tests passed, 20 opt-in skipped. One pre-existing
+  Windows port-reuse launcher test failed and was not changed. Flutter: 30 tests
+  passed. No commit or push. Step 5 has not been started.
+
 ## Release Step 3: nutrition coverage (2026-10-25, supported coverage verified)
 
 - Adding total sugar with exact USDA food/nutrient identifiers, units and derivations.

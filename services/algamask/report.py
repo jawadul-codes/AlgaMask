@@ -32,6 +32,9 @@ def render_report(result: RunResult) -> str:
         provenance += f"<p>{exclusion_label}: {escape(', '.join(result.request.exclusions))}</p>"
     if result.request.experiment == "spirulina-proof-v1":
         provenance += "<p>Experiment: spirulina-proof-v1. 45 g ingredient input, not verified finished serving. Nutrition per serving refers to this input mass. Scientific and physical-trial approval pending.</p>"
+    screening = result.impact.get("screening") or {}
+    if screening.get("search_version"):
+        provenance += f"<p>Search policy: {escape(screening['search_version'])}. {escape(screening.get('scope') or '')}</p>"
     explanation = ""
     if result.generation and result.generation.status == 'complete' and result.status != 'generation_failed':
         generated = result.generation

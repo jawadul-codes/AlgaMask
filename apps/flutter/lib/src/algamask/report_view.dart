@@ -776,6 +776,11 @@ class ReportView extends StatelessWidget {
             'Automated checks against experiment constraints',
           ),
           const SizedBox(height: 12),
+          if (screening['search_version'] != null)
+            Text(
+              'Policy ${screening['search_version']}',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
           if (screening['scope'] != null)
             Text(
               '${screening['scope']}',

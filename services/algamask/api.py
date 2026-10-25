@@ -23,6 +23,7 @@ from scoring import placeholder
 from .agents.supervisor import run_workflow
 from .report import render_report
 from .schemas import RunRequest, RunResult
+from . import formulation_engine
 from .runtime import RetrievalRuntime, RetrievalUnavailable, Settings
 from .search_schemas import SearchRequest, SearchResult
 from .run_store import RunStore, SubmissionConflict, LeaseLost
@@ -84,7 +85,9 @@ def day1_preview(request: Day1Request):
 
 
 def execution_context(request):
-    return request.app.state.retrieval_runtime.settings.model_dump(mode='json')
+    context = request.app.state.retrieval_runtime.settings.model_dump(mode="json")
+    context["search_version"] = formulation_engine.ACTIVE_SEARCH_VERSION
+    return context
 
 
 def existing_job_response(job, request):
@@ -119,7 +122,8 @@ def execute(job, token, request):
         worker.start()
         payload = RunRequest.model_validate(job['request'])
         search = None if runtime.settings.mode == 'mock' else configured_search(request)
-        result = run_workflow(payload, search, runtime.generation_provider() if search else None)
+        result = run_workflow(payload, search, runtime.generation_provider() if search else None,
+                              formulation_engine.bound_search_version(job["context"]))
         result = result.model_copy(update={'run_id': job_id, 'created_at': job['created_at']})
         storage(store.finish, job_id, token, result)
         return result

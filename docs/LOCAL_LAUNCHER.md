@@ -19,6 +19,10 @@ script location; it does not depend on the terminal's current directory.
 The default backend preference is 8124; the web preference is 3001. If occupied,
 the launcher tries up to 29 subsequent ports. Both sockets remain reserved during
 startup; the backend inherits its bound socket, and the web server adopts its socket.
+On Windows, reservation uses exclusive address use so a live listener cannot be
+stolen. On macOS and Linux, address reuse allows an immediate restart after
+TIME_WAIT, while an active listener still wins. The one-command process itself
+still runs only on macOS and Linux.
 The selected backend URL is compiled into an isolated Flutter build so the two always
 agree. Existing servers and their processes are never terminated by port number.
 
@@ -48,6 +52,13 @@ Saved runs are not deleted. Unrelated services remain running.
 Logs and compiled builds stay in ignored `var/dev/session-*` folders for diagnosis.
 No automatic cleanup deletes earlier sessions. They can consume disk space over time.
 Only the compiled web directory is served, not the repository or backend log directory.
+
+## Verification (2026-10-26)
+
+On Windows, exclusive port reservation passed the occupied-port tests, including
+the case that previously allowed a second bind. `python tools/dev.py` still
+stops before reserving a port on Windows. The full local release check is
+recorded in RELEASE_STEP5_VERIFICATION.md.
 
 ## Verification (2026-10-24)
 

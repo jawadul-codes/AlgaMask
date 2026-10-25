@@ -171,7 +171,7 @@ def build(directory: Path, output: Path, version: str, *, publish: bool = False,
 
 def verify(directory: Path, *, require_release: bool = False) -> dict:
     """Verify bytes and rerun current gates before allowing runtime consumption."""
-    manifest = json.loads((directory / "manifest.json").read_text())
+    manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
     if manifest.get("format_version") != 1 or manifest.get("schema_version") not in SUPPORTED_SCHEMA_VERSIONS:
         raise ValueError("Unsupported manifest or schema version")
     expected = {f"reviewed/{t}.csv" for t in TABLES} | {"review.json", "REVIEW.md"}
@@ -190,7 +190,7 @@ def verify(directory: Path, *, require_release: bool = False) -> dict:
     if manifest["content_hash"] != digest(canonical(files)) or manifest["validation_report_hash"] != files["review.json"]:
         raise ValueError("Manifest hash mismatch")
     report = audit(directory / "reviewed")
-    if report["schema_version"] != manifest["schema_version"] or report != json.loads((directory / "review.json").read_text()) or report["row_counts"] != manifest["row_counts"]:
+    if report["schema_version"] != manifest["schema_version"] or report != json.loads((directory / "review.json").read_text(encoding="utf-8")) or report["row_counts"] != manifest["row_counts"]:
         raise ValueError("Review report does not match dataset")
     if require_release and (manifest.get("kind") != "release" or manifest.get("runtime_eligible") is not True or not manifest.get("reviewer") or not report["publication_ready"]):
         raise ValueError("Dataset is not an approved runtime release")

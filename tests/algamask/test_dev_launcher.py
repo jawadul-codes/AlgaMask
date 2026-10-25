@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 import socket
+import sys
 
 import pytest
 
@@ -67,3 +68,17 @@ def test_backend_exit_fails_fast():
         def poll(self): return 1
     with pytest.raises(RuntimeError, match="Backend exited"):
         dev.wait_ready("http://127.0.0.1:1", Exited(), timeout=1)
+
+
+def test_readiness_timeout_has_no_mock_fallback():
+    class Alive:
+        def poll(self): return None
+    with pytest.raises(RuntimeError, match="timed out"):
+        dev.wait_ready("http://127.0.0.1:1", Alive(), timeout=0.2)
+
+
+def test_unsupported_platform_stops_before_reserving_a_port(monkeypatch, capsys):
+    monkeypatch.setattr(dev.os, "name", "nt")
+    monkeypatch.setattr("sys.argv", ["dev.py"])
+    assert dev.main() == 1
+    assert "macOS/Linux" in capsys.readouterr().out

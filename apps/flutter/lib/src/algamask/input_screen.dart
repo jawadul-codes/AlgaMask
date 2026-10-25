@@ -604,6 +604,8 @@ class _InputScreenState extends State<InputScreen> {
         feasibility!['can_run'] == true
             ? 'Configuration can be screened with current data.'
             : 'Adjust your configuration before running.',
+      if (feasibility?['search_version'] != null)
+        'Search policy: ${feasibility!['search_version']}.',
       ...?((feasibility?['messages'] as List?)?.map((e) => '$e')),
     ];
     final ranges = feasibility?['margins'] as Map? ?? {};

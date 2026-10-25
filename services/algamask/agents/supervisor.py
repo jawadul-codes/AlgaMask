@@ -7,13 +7,13 @@ from ..schemas import AgentOutput, RunRequest, RunResult, TraceStep
 from . import chemistry, critic, impact_agent, profile, recipe, retrieve
 
 
-def run_workflow(request: RunRequest, search=None, generation_provider=None) -> RunResult:
+def run_workflow(request: RunRequest, search=None, generation_provider=None, search_version=None) -> RunResult:
     from ..report_interpretation import interpret
-    result = _run_workflow(request, search, generation_provider)
+    result = _run_workflow(request, search, generation_provider, search_version)
     return result.model_copy(update={'interpretation': interpret(result)})
 
 
-def _run_workflow(request: RunRequest, search=None, generation_provider=None) -> RunResult:
+def _run_workflow(request: RunRequest, search=None, generation_provider=None, search_version=None) -> RunResult:
     if request.experiment != "engineering_grid" and search is None:
         raise ValueError("Fixed experiment requires development retrieval; mock execution is not supported.")
     trace = []
@@ -83,14 +83,21 @@ def _run_workflow(request: RunRequest, search=None, generation_provider=None) ->
         candidates = chemistry.run(request, evidence)
         record("Chemistry", "CANDIDATES_GENERATED", "Selected a placeholder aroma strategy.", candidates)
     if search is not None:
-        formulas, controls, audit = formulation_engine.screen(request, search.snapshot,
-                                                              development=metadata["development_only"])
+        formulas, controls, audit = formulation_engine.screen(
+            request, search.snapshot, development=metadata["development_only"], version=search_version)
         record("Recipe", "RECIPES_SCREENED", "Checked the selected versioned engineering experiment.",
                audit, "complete" if formulas else "blocked")
-        verdicts = {f.id: formulation_engine.check_formula(f, request, search.snapshot) for f in formulas}
+        policy_version = audit.get("search_version")
+        verdicts = {f.id: formulation_engine.check_formula(
+            f, request, search.snapshot, version=policy_version) for f in formulas}
         accepted = [f for f in formulas if not verdicts[f.id]]
         if len(accepted) != len(formulas):
             raise ValueError("Independent formulation check failed")
+        for control in controls:
+            control_errors = formulation_engine.check_formula(
+                control, request, search.snapshot, baseline=control.id == "B0", check_targets=False, check_grid=False)
+            if control_errors:
+                raise ValueError(f"Independent control check failed: {control_errors}")
         record("Critic", "SCREENING_PASSED" if accepted else "REJECTED",
                "Checked mass, species inclusion, exclusions and requested nutrition targets; not scientific approval.",
                {"verdicts": verdicts, "accepted_ids": [f.id for f in accepted],

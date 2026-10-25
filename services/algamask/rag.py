@@ -96,7 +96,7 @@ def build_index(dataset: Path, output: Path, version: str, provider: EmbeddingPr
 class EvidenceSearch:
     def __init__(self, dataset: Path, index_path: Path, provider: EmbeddingProvider, *, development: bool = False, reranker=None):
         release = verify(dataset, require_release=not development)
-        manifest = json.loads((index_path / "manifest.json").read_text())
+        manifest = json.loads((index_path / "manifest.json").read_text(encoding="utf-8"))
         if manifest["format_version"] != 1 or manifest["text_version"] != TEXT_VERSION or manifest["index_type"] != "IndexFlatIP" or manifest["metric"] != "cosine":
             raise ValueError("Unsupported index configuration")
         if manifest["dataset_hash"] != release["content_hash"] or manifest["dataset_version"] != release["dataset_version"]:
@@ -108,7 +108,7 @@ class EvidenceSearch:
         hashes = {name: digest((index_path / name).read_bytes()) for name in ("documents.json", "vectors.faiss")}
         if hashes != manifest["files"] or digest(canonical(hashes)) != manifest["content_hash"]:
             raise ValueError("Index integrity mismatch")
-        docs = json.loads((index_path / "documents.json").read_text())
+        docs = json.loads((index_path / "documents.json").read_text(encoding="utf-8"))
         if docs != documents(dataset, manifest["development_only"]):
             raise ValueError("Index metadata does not match dataset")
         index = faiss.read_index(str(index_path / "vectors.faiss"))

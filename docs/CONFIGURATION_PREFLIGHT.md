@@ -26,7 +26,12 @@ uses 2% and 45 g. These interface limits do not establish effective or safe dose
 
 ## Reproduced example
 
-Current rc.5: chlorella means the named Algomed powder reference. At 3%, 45 g and
+The numbers in this section are the original nine-recipe policy,
+`exact-form-grid-v1`. The live screen is `protein-base-grid-v2`. Its ranges and
+the whey recipe it adds are in
+[RELEASE_STEP4_RECIPE_SCREENING.md](RELEASE_STEP4_RECIPE_SCREENING.md).
+
+Current rc.5 under v1: chlorella means the named Algomed powder reference. At 3%, 45 g and
 vanilla, ranges are protein 4.57866–5.17797 g, energy 154.017–159.201 kcal,
 total sugar 7.508205–10.419345 g. Minimum protein 12 g plus maximum sugar 0 g
 blocks with numeric adjustment margins, not missing-data errors. With minimum

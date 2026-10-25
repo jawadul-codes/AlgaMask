@@ -26,25 +26,32 @@ carbohydrate nor ALA is substituted. See [source coverage](NUTRITION_COVERAGE.md
 
 ## Implemented: experimental screening workflow
 
-With `ALGAMASK_MODE=development`, `/runs` now uses the exact dataset snapshot retained
-by the verified retrieval index. After grounded explanation succeeds, the Recipe
-stage enumerates nine candidates: dried dates at 25/30/35%, flavour ingredients at
-1/2/3%, requested algae inclusion (50:50 for blend), and rolled oats as the remainder.
-Cocoa-spice splits its flavour mass equally between cocoa and cinnamon. Vanilla is
-extract; citrus is raw orange peel. These are **explicit engineering assumptions**,
-not recommended doses or evidence-backed manufacturing recipes. Dried dates are
-not labelled date paste. No retrieved passage is assigned as dose support.
+With `ALGAMASK_MODE=development`, `/runs` uses the exact dataset snapshot retained
+by the verified retrieval index. New runs use `protein-base-grid-v2`: dried dates
+at 25/30/35%, flavour ingredients at 1/2/3%, USDA beverage whey-protein powder
+isolate at 0/10/20% of input mass, the requested algae inclusion (50:50 for blend),
+and rolled oats as the remainder. The 0% whey slice is the previous nine-recipe
+grid and keeps those recipe IDs. Cocoa-spice splits its flavour mass equally
+between cocoa and cinnamon. Vanilla is extract; citrus is raw orange peel.
+These percentages are explicit engineering assumptions, not recommended doses or
+food-safety limits. Whey is FDC 173177, a beverage-powder isolate at 58.14 g
+protein per 100 g, and it contains milk. Soy isolate is not used because its
+sugar value is unknown. No oat-free filler with nutrition is available, so
+excluding oats still blocks. No retrieved passage is assigned as dose support.
 
 The search checks serving mass, exact species inclusion, grid membership and
 exclusions. Optional per-serving request fields are `min_protein_g`,
-`max_energy_kcal` and `max_sugar_g`. A target with missing data cannot pass. Active
-rc.5 supports protein/energy/sugar for vanilla and cocoa-spice across all three
-algae choices. Citrus sugar remains unknown because the raw-orange-peel record lacks
-total sugar. Chlorella refers to the named Algomed supplier-label profile.
-Candidates meeting the checks are ranked by estimated protein per serving, with
-stable ID tie-breaking; at most three are returned. Failure means **no verified
-candidate in this nine-point grid**, not proof that the user's goal is impossible.
-The Critic repeats checks independently of the generator's success result.
+`max_energy_kcal` and `max_sugar_g`. A target with missing data cannot pass.
+Preflight and execution use the same 27-recipe generator. Candidates meeting
+the checks are ranked by estimated protein per serving, with stable ID
+tie-breaking; at most three are returned. Failure means no verified candidate
+in this declared grid, or that the candidate budget stopped the search. Neither
+is proof that the user's goal is impossible outside the grid. The Critic repeats
+checks independently of the generator's success result.
+
+`exact-form-grid-v1` remains the nine-recipe oat grid. Jobs saved without a
+policy field still run as v1. Completed results are not recalculated.
+`spirulina-proof-v1` quantities are unchanged.
 
 Oats/coconut exclusions remove matching ingredient forms. Peanut/tree-nut/sesame/
 milk/soy allergy exclusions block screening: the corpus cannot establish complete
@@ -60,7 +67,7 @@ individually matched controls. The reported protein-density percentage change is
 only for the top candidate versus B0; missing/zero baseline values yield unknown.
 
 `impact.nutrition` contains estimates and provenance per candidate/control;
-`impact.screening` records all nine verdicts, assumptions, search version and control
+`impact.screening` records every checked recipe, the assumptions, search version and control
 parent. HTML reports show estimates, missing-data reasons, source qualifications,
 review status and screening audit. Sensory change remains unknown and panel size 0.
 The default mock mode remains demonstrational and rejects nutrition targets rather
@@ -69,12 +76,13 @@ engineering grid is development-only, even if a future retrieval release exists.
 
 ## Remaining for scientifically validated formulations
 
-- Collect/review applicable protein-bar bounds with a confirmed mass basis and
-  material/process context; the existing snack-bar bound is not automatically reused.
+The bounded whey expansion in `protein-base-grid-v2` is an engineering screen only.
+It does not add reviewed protein-bar bounds, supplier-lot measurements, or sensory trials.
+
 - Resolve nutrient and supplier-specific allergen coverage, ingredient processing
   assumptions, product-lot measurements and actual sensory trials.
-- Extend the search space and constraint policy using those reviewed inputs, then
-  verify production eligibility separately from arithmetic feasibility.
+- Any wider search still needs those reviewed inputs. Production eligibility is
+  separate from arithmetic feasibility.
 
 No scientific approvals were changed, no dataset release was published, and no
-formulation is claimed production eligible. Flutter integration is a later step.
+formulation is claimed production eligible.

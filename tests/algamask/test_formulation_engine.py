@@ -19,7 +19,9 @@ def test_grid_constraints_and_controls(snapshot, algae, flavour, mass, inclusion
     request = RunRequest(algae=algae, flavour=flavour, serving_g=mass, inclusion_pct=inclusion)
     formulas, controls, audit = screen(request, snapshot, development=True)
     assert len(formulas) == 3 and len(controls) == 2
-    assert len(audit["verdicts"]) == 9
+    assert len(audit["verdicts"]) == 27
+    assert audit["search_version"] == "protein-base-grid-v2"
+    assert formulas[0].id.endswith("-W20")
     assert not audit["production_eligible"]
     assert audit["control_parent_id"] == formulas[0].id
     for formula in formulas + controls:
@@ -40,13 +42,17 @@ def test_grid_constraints_and_controls(snapshot, algae, flavour, mass, inclusion
     ({"max_energy_kcal": 200}, "unknown"),
     ({"max_sugar_g": 10}, "unknown"),
     ({"exclusions": ["oats"]}, "Excluded ingredient"),
-    ({"exclusions": ["milk"]}, "coverage unknown"),
+    ({"exclusions": ["milk"]}, "milk-block"),
     ({"exclusions": ["soy"]}, "coverage unknown"),
     ({"exclusions": ["tree_nut"]}, "coverage unknown"),
 ])
 def test_unsatisfied_or_unknown_constraints(snapshot, payload, reason):
     formulas, controls, audit = screen(RunRequest(**payload), snapshot, development=True)
     assert not formulas and not controls
+    if reason == "milk-block":
+        assert all(any("IF-WHEY-PWD" in error or "coverage unknown" in error for error in errors)
+                   for errors in audit["verdicts"].values())
+        return
     assert all(any(reason in error for error in errors) for errors in audit["verdicts"].values())
 
 

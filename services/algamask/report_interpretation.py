@@ -5,6 +5,7 @@ INGREDIENT_NAMES = {
     'IF-OAT-DRY': 'Dry oats', 'IF-DATE-DRIED': 'Dried dates',
     'IF-COCOA-PWD': 'Cocoa powder', 'IF-CINN-PWD': 'Cinnamon powder',
     'IF-VAN-EXT': 'Vanilla extract', 'IF-ORANGE-PEEL': 'Raw orange peel',
+    'IF-WHEY-PWD': 'Whey protein powder isolate (beverage reference)',
 }
 
 
@@ -41,9 +42,17 @@ def interpret(result):
         reason = 'This result is a software fixture; it does not establish nutritional or sensory performance.'
     else:
         title = 'Candidates passed computational checks'
-        reason = ('Fixed ingredient amounts were checked against the requested targets.' if
-                  result.request.experiment == 'spirulina-proof-v1' else
-                  'Candidates from nine recipe variations are ordered by estimated protein, then candidate ID.')
+        screening = result.impact.get('screening') or {}
+        version = screening.get('search_version')
+        if result.request.experiment == 'spirulina-proof-v1':
+            reason = 'Fixed ingredient amounts were checked against the requested targets.'
+        elif version == 'protein-base-grid-v2':
+            reason = ('Candidates from the protein-base grid (dates, flavour, and beverage whey isolate at 0/10/20% of input, replacing oats) '
+                      'are ordered by estimated protein, then candidate ID. This is not a sensory ranking.')
+        elif version in (None, 'exact-form-grid-v1'):
+            reason = 'Candidates from nine recipe variations are ordered by estimated protein, then candidate ID.'
+        else:
+            reason = screening.get('scope') or 'Candidates are ordered by estimated protein, then candidate ID.'
     reasons = []
     if status != 'report_ready' or not result.formulations:
         audit = result.impact.get('screening', {})
@@ -76,6 +85,8 @@ def interpret(result):
             'nutrition_notice': nutrition_notice,
             'blocking_reasons': list(dict.fromkeys(reasons)),
             'sensory': sensory,
-            'controls': 'B0 and A0 are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.',
+            'controls': ('B0 and A0 are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'
+                         + (' Flavour and algae are replaced with oats. Beverage whey isolate, when the top candidate uses it, remains in both controls and is a milk ingredient.'
+                            if (result.impact.get('screening') or {}).get('search_version') == 'protein-base-grid-v2' else '')),
             'mass_basis': f'Nutrition is estimated per {result.request.serving_g:g} g ingredient input. Finished product yield is unmeasured.',
             'evidence': {e['chunk_id']: evidence_scope(e, result.request) for e in result.evidence}}

@@ -9,6 +9,7 @@ import shutil
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -30,9 +31,15 @@ def reserve_port(preferred, *, explicit=False):
     for port in range(preferred, min(preferred + (1 if explicit else 30), 65536)):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            # Permit immediate restart after an owned connection enters TIME_WAIT.
-            # SO_REUSEPORT is deliberately not enabled: an active listener still wins.
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if sys.platform == "win32":
+                # Windows SO_REUSEADDR allows a second bind to steal a live listener.
+                # Exclusive use keeps an occupied port occupied. The listening socket
+                # is closed before a restart, so the same port can be bound again.
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+            else:
+                # Permit immediate restart after an owned connection enters TIME_WAIT.
+                # SO_REUSEPORT is deliberately not enabled: an active listener still wins.
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind(("127.0.0.1", port))
             sock.listen(128)
             return sock

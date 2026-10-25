@@ -1,6 +1,7 @@
 """Verify the local application or fail closed on production eligibility."""
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -32,7 +33,13 @@ def main():
             (['flutter', 'test'], ROOT / 'apps/flutter'),
             (['flutter', 'build', 'web'], ROOT / 'apps/flutter'),
         ]:
-            subprocess.run(command, cwd=directory, check=True)
+            argv = list(command)
+            if argv[0] != sys.executable:
+                resolved = shutil.which(argv[0])
+                if resolved is None:
+                    raise RuntimeError(f"{argv[0]} was not found on PATH. Install it and open a terminal that can run `{argv[0]}`.")
+                argv[0] = resolved
+            subprocess.run(argv, cwd=directory, check=True)
         runtime = RetrievalRuntime(settings)
         search = runtime.get_search()
         with tempfile.TemporaryDirectory(prefix='algamask-release-') as temporary:

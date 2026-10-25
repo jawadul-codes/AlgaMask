@@ -77,7 +77,7 @@ def test_supported_sugar_targets_have_numeric_ranges(snapshot, algae, flavour):
                 min_protein_g=5, max_energy_kcal=200, max_sugar_g=10)
     result = check_inputs(RunRequest(**args), snapshot)
     assert result['can_run'] and result['candidate_count'] > 0
-    assert all(m['known_candidates'] == 9 for m in result['margins'].values())
+    assert all(m['known_candidates'] == 27 for m in result['margins'].values())
     impossible = check_inputs(RunRequest(**{**args, 'max_sugar_g': 0}), snapshot)
     assert not impossible['can_run'] and impossible['candidate_count'] == 0
     assert any('Raise the maximum' in m for m in impossible['messages'])

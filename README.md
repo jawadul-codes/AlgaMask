@@ -9,7 +9,10 @@ AlgaMask is a local Flutter + FastAPI application for experimental algae-bar
 formulation screening. It supports source-grounded evidence explanations, exact-form
 nutrition estimates, constraint checks, matched controls, reports and saved history.
 Current formulations are computational experiments; manufacturing/sensory validation
-and scientific dataset publication remain incomplete.
+and scientific dataset publication remain incomplete. New screening runs use
+`protein-base-grid-v2` (dates, flavour, and 0/10/20% beverage whey isolate).
+The older nine-recipe grid remains available for saved jobs. See
+`docs/RELEASE_STEP4_RECIPE_SCREENING.md`.
 
 ## Start locally
 
@@ -69,6 +72,22 @@ flutter run -d chrome --web-port 3000 --dart-define=API_BASE_URL=http://127.0.0.
 
 Use loopback for this single-user development service. API docs are available at
 http://127.0.0.1:8000/docs. Hosted access controls are not configured.
+
+On Windows, `tools/dev.py` stops immediately and does not claim a one-command
+launch. Use the manual commands above in PowerShell, with `flutter run -d web-server`
+when Chrome is not installed:
+
+```powershell
+$env:ALGAMASK_MODE = "development"
+$env:HF_HUB_OFFLINE = "1"
+$env:ALGAMASK_GENERATION_PROVIDER = "extractive"
+uv run --extra rag uvicorn algamask.api:app --host 127.0.0.1 --port 8000
+```
+
+Saved runs go to `var/runs.sqlite3` unless `ALGAMASK_RUN_DB` points somewhere else.
+`GET /health` reports `"mode":"development"` for real data and `"mode":"mock"` when
+that variable is omitted. Mock mode is a synthetic fixture. It does not silently
+replace a failed retrieval setup.
 
 ## Use the app
 

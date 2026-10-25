@@ -49,7 +49,9 @@ grid cannot satisfy arbitrary protein or calorie targets.
 Raw orange peel has no total sugar in this source. Citrus recipes therefore block
 an explicit sugar target. They can run with that optional target blank, while
 reporting sugar unknown. Coconut oil, salt and soy isolate assumed-zero sugar
-entries also remain unknown; they are not used in the current nine-point grid.
+entries also remain unknown; they are not used in the original nine-point grid
+(`exact-form-grid-v1`). The live screen is `protein-base-grid-v2`; its ranges
+are recorded separately and do not replace the v1 numbers below.
 
 Fibre/iron and total omega-3 are not complete for every recipe. No missing field
 was invented to make the app produce an apparently complete report.
