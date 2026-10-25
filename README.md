@@ -19,7 +19,7 @@ After the dependencies and local RAG model are installed, run this from any term
 (including Antigravity):
 
 ```sh
-python3 /Users/mohamaadmazharulislam/AlgaMask/tools/dev.py
+python3 /AlgaMask/tools/dev.py
 ```
 
 On another computer, replace the path with your checkout location. From the repository

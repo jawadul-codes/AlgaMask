@@ -8,6 +8,12 @@ from . import chemistry, critic, impact_agent, profile, recipe, retrieve
 
 
 def run_workflow(request: RunRequest, search=None, generation_provider=None) -> RunResult:
+    from ..report_interpretation import interpret
+    result = _run_workflow(request, search, generation_provider)
+    return result.model_copy(update={'interpretation': interpret(result)})
+
+
+def _run_workflow(request: RunRequest, search=None, generation_provider=None) -> RunResult:
     if request.experiment != "engineering_grid" and search is None:
         raise ValueError("Fixed experiment requires development retrieval; mock execution is not supported.")
     trace = []
@@ -17,7 +23,7 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
         trace.append(TraceStep(**validated.model_dump()))
 
     sensory = profile.run(request)
-    record("Profile", "PROFILED", "Prepared five illustrative sensory categories.", {"sensory_map": sensory})
+    record("Profile", "UNMEASURED", "Listed possible sensory categories; no measured risks or masking predictions are available.", {"sensory_map": sensory}, 'assumed')
     evidence, searches = retrieve.run(request, search)
     metadata = None
     generation = None
@@ -28,7 +34,7 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
         metadata = {key: search.manifest[key] for key in ("dataset_version", "dataset_hash", "index_version", "embedding", "development_only")}
         metadata["searches"] = searches
         mode = "rag_development" if metadata["development_only"] else "rag"
-        limitations = ["Cited explanations use local retrieval; the sensory profile remains illustrative.",
+        limitations = ["Cited explanations use local retrieval; sensory effects and flavour masking remain unmeasured.",
                        "Retrieved passages do not establish effective or safe ingredient doses.",
                        "Recipe search uses an explicit experimental grid, not scientifically validated protein-bar bounds.",
                        "Composition estimates are not product measurements; missing values remain unknown.",
@@ -105,7 +111,7 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None) -> 
     record("Recipe", "RECIPES_GENERATED", "Created three mass-balanced demonstration concepts.", {"formulations": [f.model_dump() for f in formulas]})
     verdicts = critic.run(request, formulas)
     approved = [f for f in formulas if not verdicts[f.id]]
-    record("Critic", "APPROVED" if approved else "REJECTED", "Checked recipe arithmetic and exclusions; cited explanation checked separately against its evidence snapshot.", {"verdicts": verdicts, "approved_ids": [f.id for f in approved], "grounding_errors": grounding_errors, "grounding_checked": generation is not None}, "complete" if search else "mock")
+    record("Critic", "DEMO_CHECKS_PASSED" if approved else "REJECTED", "Checked demonstration recipe arithmetic and exclusions; this is not scientific approval.", {"verdicts": verdicts, "approved_ids": [f.id for f in approved], "grounding_errors": grounding_errors, "grounding_checked": generation is not None}, "complete" if search else "mock")
     impact = impact_agent.run(request, approved)
     record("Impact", "IMPACT_CALCULATED" if approved else "BLOCKED", "Nutrition and sensory measurements are unavailable.", impact)
     controls = [build_formula(request, "B0", None, False), build_formula(request, "A0", None)]

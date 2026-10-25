@@ -224,7 +224,8 @@ def get_run(run_id: str, request: Request):
     result = storage(request.app.state.run_store.get, run_id)
     if result is None:
         raise HTTPException(404, "Run not found.")
-    return result
+    from .report_interpretation import interpret
+    return result.model_copy(update={'interpretation': interpret(result)})
 
 
 @app.get("/runs/{run_id}/report", response_class=HTMLResponse)

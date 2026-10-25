@@ -57,6 +57,74 @@ Map<String, dynamic> result(String status) => {
 };
 
 void main() {
+  testWidgets(
+    'candidate report distinguishes controls, precision and background evidence',
+    (tester) async {
+      final data = result('report_ready');
+      data['formulations'] = [
+        {
+          'id': 'S25-1',
+          'name': 'Test candidate',
+          'total_g': 45,
+          'ingredients': [
+            {'ingredient_id': 'IF-COCOA-PWD', 'grams': 0.225},
+            {'ingredient_id': 'IF-OAT-DRY', 'grams': 44.775},
+          ],
+        },
+      ];
+      data['controls'] = [
+        {
+          'id': 'B0',
+          'name': 'Control',
+          'total_g': 45,
+          'ingredients': [
+            {'ingredient_id': 'IF-OAT-DRY', 'grams': 45},
+          ],
+        },
+      ];
+      data['interpretation'] = {
+        'ingredient_names': {
+          'IF-COCOA-PWD': 'Cocoa powder',
+          'IF-OAT-DRY': 'Dry oats',
+        },
+        'evidence': {
+          'C1': {
+            'label': 'Related-study background',
+            'notes': ['The study does not cover all requested algae species.'],
+          },
+        },
+      };
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ReportView(
+                result: data,
+                reportUri: Uri.parse('http://localhost/runs/test/report'),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Candidates found'), findsOneWidget);
+      expect(
+        find.textContaining('targets apply to candidates only'),
+        findsOneWidget,
+      );
+      expect(find.text('Cocoa powder 0.2250 g'), findsOneWidget);
+      expect(find.text('Evidence context and limits'), findsOneWidget);
+      expect(find.text('Related-study background'), findsOneWidget);
+      expect(
+        find.textContaining('Selected candidate sugar: unknown'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('The study does not cover all requested'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
   testWidgets('denied clipboard write shows recovery feedback', (tester) async {
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -120,7 +188,10 @@ void main() {
         find.textContaining('LOCAL RAG · development data'),
         findsOneWidget,
       );
-      expect(find.text('Source-scoped finding'), findsOneWidget);
+      expect(
+        find.text('Source-scoped finding'),
+        status == 'generation_failed' ? findsNothing : findsOneWidget,
+      );
       final tile = find.text('S25-1 · composition estimate');
       await tester.ensureVisible(tile);
       await tester.tap(tile);

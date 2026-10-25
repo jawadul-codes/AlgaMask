@@ -219,3 +219,59 @@ def test_oat_preference_explains_no_remaining_recipes(client):
     assert 'no oat-free recipe' in str(result['messages'])
     assert 'Nutrition targets have not been evaluated' in str(result['messages'])
     assert 'required data is missing' not in str(result)
+
+
+def test_new_reports_do_not_invent_sensory_scores(client):
+    api, _ = client
+    result = api.post('/runs', json={'algae': 'chlorella', 'flavour': 'vanilla'}).json()
+    assert all(item['relative_risk'] is None for item in result['sensory_map'])
+    assert all(item['status'] == 'unmeasured' for item in result['sensory_map'])
+    summary = result['interpretation']
+    assert 'computational checks' in summary['title']
+    assert 'unmeasured' in summary['sensory']
+    assert 'unknown energy, sugar' in summary['nutrition_notice']
+    assert 'controls may exceed' in summary['controls']
+    assert all(not scope['recipe_validated'] for scope in summary['evidence'].values())
+    html = api.get(f"/runs/{result['run_id']}/report").text
+    assert 'Evidence context and limits' in html
+    assert 'comparison control' in html and 'targets apply to candidates only' in html
+    assert 'Dried dates [IF-DATE-DRIED]' in html
+    assert 'Study material: related matrix.' in html
+
+
+def test_historical_report_gets_clarity_without_rewriting_stored_values(client):
+    from algamask.schemas import RunResult
+    api, _ = client
+    current = api.post('/runs', json={}).json()
+    legacy = RunResult.model_validate({**current, 'run_id': 'legacy-demo', 'interpretation': {},
+        'sensory_map': [{'category': 'Bitter', 'relative_risk': 0.6, 'status': 'assumed for demo'}]})
+    app.state.run_store.save(legacy)
+    reopened = api.get('/runs/legacy-demo').json()
+    assert reopened['sensory_map'][0]['relative_risk'] == 0.6
+    assert 'Historical demo scores' in reopened['interpretation']['sensory']
+    assert not app.state.run_store.get('legacy-demo').interpretation
+
+
+@pytest.mark.parametrize('species,matrix', [(['spirulina'], 'cookies'), ([], 'protein bar'), (['chlorella'], 'protein bar')])
+def test_source_direct_never_becomes_recipe_validation(species, matrix):
+    from algamask.report_interpretation import evidence_scope
+    from algamask.schemas import RunRequest
+    scope = evidence_scope({'species': species, 'matrix': matrix, 'chunk_tag': 'intervention',
+                            'support_class': 'direct'}, RunRequest(algae='chlorella', flavour='vanilla'))
+    assert not scope['recipe_validated']
+    assert scope['label'] == 'Related-study background'
+    assert 'not validation of this recipe' in ' '.join(scope['notes'])
+
+
+def test_html_does_not_present_failed_generated_claims(client):
+    from algamask.schemas import RunResult
+    from algamask.report import render_report
+    api, _ = client
+    result = RunResult.model_validate(api.post('/runs', json={}).json())
+    result.generation.claims[0].text = 'UNVERIFIED GENERATED SENTENCE'
+    result.status = 'generation_failed'
+    result.formulations, result.controls = [], []
+    html = render_report(result)
+    assert 'UNVERIFIED GENERATED SENTENCE' not in html
+    assert 'Evidence explanation could not be verified' in html
+    assert 'No formulations were returned' in html

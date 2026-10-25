@@ -20,6 +20,21 @@ class ReportView extends StatelessWidget {
       (impact['nutrition'] as Map?)?.cast<String, dynamic>() ?? {};
   Map<String, dynamic> get screening =>
       (impact['screening'] as Map?)?.cast<String, dynamic>() ?? {};
+  Map get interpretation => result['interpretation'] as Map? ?? {};
+  bool get hasCandidate =>
+      result['status'] == 'report_ready' &&
+      (result['formulations'] as List? ?? []).isNotEmpty;
+  String get outcomeLabel => result['status'] == 'generation_failed'
+      ? 'Explanation blocked'
+      : !hasCandidate
+      ? 'No candidate returned'
+      : result['mode'] == 'mock'
+      ? 'Demo only'
+      : 'Candidates found';
+  String ingredientName(dynamic id) =>
+      '${(interpretation['ingredient_names'] as Map?)?[id] ?? label(id)}';
+  String get controlsNote =>
+      '${interpretation['controls'] ?? 'B0 and A0 are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'}';
   List<dynamic> get formulas => [
     ...?result['controls'] as List?,
     ...?result['formulations'] as List?,
@@ -105,7 +120,7 @@ class ReportView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ready = result['status'] == 'report_ready';
+    final ready = hasCandidate;
     final selected = _selectedFormula();
     final selectedId = selected?['id']?.toString();
     final estimate = nutrition[selectedId] as Map?;
@@ -150,7 +165,7 @@ class ReportView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                label(result['status']),
+                outcomeLabel,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
@@ -176,6 +191,36 @@ class ReportView extends StatelessWidget {
         const AlgaNotice(
           text: 'Experimental screening only. Arithmetic checks do not establish scientific or allergen safety approval.',
         ),
+        const SizedBox(height: 10),
+        Text(
+          '${interpretation['title'] ?? (ready ? 'Candidates passed computational checks' : 'No candidate is available for this run.')}',
+        ),
+        Text(
+          '${interpretation['reason'] ?? 'Review the evidence limitations and computational checks below.'}',
+          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        Text(
+          '${interpretation['mass_basis'] ?? 'Nutrition estimates refer to ingredient input mass; finished product yield is unmeasured.'}',
+          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        if (interpretation['nutrition_notice'] != null)
+          Text(
+            '${interpretation['nutrition_notice']}',
+            style: const TextStyle(fontSize: 12, color: AlgaColors.amber),
+          ),
+        const SizedBox(height: 8),
+        Text(
+          '${interpretation['sensory'] ?? 'Sensory effects and flavour masking are unmeasured. Historical demo scores are not measurements.'}',
+          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        for (final reason in interpretation['blocking_reasons'] as List? ?? [])
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              '$reason',
+              style: const TextStyle(fontSize: 12, color: AlgaColors.amber),
+            ),
+          ),
         if (!ready)
           const Padding(
             padding: EdgeInsets.only(top: 12),
@@ -204,20 +249,22 @@ class ReportView extends StatelessWidget {
                 ),
                 _metric(
                   'Protein estimate',
-                  protein == null ? 'Unknown' : '${number(protein)} g',
-                  'Per serving',
+                  protein == null
+                      ? 'Unknown'
+                      : '${number(protein, decimals: 2)} g',
+                  'Per ingredient input',
                   Icons.analytics_outlined,
                 ),
                 _metric(
                   'Energy estimate',
                   energy == null
                       ? 'Unknown'
-                      : '${number(energy, decimals: 0)} kcal',
-                  'Per serving',
+                      : '${number(energy, decimals: 2)} kcal',
+                  'Per ingredient input',
                   Icons.bolt_outlined,
                 ),
                 _metric(
-                  'Screened formulas',
+                  'Compared formulas',
                   '${formulas.length}',
                   'Controls and candidates',
                   Icons.check_circle_outline,
@@ -318,6 +365,7 @@ class ReportView extends StatelessWidget {
   }
 
   Map? _selectedFormula() {
+    if (!hasCandidate) return null;
     final candidates = result['formulations'] as List? ?? [];
     for (final item in candidates) {
       if (item is Map && item['id'] == 'A1') return item;
@@ -378,6 +426,15 @@ class ReportView extends StatelessWidget {
           'Candidate comparison',
           'Formula mass and estimated key outputs per serving',
         ),
+        const SizedBox(height: 8),
+        Text(
+          controlsNote,
+          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
+        const Text(
+          'Ingredient amounts are displayed to four decimal places; JSON retains calculation precision.',
+          style: TextStyle(fontSize: 11, color: AlgaColors.muted),
+        ),
         const SizedBox(height: 17),
         if (formulas.isEmpty)
           const Text(
@@ -393,6 +450,9 @@ class ReportView extends StatelessWidget {
   Widget _formulaRow(Map formula) {
     final id = '${formula['id']}';
     final isSelected = id == _selectedFormula()?['id'];
+    final isControl = (result['controls'] as List? ?? []).any(
+      (f) => f is Map && f['id'] == id,
+    );
     final ingredients = formula['ingredients'] as List? ?? [];
     final estimate = nutrition[id] as Map?;
     final perServing = estimate?['per_serving'] as Map?;
@@ -412,6 +472,13 @@ class ReportView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            isControl
+                ? 'Comparison control · candidate nutrition limits do not apply'
+                : 'Candidate · requested nutrition targets checked',
+            style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+          ),
+          const SizedBox(height: 7),
           Row(
             children: [
               Container(
@@ -487,7 +554,7 @@ class ReportView extends StatelessWidget {
               for (final ingredient in ingredients)
                 if (ingredient is Map)
                   Text(
-                    '${label(ingredient['ingredient_id'])} ${number(ingredient['grams'])} g',
+                    '${ingredientName(ingredient['ingredient_id'])} ${number(ingredient['grams'], decimals: 4)} g',
                     style: const TextStyle(
                       fontSize: 10,
                       color: AlgaColors.muted,
@@ -497,7 +564,7 @@ class ReportView extends StatelessWidget {
           ),
           const SizedBox(height: 9),
           Text(
-            'Protein: ${number(perServing?['protein_g'])} g   ·   Energy: ${number(perServing?['energy_kcal'], decimals: 0)} kcal',
+            'Estimated protein: ${number(perServing?['protein_g'], decimals: 2)} g   ·   Energy: ${number(perServing?['energy_kcal'], decimals: 2)} kcal',
             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
           ),
           if ((formula['warnings'] as List? ?? []).isNotEmpty)
@@ -521,6 +588,12 @@ class ReportView extends StatelessWidget {
           style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
         ),
         const SizedBox(height: 12),
+        Text(
+          hasCandidate
+              ? 'Selected candidate sugar: ${number(((nutrition[_selectedFormula()?['id']] as Map?)?['per_serving'] as Map?)?['sugar_g'], decimals: 3)} g. Unknown does not mean zero.'
+              : 'No candidate nutrition values are available.',
+          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+        ),
         if (nutrition.isEmpty)
           const Text(
             'No composition estimates were returned.',
@@ -530,7 +603,7 @@ class ReportView extends StatelessWidget {
           if (entry.value is Map) _nutritionRow(entry.key, entry.value as Map),
         const SizedBox(height: 5),
         Text(
-          'Estimated protein-density change: ${number(impact['nutrition_change_pct'])}%  ·  Sensory change: unknown  ·  Panel participants: 0',
+          'Estimated protein-density change: ${number(impact['nutrition_change_pct'])}%  ·  Sensory change: unknown  ·  Prototype panel participants: 0',
           style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
         ),
       ],
@@ -579,15 +652,19 @@ class ReportView extends StatelessWidget {
 
   Widget _evidence(BuildContext context) {
     final generation = result['generation'] as Map?;
-    final claims = generation?['claims'] as List? ?? [];
+    final claims =
+        generation?['status'] == 'complete' &&
+            result['status'] != 'generation_failed'
+        ? ((generation?['claims'] as List?) ?? <dynamic>[])
+        : <dynamic>[];
     final evidence = result['evidence'] as List? ?? [];
     return AlgaCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           heading(
-            'Why this candidate',
-            'Cited context and evidence used in screening',
+            'Evidence context and limits',
+            'Retrieved studies provide context; recipe masking efficacy is unverified',
           ),
           const SizedBox(height: 12),
           Text(
@@ -624,6 +701,8 @@ class ReportView extends StatelessWidget {
                       '${item['text']}',
                       style: const TextStyle(fontSize: 12, height: 1.45),
                     ),
+                    const SizedBox(height: 7),
+                    ..._scopeWidgets(item),
                     const SizedBox(height: 8),
                     Text(
                       '${(item['citation'] as Map?)?['chunk_id'] ?? 'Citation'} · ${(item['citation'] as Map?)?['source_id'] ?? 'source unknown'}',
@@ -641,14 +720,49 @@ class ReportView extends StatelessWidget {
             const SizedBox(height: 8),
             for (final item in evidence.take(3))
               if (item is Map)
-                Text(
-                  '${item['source_title'] ?? item['title'] ?? item['source_id']}: ${item['claim_summary'] ?? item['text'] ?? ''}',
-                  style: const TextStyle(fontSize: 12, height: 1.5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${item['source_title'] ?? item['title'] ?? item['source_id']}: ${item['claim_summary'] ?? item['text'] ?? ''}',
+                      style: const TextStyle(fontSize: 12, height: 1.5),
+                    ),
+                    ..._scopeWidgets({'citation': item}),
+                  ],
                 ),
           ],
         ],
       ),
     );
+  }
+
+  List<Widget> _scopeWidgets(Map claim) {
+    final citation = claim['citation'] as Map? ?? {};
+    final scope =
+        (interpretation['evidence'] as Map?)?[citation['chunk_id']] as Map?;
+    return [
+      Text(
+        '${scope?['label'] ?? 'Background context · recipe applicability unverified'}',
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AlgaColors.amber,
+        ),
+      ),
+      Text(
+        'Study material: ${citation['matrix'] ?? 'not recorded'}. Source statement support: ${citation['support_class'] ?? 'unknown'}. Review: ${citation['review_status'] ?? 'unknown'}.',
+        style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+      ),
+      for (final note
+          in scope?['notes'] as List? ??
+              [
+                'Selected flavour, inclusion and masking effect have not been validated for this recipe.',
+              ])
+        Text(
+          '$note',
+          style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+        ),
+    ];
   }
 
   Widget _checks() {

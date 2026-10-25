@@ -2,6 +2,28 @@
 
 Updated: 2026-10-25
 
+## Release Step 2: output clarity (2026-10-25, verified)
+
+- Replacing numeric demo sensory risks with unknown/unmeasured values in new runs.
+- Adding derived report interpretation: computational outcome, reasons, input-mass
+  basis, control roles and citation applicability without upgrading study support
+  into proof of recipe masking efficacy. Historical runs receive interpretation
+  on read; their stored evidence and measured/estimated values are not rewritten.
+- Updating Flutter/HTML reports with context labels, ingredient names/precision,
+  visible unknown sugar and suppression of unverified generated claims.
+- New mock Critic traces say DEMO_CHECKS_PASSED rather than APPROVED; no implied
+  scientific approval. Historical records remain intact and visibly qualified.
+- Verified browser run 69804c6a-251c-4969-8eff-efffdda95589 (chlorella/vanilla):
+  protein 5.26 g, energy/sugar unknown, background/mismatched-study labels, precise
+  ingredient names/grams, control explanations; copied JSON has five null risks.
+- Print report and historical report qualification verified in the browser.
+  Details: REPORT_OUTPUT_CLARITY.md; screenshot retained in the audit temp folder.
+- Flutter analysis clean; 30 Flutter tests passed; compiled web build passed.
+  Final backend suite: 213 passed / 10 opt-in skipped; separate real offline RAG
+  integration: all 10 passed. Whitespace validation passed. No nutrition dataset,
+  evidence records, retrieval ranking or formulation search was expanded.
+- Owned audit services stopped; existing user services unchanged. No commit/push.
+
 ## Release Step 1: browser workflow audit (2026-10-25, completed within recorded scope)
 
 - Testing the current compiled Flutter UI against real offline development RAG

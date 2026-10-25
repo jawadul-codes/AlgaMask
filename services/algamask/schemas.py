@@ -105,3 +105,4 @@ class RunResult(BaseModel):
     controls: list[Formulation]
     impact: dict
     limitations: list[str]
+    interpretation: dict[str, Any] = Field(default_factory=dict)
