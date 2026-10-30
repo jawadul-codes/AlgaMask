@@ -162,7 +162,7 @@ class _InputScreenState extends State<InputScreen> {
       key: ValueKey(
         result == null ? 'experiment-builder' : 'experiment-report',
       ),
-      padding: const EdgeInsets.fromLTRB(28, 32, 28, 64),
+      padding: const EdgeInsets.fromLTRB(28, 24, 28, 64),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1240),
@@ -195,31 +195,25 @@ class _InputScreenState extends State<InputScreen> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          'NEW EXPERIMENT',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 2,
-            color: AlgaColors.green,
+        LayoutBuilder(
+          builder: (context, c) => Text(
+            'Design a better algae bar',
+            style: algaType(
+              c.maxWidth < 600 ? 36 : 60,
+              tracking: -0.035,
+              height: 1.02,
+            ),
           ),
         ),
-        const SizedBox(height: 12),
-        const Text(
-          'Design a better algae bar',
-          style: TextStyle(
-            fontSize: 39,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -1.7,
-            height: 1.08,
+        const SizedBox(height: 14),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Text(
+            'Explore algae sources, formulation options, and nutrition targets before laboratory trials.',
+            style: algaType(18, weight: 400, height: 1.5),
           ),
         ),
-        const SizedBox(height: 12),
-        const Text(
-          'Explore algae sources, formulation options, and nutrition targets before laboratory trials.',
-          style: TextStyle(fontSize: 15, color: AlgaColors.muted),
-        ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 32),
         LayoutBuilder(
           builder: (context, constraints) {
             final left = _setupCard(), right = _briefCard();
@@ -244,14 +238,18 @@ class _InputScreenState extends State<InputScreen> {
             child: AlgaNotice(text: error!),
           ),
         if (loading)
-          const Padding(
-            padding: EdgeInsets.only(top: 18),
+          Padding(
+            padding: const EdgeInsets.only(top: 18),
             child: Column(
               children: [
-                LinearProgressIndicator(),
-                SizedBox(height: 10),
+                const LinearProgressIndicator(
+                  minHeight: 6,
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                ),
+                const SizedBox(height: 10),
                 Text(
                   'Retrieving evidence and screening candidates. The first local run may take longer.',
+                  style: algaType(15, weight: 500),
                 ),
               ],
             ),
@@ -265,7 +263,6 @@ class _InputScreenState extends State<InputScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _step(
-          '01',
           'Algae source',
           'Select the primary algae source for this experiment.',
         ),
@@ -307,10 +304,8 @@ class _InputScreenState extends State<InputScreen> {
               ],
             ),
           ),
-        const SizedBox(height: 27),
-        const Divider(color: AlgaColors.line),
-        const SizedBox(height: 18),
-        _step('02', 'Formula', 'Set the core formulation parameters.'),
+        const SizedBox(height: 40),
+        _step('Formula', 'Set the core formulation parameters.'),
         const SizedBox(height: 20),
         if (!fixedProof)
           LayoutBuilder(
@@ -347,16 +342,10 @@ class _InputScreenState extends State<InputScreen> {
         else
           const Text(
             'Spirulina 2% · 45 g ingredient input',
-            style: TextStyle(color: AlgaColors.muted),
+            style: TextStyle(fontSize: 16),
           ),
-        const SizedBox(height: 24),
-        const Divider(color: AlgaColors.line),
-        const SizedBox(height: 18),
-        _step(
-          '03',
-          'Flavour direction',
-          'Select the intended flavour direction.',
-        ),
+        const SizedBox(height: 40),
+        _step('Flavour direction', 'Select the intended flavour direction.'),
         const SizedBox(height: 18),
         if (!fixedProof)
           LayoutBuilder(
@@ -395,35 +384,27 @@ class _InputScreenState extends State<InputScreen> {
             ),
           )
         else
-          const Text(
-            'Cocoa + spice',
-            style: TextStyle(color: AlgaColors.muted),
-          ),
-        const SizedBox(height: 26),
-        const Divider(color: AlgaColors.line),
+          const Text('Cocoa + spice', style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 32),
         SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
-          title: const Text(
+          title: Text(
             'Fixed B0 / A0 / A1 experiment',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            style: algaType(17, weight: 600),
           ),
-          subtitle: const Text(
+          subtitle: Text(
             'spirulina-proof-v1 · engineering assumptions',
-            style: TextStyle(fontSize: 12),
+            style: algaType(14, weight: 400, color: AlgaColors.muted),
           ),
           value: fixedProof,
           onChanged: loading ? null : (v) => change(() => fixedProof = v),
         ),
         if (fixedProof)
-          const Padding(
-            padding: EdgeInsets.only(top: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
             child: Text(
               '45 g ingredient input, not finished serving. Spirulina 2% in A0/A1; dates 13.50 g and cocoa 0.90 g in every arm. A1 adds 0.45 g cinnamon by replacing oats. Nutrition targets apply to A1; exclusions apply to every arm.',
-              style: TextStyle(
-                fontSize: 12,
-                color: AlgaColors.muted,
-                height: 1.5,
-              ),
+              style: algaType(15, weight: 400, height: 1.55),
             ),
           ),
       ],
@@ -434,25 +415,21 @@ class _InputScreenState extends State<InputScreen> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
+        Text(
           'Live experiment brief',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
-          ),
+          style: algaType(28, tracking: -0.02, height: 1.1),
         ),
-        const SizedBox(height: 4),
-        const Text(
+        const SizedBox(height: 6),
+        Text(
           'This summary updates as you adjust your selections.',
-          style: TextStyle(fontSize: 12, color: AlgaColors.muted),
+          style: algaType(16, weight: 400, color: AlgaColors.muted),
         ),
-        const SizedBox(height: 17),
+        const SizedBox(height: 20),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
-            color: AlgaColors.pale,
-            borderRadius: BorderRadius.circular(8),
+            color: AlgaColors.deep,
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
             children: [
@@ -479,17 +456,15 @@ class _InputScreenState extends State<InputScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 23),
-        const Divider(color: AlgaColors.line),
-        const SizedBox(height: 15),
-        const Text(
+        const SizedBox(height: 40),
+        Text(
           'Nutrition targets',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+          style: algaType(22, weight: 600, height: 1.15),
         ),
-        const SizedBox(height: 3),
-        const Text(
+        const SizedBox(height: 4),
+        Text(
           'Optional limits per serving',
-          style: TextStyle(fontSize: 12, color: AlgaColors.muted),
+          style: algaType(15, weight: 400, color: AlgaColors.muted),
         ),
         const SizedBox(height: 16),
         _target('Minimum protein', 'g', protein, 50),
@@ -497,25 +472,21 @@ class _InputScreenState extends State<InputScreen> {
         _target('Maximum sugar', 'g', sugar, 50),
         const Text(
           'Targets use reference ingredient composition, not lab measurements. The check below shows available ranges and any missing data. Total sugar includes sugar naturally present in ingredients.',
-          style: TextStyle(fontSize: 11, color: AlgaColors.muted, height: 1.45),
+          style: TextStyle(fontSize: 13, color: AlgaColors.muted, height: 1.5),
         ),
-        const SizedBox(height: 21),
-        const Divider(color: AlgaColors.line),
-        const SizedBox(height: 15),
-        const Text(
-          'Exclusions',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 3),
-        const Text(
+        const SizedBox(height: 40),
+        Text('Exclusions', style: algaType(22, weight: 600, height: 1.15)),
+        const SizedBox(height: 4),
+        Text(
           'Choose how to apply your exclusions',
-          style: TextStyle(fontSize: 12, color: AlgaColors.muted),
+          style: algaType(15, weight: 400, color: AlgaColors.muted),
         ),
         const SizedBox(height: 12),
-        DropdownButton<String>(
+        DropdownButtonFormField<String>(
           key: const Key('exclusion-mode'),
-          value: exclusionMode,
+          initialValue: exclusionMode,
           isExpanded: true,
+          borderRadius: BorderRadius.circular(14),
           items: const [
             DropdownMenuItem(
               value: 'ingredient_preference',
@@ -530,9 +501,10 @@ class _InputScreenState extends State<InputScreen> {
               ? null
               : (value) => change(() => exclusionMode = value!),
         ),
+        const SizedBox(height: 12),
         Wrap(
-          spacing: 6,
-          runSpacing: 4,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             for (final value in [
               'peanut',
@@ -546,7 +518,13 @@ class _InputScreenState extends State<InputScreen> {
               FilterChip(
                 label: Text(
                   value.replaceAll('_', ' '),
-                  style: const TextStyle(fontSize: 11),
+                  style: algaType(
+                    14,
+                    weight: 600,
+                    color: exclusions.contains(value)
+                        ? Colors.white
+                        : AlgaColors.ink,
+                  ),
                 ),
                 selected: exclusions.contains(value),
                 onSelected: loading
@@ -556,9 +534,11 @@ class _InputScreenState extends State<InputScreen> {
                             ? exclusions.add(value)
                             : exclusions.remove(value),
                       ),
-                visualDensity: VisualDensity.compact,
-                selectedColor: AlgaColors.pale,
-                checkmarkColor: AlgaColors.green,
+                shape: const StadiumBorder(),
+                side: BorderSide.none,
+                backgroundColor: AlgaColors.pale,
+                selectedColor: AlgaColors.ink,
+                checkmarkColor: AlgaColors.lime,
               ),
           ],
         ),
@@ -568,9 +548,9 @@ class _InputScreenState extends State<InputScreen> {
               ? 'Omits the selected foods from the recipe. For an allergy, choose verified free-from; preferences do not check supplier cross-contact.'
               : 'Requires verified absence, including supplier cross-contact. Current supplier data cannot confirm this for selected exclusions.',
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 13,
             color: AlgaColors.muted,
-            height: 1.4,
+            height: 1.5,
           ),
         ),
         const SizedBox(height: 18),
@@ -636,45 +616,12 @@ class _InputScreenState extends State<InputScreen> {
     );
   }
 
-  Widget _step(String number, String title, String subtitle) => Row(
+  Widget _step(String title, String subtitle) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Container(
-        width: 42,
-        height: 42,
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: AlgaColors.pale,
-          shape: BoxShape.circle,
-        ),
-        child: Text(
-          number,
-          style: const TextStyle(
-            fontWeight: FontWeight.w800,
-            color: AlgaColors.forest,
-          ),
-        ),
-      ),
-      const SizedBox(width: 13),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.4,
-              ),
-            ),
-            Text(
-              subtitle,
-              style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
-            ),
-          ],
-        ),
-      ),
+      Text(title, style: algaType(28, tracking: -0.02, height: 1.1)),
+      const SizedBox(height: 6),
+      Text(subtitle, style: algaType(16, weight: 400, color: AlgaColors.muted)),
     ],
   );
 
@@ -688,22 +635,19 @@ class _InputScreenState extends State<InputScreen> {
     bool isFlavour = false,
   }) {
     final width = available < 510 ? available : (available - 24) / 3;
+    final fg = selected ? Colors.white : AlgaColors.ink;
     return InkWell(
-      borderRadius: BorderRadius.circular(9),
+      borderRadius: BorderRadius.circular(20),
       onTap: loading
           ? null
           : () => change(() => isFlavour ? flavour = value : algae = value),
       child: Container(
         width: width,
-        height: 184,
-        padding: const EdgeInsets.all(14),
+        height: 200,
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xfff3f8f1) : Colors.white,
-          border: Border.all(
-            color: selected ? AlgaColors.green : AlgaColors.line,
-            width: selected ? 1.5 : 1,
-          ),
-          borderRadius: BorderRadius.circular(9),
+          color: selected ? AlgaColors.ink : AlgaColors.pale,
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -714,8 +658,8 @@ class _InputScreenState extends State<InputScreen> {
                   selected
                       ? Icons.radio_button_checked
                       : Icons.radio_button_unchecked,
-                  color: selected ? AlgaColors.forest : AlgaColors.muted,
-                  size: 19,
+                  color: selected ? AlgaColors.lime : AlgaColors.muted,
+                  size: 20,
                 ),
               ],
             ),
@@ -723,21 +667,23 @@ class _InputScreenState extends State<InputScreen> {
               child: Center(
                 child: Image.asset(
                   'assets/ingredients/$value.png',
-                  width: 124,
-                  height: 94,
+                  width: 140,
+                  height: 104,
+                  cacheWidth: 320,
                   fit: BoxFit.contain,
                   errorBuilder: (_, _, _) =>
                       Icon(icon, color: AlgaColors.green, size: 42),
                 ),
               ),
             ),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
-            ),
+            Text(title, style: algaType(18, weight: 600, color: fg)),
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+              style: algaType(
+                14,
+                weight: 400,
+                color: selected ? const Color(0xffd6e4dc) : AlgaColors.muted,
+              ),
             ),
           ],
         ),
@@ -758,19 +704,8 @@ class _InputScreenState extends State<InputScreen> {
     children: [
       Row(
         children: [
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-            ),
-          ),
-          Text(
-            valueText,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              color: AlgaColors.forest,
-            ),
-          ),
+          Expanded(child: Text(title, style: algaType(16, weight: 600))),
+          Text(valueText, style: algaType(24, weight: 600, tracking: -0.02)),
         ],
       ),
       Slider(
@@ -785,11 +720,11 @@ class _InputScreenState extends State<InputScreen> {
         children: [
           Text(
             '$min${title == 'Algae inclusion' ? '%' : ' g'}',
-            style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+            style: const TextStyle(fontSize: 13, color: AlgaColors.muted),
           ),
           Text(
             '$max${title == 'Algae inclusion' ? '%' : ' g'}',
-            style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
+            style: const TextStyle(fontSize: 13, color: AlgaColors.muted),
           ),
         ],
       ),
@@ -797,21 +732,18 @@ class _InputScreenState extends State<InputScreen> {
   );
 
   Widget _summary(String label, String value, IconData icon) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 7),
+    padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
       children: [
-        Icon(icon, size: 18, color: AlgaColors.forest),
-        const SizedBox(width: 11),
+        Icon(icon, size: 18, color: AlgaColors.lime),
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
+            style: algaType(15, weight: 400, color: Colors.white),
           ),
         ),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
-        ),
+        Text(value, style: algaType(16, weight: 600, color: AlgaColors.lime)),
       ],
     ),
   );

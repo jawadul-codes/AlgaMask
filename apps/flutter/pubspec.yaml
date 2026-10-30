@@ -61,6 +61,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/ingredients/
+  fonts:
+    - family: Urbanist
+      fonts:
+        - asset: assets/fonts/Urbanist.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

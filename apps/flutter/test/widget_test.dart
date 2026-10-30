@@ -210,7 +210,7 @@ void main() {
       MaterialApp(home: InputScreen(client: SuccessfulClient())),
     );
     await tester.pumpAndSettle(const Duration(milliseconds: 400));
-    expect(find.text('AlgaMask'), findsOneWidget);
+    expect(find.text('ALGAMASK'), findsOneWidget);
     expect(find.text('Design a better algae bar'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
