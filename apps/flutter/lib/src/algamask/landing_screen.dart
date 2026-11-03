@@ -208,13 +208,13 @@ class _Hero extends StatelessWidget {
           return Stack(
             clipBehavior: Clip.none,
             children: [
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: h * (narrow ? 0.4 : 0.3),
-                child: const RepaintBoundary(
-                  child: CustomPaint(painter: _HillsPainter()),
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: ValueListenableBuilder<double>(
+                    valueListenable: progress,
+                    builder: (context, p, _) =>
+                        _Transition(progress: p, narrow: narrow, room: room),
+                  ),
                 ),
               ),
               Positioned(
@@ -227,59 +227,6 @@ class _Hero extends StatelessWidget {
                 top: h * 0.12 + (narrow ? 0 : word),
                 child: Text('MASK', style: wordStyle),
               ),
-              Positioned.fill(
-                child: RepaintBoundary(
-                  child: ValueListenableBuilder<double>(
-                    valueListenable: progress,
-                    builder: (context, p, _) =>
-                        _Transition(progress: p, narrow: narrow, room: room),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: pad,
-                top: h * 0.12 + word * 1.08,
-                child: ValueListenableBuilder<double>(
-                  valueListenable: progress,
-                  builder: (context, p, _) => _StageChip(label: _stage(p)),
-                ),
-              ),
-              if (!narrow) ...[
-                Positioned(
-                  right: pad,
-                  top: h * 0.14,
-                  child: const _RoundBadge(
-                    image: 'assets/ingredients/chlorella.png',
-                    lines: 'Research use\nonly',
-                  ),
-                ),
-                Positioned(
-                  left: pad,
-                  bottom: pad * 0.6 + h * 0.2 + 16,
-                  child: const _RoundBadge(
-                    icon: Icons.dataset_outlined,
-                    lines: 'Dataset 0.1.0-rc.5',
-                  ),
-                ),
-                Positioned(
-                  left: pad,
-                  bottom: pad * 0.6,
-                  height: h * 0.2,
-                  child: Row(
-                    children: const [
-                      _MiniCard(
-                        title: '27 recipes\nper run',
-                        image: 'assets/ingredients/blend.png',
-                      ),
-                      SizedBox(width: 12),
-                      _MiniCard(
-                        title: 'Masker\nmatching',
-                        image: 'assets/ingredients/vanilla.png',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
               Positioned(
                 right: pad,
                 bottom: pad * (narrow ? 1 : 1.1),
@@ -292,7 +239,7 @@ class _Hero extends StatelessWidget {
                       'fishy, grassy off-notes, with every claim cited.',
                       style: _type(
                         narrow ? 16 : 19,
-                        color: Colors.white,
+                        color: _ink,
                         height: 1.35,
                       ),
                     ),
@@ -500,121 +447,33 @@ class _MiniCard extends StatelessWidget {
 
 /// The scroll-driven centrepiece: algae powder, maskers converging, then the bar.
 class _Transition extends StatelessWidget {
-  const _Transition({
-    required this.progress,
-    required this.narrow,
-    required this.room,
-  });
+  const _Transition({required this.progress, required this.narrow, required this.room});
   final double progress;
   final bool narrow;
-
-  /// Where the powder mounds may sit without covering the headline words.
   final Rect room;
 
-  static const _maskers = [
-    ('cocoa-spice', Offset(-1, -0.08), 0.5, -0.3),
-    ('vanilla', Offset(0.62, -0.62), 0.46, 0.4),
-    ('citrus', Offset(0.3, 0.7), 0.42, -0.2),
-    ('cocoa-spice', Offset(-0.85, 0.5), 0.36, 0.6),
-  ];
-
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, box) {
-      final w = box.maxWidth;
-      final h = box.maxHeight;
-      // The mounds reach about 0.78s left, 0.74s right, 0.3s above and
-      // 0.42s below their centre.
-      final s = math.max(
-        0.0,
-        [
-          w * (narrow ? 0.56 : 0.3),
-          h * 0.4,
-          room.width / 1.52,
-          if (!narrow) room.height / 0.72,
-        ].reduce(math.min),
-      );
-      final c = narrow
-          ? Offset(w * 0.5, h * 0.55)
-          : Offset(
-              room.left + 0.78 * s + (room.width - 1.52 * s) / 2,
-              room.top + 0.3 * s + (room.height - 0.72 * s) / 2,
-            );
-      final p = progress;
-      final gather = _seg(p, 0.18, 0.62);
-      final fade = 1 - _seg(p, 0.5, 0.72);
-      final bar = _seg(p, 0.55, 0.95, Curves.easeOutCubic);
-      // Maskers wait just past the card edge and fly in to merge with the algae.
-      final fly = _seg(p, 0.02, 0.6);
-
-      Widget at(Offset o, double size, Widget child, {double turn = 0}) =>
-          Positioned(
-            left: o.dx - size / 2,
-            top: o.dy - size / 2,
-            width: size,
-            height: size,
-            child: turn == 0
-                ? child
-                : Transform.rotate(angle: turn, child: child),
-          );
-
-      Offset toward(Offset from, double t) => Offset.lerp(from, c, t)!;
-      Offset offstage(Offset dir, double size) {
-        final u = dir / dir.distance;
-        final reach = math.min(
-          u.dx == 0 ? double.infinity : (w / 2 + size) / u.dx.abs(),
-          u.dy == 0 ? double.infinity : (h / 2 + size) / u.dy.abs(),
-        );
-        return c + u * reach;
-      }
-
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          if (fade > 0) ...[
-            for (final (name, dir, scale, turn) in _maskers)
-              at(
-                Offset.lerp(offstage(dir, s * scale), c, fly)!,
-                s * scale * (1 - fly * 0.6),
-                _Cutout(name, fade),
-                turn: turn * (1 - fly) * 2,
-              ),
-            at(
-              toward(c + Offset(-s * 0.3, s * 0.06), gather),
-              s * 1.05 * (1 - gather * 0.55),
-              _Cutout('spirulina', fade),
-            ),
-            at(
-              toward(c + Offset(s * 0.34, s * 0.14), gather),
-              s * 0.85 * (1 - gather * 0.55),
-              _Cutout('chlorella', fade),
-            ),
-          ],
-          Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _DustPainter(center: c, radius: s, t: gather * fade),
-              ),
-            ),
-          ),
-          if (bar > 0)
-            at(
-              c + Offset(0, s * 0.05),
-              s * 1.5 * (0.6 + bar * 0.4),
-              Opacity(
-                opacity: _seg(p, 0.55, 0.75),
-                child: Transform.rotate(
-                  angle: -0.42 + bar * 0.28,
-                  child: const RepaintBoundary(
-                    child: CustomPaint(painter: _BarPainter()),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      );
-    },
-  );
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+    final w = box.maxWidth;
+    final h = box.maxHeight;
+    final bowlSize = math.min(w * (narrow ? .72 : .38), h * .54);
+    final center = Offset(w * (narrow ? .5 : .51), h * (narrow ? .51 : .54));
+    final spread = Curves.easeOutCubic.transform((progress / .72).clamp(0.0, 1.0));
+    final diameter = math.min(math.max(w, h) * .88, math.min(w, h) * 1.05);
+    return Stack(children: [
+      Positioned(left: center.dx - diameter / 2,
+        top: center.dy - diameter / 2,
+        width: diameter, height: diameter,
+        child: IgnorePointer(child: Opacity(opacity: (spread * 3).clamp(0.0, 1.0),
+          child: Transform.scale(scale: .28 + spread * .72,
+            child: Image.asset('assets/ingredients/powder-burst.png',
+              fit: BoxFit.contain, filterQuality: FilterQuality.high))))),
+      Positioned(left: center.dx - bowlSize / 2, top: center.dy - bowlSize / 2,
+        width: bowlSize, height: bowlSize,
+        child: IgnorePointer(child: Image.asset('assets/ingredients/bowl-cutout.png',
+          fit: BoxFit.contain, filterQuality: FilterQuality.high))),
+    ]);
+  });
 }
 
 /// An ingredient cutout, decoded small and faded without a compositing layer.
@@ -633,38 +492,48 @@ class _Cutout extends StatelessWidget {
   );
 }
 
-/// Green and cocoa specks pulled inward as the ingredients combine.
+/// Powder grains drift out from the bowl as scrolling advances.
 class _DustPainter extends CustomPainter {
-  const _DustPainter({
-    required this.center,
-    required this.radius,
-    required this.t,
-  });
+  const _DustPainter({required this.center, required this.radius, required this.t});
   final Offset center;
   final double radius;
   final double t;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (t <= 0.01) return;
-    final rnd = math.Random(7);
+    if (t <= 0.001) return;
+    final rnd = math.Random(4817);
     final paint = Paint();
-    const colors = [Color(0xff1f5d3a), Color(0xff5b7a2a), Color(0xff6b3b22)];
-    for (var i = 0; i < 90; i++) {
+    const colors = [Color(0xff063f25), Color(0xff075532), Color(0xff136a3b), Color(0xff217a48), Color(0xff0b4a2b)];
+    // Overlapping irregular deposits, with finer grains around their edges.
+    // Stable seeds keep the same material attached to its scroll trajectory.
+    for (var i = 0; i < 48000; i++) {
       final a = rnd.nextDouble() * math.pi * 2;
-      final r = radius * (0.5 + rnd.nextDouble() * 1.1) * (1.15 - t);
-      final spin = a + t * 1.6;
-      paint.color = colors[i % 3].withValues(alpha: math.sin(t * math.pi));
-      canvas.drawCircle(
-        center + Offset(math.cos(spin), math.sin(spin)) * r,
-        1.5 + rnd.nextDouble() * 3,
-        paint,
-      );
+      final depth = math.pow(rnd.nextDouble(), .72).toDouble();
+      final edge = .82 + .14 * math.sin(a * 3 + .7) + .09 * math.sin(a * 7 - 1.2);
+      final distance = radius * (.43 + depth * 2.05 * t * edge);
+      final p = center + Offset(math.cos(a) * distance,
+        math.sin(a) * distance * .8);
+      final noise = math.sin(p.dx * .065 + math.sin(p.dy * .037)*2) *
+        math.cos(p.dy * .081 + math.sin(p.dx*.043));
+      final grain = rnd.nextDouble();
+      final fade = (1 - depth * depth * .85) * t;
+      if (noise < -.38 && grain > .24) continue;
+      paint.color = colors[rnd.nextInt(colors.length)].withValues(
+        alpha: (.45 + grain * .5) * fade);
+      final r = (.45 + math.pow(grain, 3) * 2.2) * (radius / 150).clamp(.7, 1.5);
+      canvas.drawOval(Rect.fromCenter(center: p, width: r * 1.7, height: r), paint);
+      if (grain > .975 && depth < .83) {
+        final clump = Path()..moveTo(p.dx-r*2,p.dy)
+          ..lineTo(p.dx-r,p.dy-r*1.5)..lineTo(p.dx+r*1.7,p.dy-r)
+          ..lineTo(p.dx+r*2,p.dy+r*.7)..lineTo(p.dx-r*.7,p.dy+r)..close();
+        canvas.drawPath(clump, paint);
+      }
     }
   }
 
   @override
-  bool shouldRepaint(_DustPainter old) => old.t != t || old.center != center;
+  bool shouldRepaint(_DustPainter old) => old.t != t || old.center != center || old.radius != radius;
 }
 
 /// A chocolate-coated algae bar in three-quarter view, cut end showing the
