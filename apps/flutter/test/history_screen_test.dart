@@ -71,7 +71,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('spirulina · report ready').first);
     await tester.pumpAndSettle();
-    expect(find.text('Screening report'), findsOneWidget);
+    expect(find.text('No recipe met your choices'), findsOneWidget);
     await tester.tap(find.text('Experiment history').first);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('spirulina · failed'));
@@ -83,7 +83,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(client.retriedAttempt, 2);
     expect(find.text('spirulina · failed'), findsNothing);
-    expect(find.text('Screening report'), findsOneWidget);
+    expect(find.text('No recipe met your choices'), findsOneWidget);
   });
   testWidgets('pagination and history error remain recoverable', (
     tester,

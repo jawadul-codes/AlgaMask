@@ -7,9 +7,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'design.dart';
 
 class ReportView extends StatelessWidget {
-  const ReportView({super.key, required this.result, required this.reportUri});
+  const ReportView({
+    super.key,
+    required this.result,
+    required this.reportUri,
+    this.onAdjust,
+  });
   final Map<String, dynamic> result;
   final Uri reportUri;
+  final VoidCallback? onAdjust;
 
   String number(dynamic value, {int decimals = 1}) =>
       value is num ? value.toStringAsFixed(decimals) : 'unknown';
@@ -34,7 +40,7 @@ class ReportView extends StatelessWidget {
   String ingredientName(dynamic id) =>
       '${(interpretation['ingredient_names'] as Map?)?[id] ?? label(id)}';
   String get controlsNote =>
-      '${interpretation['controls'] ?? 'B0 and A0 are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'}';
+      '${interpretation['controls'] ?? 'Base recipe (B0) and Algae version (A0) are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'}';
   List<dynamic> get formulas => [
     ...?result['controls'] as List?,
     ...?result['formulations'] as List?,
@@ -118,248 +124,240 @@ class ReportView extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final ready = hasCandidate;
-    final selected = _selectedFormula();
-    final selectedId = selected?['id']?.toString();
-    final estimate = nutrition[selectedId] as Map?;
-    final serving = estimate?['per_serving'] as Map?;
-    final protein = serving?['protein_g'];
-    final energy = serving?['energy_kcal'];
-    final mode = result['mode'] == 'mock'
-        ? 'MOCK · synthetic fixtures'
-        : result['mode'] == 'rag_development'
-        ? 'LOCAL RAG · development data'
-        : 'LOCAL RAG · released evidence';
-    final top = Column(
+  String displayName(String id) {
+    final names = interpretation['display_names'] as Map? ?? {};
+    if (names[id] != null) return '${names[id]}';
+    if (id == 'B0') return 'Base recipe';
+    if (id == 'A0') return 'Algae version';
+    if (id == 'A1' &&
+        result['request']?['experiment'] == 'spirulina-proof-v1') {
+      return 'Flavour version';
+    }
+    final candidates = result['formulations'] as List? ?? [];
+    final index = candidates.indexWhere(
+      (item) => item is Map && item['id'] == id,
+    );
+    return index < 0 ? id : 'Recipe option ${index + 1}';
+  }
+
+  String get consumerOutcome => result['status'] == 'generation_failed'
+      ? 'We couldn’t verify this result'
+      : hasCandidate
+      ? 'Recipe option found'
+      : 'No recipe met your choices';
+
+  String get mainReason {
+    if (interpretation['primary_blocker'] != null) {
+      return '${interpretation['primary_blocker']}';
+    }
+    final reasons = interpretation['blocking_reasons'] as List? ?? [];
+    if (reasons.isNotEmpty) return '${reasons.first}';
+    if (screening['reason'] != null) return '${screening['reason']}';
+    return result['status'] == 'generation_failed'
+        ? 'The evidence explanation did not pass its checks.'
+        : 'The checked recipes did not meet all your choices together.';
+  }
+
+  Widget _summaryMetric(String name, dynamic value, String unit) => Expanded(
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'EXPERIMENTS  /  SCREENING REPORT',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: AlgaColors.green,
-            letterSpacing: 1.4,
-          ),
+        Text(
+          name,
+          style: const TextStyle(color: AlgaColors.muted, fontSize: 13),
         ),
-        const SizedBox(height: 10),
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 14,
-          runSpacing: 8,
-          children: [
-            const Text(
-              'Screening report',
-              style: TextStyle(
-                fontSize: 35,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1.3,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-              decoration: BoxDecoration(
-                color: ready ? AlgaColors.pale : AlgaColors.amberPale,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                outcomeLabel,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                  color: ready ? AlgaColors.green : AlgaColors.amber,
+        const SizedBox(height: 4),
+        Text(
+          value is num ? '${number(value, decimals: 2)} $unit' : 'Unknown',
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+        ),
+      ],
+    ),
+  );
+
+  Widget _selectedCard(Map selected) {
+    final id = '${selected['id']}';
+    final values = (nutrition[id] as Map?)?['per_serving'] as Map? ?? {};
+    final ingredients = selected['ingredients'] as List? ?? [];
+    final mass = result['request']?['serving_g'] ?? selected['total_g'];
+    return AlgaCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            displayName(id),
+            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            'Estimated for $mass g of ingredients before processing',
+            style: const TextStyle(color: AlgaColors.muted),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              _summaryMetric('Protein', values['protein_g'], 'g'),
+              _summaryMetric('Energy', values['energy_kcal'], 'kcal'),
+              _summaryMetric('Total sugar', values['sugar_g'], 'g'),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'Ingredients in this option',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 7),
+          for (final item in ingredients)
+            if (item is Map)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '• ${ingredientName(item['ingredient_id'])}: ${number(item['grams'], decimals: 2)} g',
                 ),
               ),
+          const SizedBox(height: 12),
+          const Text(
+            'These are calculations from ingredient records, not measurements of a finished bar. Unknown does not mean zero.',
+            style: TextStyle(color: AlgaColors.muted, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailGroup(String title, List<Widget> children) => Padding(
+    padding: const EdgeInsets.only(top: 12),
+    child: AlgaCard(
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+        ),
+        children: children,
+      ),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = _selectedFormula();
+    final candidates = result['formulations'] as List? ?? [];
+    final mock = result['mode'] == 'mock';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'YOUR SCREENING RESULT',
+          style: TextStyle(
+            color: AlgaColors.green,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          consumerOutcome,
+          style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        if (!hasCandidate)
+          Text(mainReason, style: const TextStyle(fontSize: 16)),
+        if (mock)
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: AlgaNotice(
+              text: 'Demo result using synthetic fixtures. These numbers are illustrative.',
             ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        SelectableText(
-          'Run ${result['run_id']}   ·   $mode',
-          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
-        ),
-        const SizedBox(height: 15),
+          ),
         if ((result['request']?['exclusions'] as List? ?? []).isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(top: 10),
             child: Text(
               '${result['request']?['exclusion_mode'] == 'ingredient_preference' ? 'Ingredient preferences (allergy safety not verified)' : 'Verified-free-from requirements'}: ${(result['request']['exclusions'] as List).map(label).join(', ')}',
             ),
           ),
+        const SizedBox(height: 12),
         const AlgaNotice(
-          text: 'Experimental screening only. Arithmetic checks do not establish scientific or allergen safety approval.',
-        ),
-        const SizedBox(height: 10),
-        Text(
-          '${interpretation['title'] ?? (ready ? 'Candidates passed computational checks' : 'No candidate is available for this run.')}',
-        ),
-        Text(
-          '${interpretation['reason'] ?? 'Review the evidence limitations and computational checks below.'}',
-          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
-        ),
-        Text(
-          '${interpretation['mass_basis'] ?? 'Nutrition estimates refer to ingredient input mass; finished product yield is unmeasured.'}',
-          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
-        ),
-        if (interpretation['nutrition_notice'] != null)
-          Text(
-            '${interpretation['nutrition_notice']}',
-            style: const TextStyle(fontSize: 12, color: AlgaColors.amber),
-          ),
-        const SizedBox(height: 8),
-        Text(
-          '${interpretation['sensory'] ?? 'Sensory effects and flavour masking are unmeasured. Historical demo scores are not measurements.'}',
-          style: const TextStyle(fontSize: 12, color: AlgaColors.muted),
-        ),
-        for (final reason in interpretation['blocking_reasons'] as List? ?? [])
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              '$reason',
-              style: const TextStyle(fontSize: 12, color: AlgaColors.amber),
-            ),
-          ),
-        if (!ready)
-          const Padding(
-            padding: EdgeInsets.only(top: 12),
-            child: Text(
-              'No verified candidate was returned. Inspect the screening checks and workflow trace for the reason.',
-              style: TextStyle(color: AlgaColors.muted),
-            ),
-          ),
-        const SizedBox(height: 22),
-      ],
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        top,
-        AlgaCard(
-          child: LayoutBuilder(
-            builder: (context, c) {
-              final metrics = <Widget>[
-                _metric(
-                  'Selected formulation',
-                  selectedId ?? '—',
-                  selected?['name']?.toString() ?? 'No formulation',
-                  Icons.science_outlined,
-                ),
-                _metric(
-                  'Protein estimate',
-                  protein == null
-                      ? 'Unknown'
-                      : '${number(protein, decimals: 2)} g',
-                  'Per ingredient input',
-                  Icons.analytics_outlined,
-                ),
-                _metric(
-                  'Energy estimate',
-                  energy == null
-                      ? 'Unknown'
-                      : '${number(energy, decimals: 2)} kcal',
-                  'Per ingredient input',
-                  Icons.bolt_outlined,
-                ),
-                _metric(
-                  'Compared formulas',
-                  '${formulas.length}',
-                  'Controls and candidates',
-                  Icons.check_circle_outline,
-                ),
-              ];
-              if (c.maxWidth < 700) {
-                return Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: [
-                    for (final item in metrics)
-                      SizedBox(
-                        width: c.maxWidth < 380
-                            ? c.maxWidth
-                            : (c.maxWidth - 20) / 2,
-                        child: item,
-                      ),
-                  ],
-                );
-              }
-              return Row(
-                children: [
-                  for (var i = 0; i < metrics.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 14),
-                    Expanded(child: metrics[i]),
-                  ],
-                ],
-              );
-            },
-          ),
+          text: 'Experimental screening only. This does not establish flavour performance, food safety, or approval to make or eat this recipe.',
         ),
         const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, c) {
-            final left = Column(
-              children: [
-                _candidates(),
-                const SizedBox(height: 16),
-                _nutrition(),
-              ],
-            );
-            final right = Column(
-              children: [
-                _evidence(context),
-                const SizedBox(height: 16),
-                _checks(),
-              ],
-            );
-            if (c.maxWidth < 880) {
-              return Column(
-                children: [left, const SizedBox(height: 16), right],
-              );
-            }
-            return Row(
+        if (selected != null) _selectedCard(selected),
+        if (selected == null)
+          AlgaCard(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 7, child: left),
-                const SizedBox(width: 16),
-                Expanded(flex: 5, child: right),
+                const Text(
+                  'What to do next',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Adjust your choices and run the check again. The detailed checks below explain what stopped this run.',
+                ),
+                if (onAdjust != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: FilledButton(
+                      onPressed: onAdjust,
+                      child: const Text('Adjust my choices'),
+                    ),
+                  ),
               ],
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-        AlgaCard(
-          child: Column(
+            ),
+          ),
+        if (selected != null)
+          const Padding(
+            padding: EdgeInsets.only(top: 14, bottom: 2),
+            child: Text(
+              'Next step: review the ingredient estimates and evidence limits before deciding what to investigate further.',
+            ),
+          ),
+        if (candidates.length > 1)
+          _detailGroup('Other options', [
+            for (var i = 1; i < candidates.length; i++)
+              if (candidates[i] is Map)
+                ListTile(
+                  title: Text(displayName('${candidates[i]['id']}')),
+                  subtitle: Text(
+                    'Protein: ${number(((nutrition[candidates[i]['id']] as Map?)?['per_serving'] as Map?)?['protein_g'], decimals: 2)} g · Total sugar: ${number(((nutrition[candidates[i]['id']] as Map?)?['per_serving'] as Map?)?['sugar_g'], decimals: 2)} g',
+                  ),
+                ),
+          ]),
+        _detailGroup('How these recipes were compared', [_candidates()]),
+        _detailGroup('Nutrition details', [_nutrition()]),
+        _detailGroup('Sources and what they can tell us', [_evidence(context)]),
+        _detailGroup('Screening checks', [_checks()]),
+        _detailGroup('Full research details', [
+          Text(result['mode'] == 'mock'
+              ? 'MOCK · synthetic fixtures'
+              : result['mode'] == 'rag_development'
+                  ? 'LOCAL RAG · development data'
+                  : 'LOCAL RAG · released evidence'),
+          details('Submitted settings', result['request']),
+          details('Dataset provenance', result['retrieval'] ?? {}),
+          details('Retrieved evidence', result['evidence'] ?? []),
+          details('Six-agent trace', result['trace'] ?? []),
+          details('Limitations', result['limitations'] ?? []),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
             children: [
-              details('Submitted settings', result['request']),
-              details(
-                'Dataset provenance',
-                result['retrieval'] ?? {'mode': mode},
+              FilledButton.icon(
+                onPressed: () => open(context, reportUri),
+                icon: const Icon(Icons.description_outlined),
+                label: const Text('Open print report'),
               ),
-              details('Retrieved evidence', result['evidence'] ?? []),
-              details('Six-agent trace', result['trace'] ?? []),
-              details('Limitations', result['limitations'] ?? []),
+              OutlinedButton.icon(
+                onPressed: () => copy(context),
+                icon: const Icon(Icons.copy_outlined),
+                label: const Text('Copy run JSON'),
+              ),
             ],
           ),
-        ),
-        const SizedBox(height: 17),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            FilledButton.icon(
-              onPressed: () => open(context, reportUri),
-              icon: const Icon(Icons.description_outlined, size: 18),
-              label: const Text('Open print report'),
-            ),
-            OutlinedButton.icon(
-              onPressed: () => copy(context),
-              icon: const Icon(Icons.copy_outlined, size: 18),
-              label: const Text('Copy run JSON'),
-            ),
-          ],
-        ),
+        ]),
       ],
     );
   }
@@ -375,48 +373,6 @@ class ReportView extends StatelessWidget {
     }
     return null;
   }
-
-  Widget _metric(String title, String value, String note, IconData icon) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Container(
-        width: 38,
-        height: 38,
-        decoration: const BoxDecoration(
-          color: AlgaColors.pale,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, size: 20, color: AlgaColors.green),
-      ),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              note,
-              style: const TextStyle(fontSize: 11, color: AlgaColors.muted),
-              maxLines: 2,
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
 
   Widget _candidates() => AlgaCard(
     child: Column(
@@ -500,7 +456,7 @@ class ReportView extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '${formula['name']}',
+                  displayName(id),
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -615,7 +571,7 @@ class ReportView extends StatelessWidget {
     return ExpansionTile(
       tilePadding: EdgeInsets.zero,
       title: Text(
-        '$id · composition estimate',
+        '${displayName(id)} ($id) · composition estimate',
         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
       ),
       subtitle: Text(

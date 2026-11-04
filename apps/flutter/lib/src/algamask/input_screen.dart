@@ -182,6 +182,7 @@ class _InputScreenState extends State<InputScreen> {
                     ReportView(
                       result: result!,
                       reportUri: client.reportUrl(result!['run_id'] as String),
+                      onAdjust: newExperiment,
                     ),
                   ],
                 ),
@@ -389,11 +390,11 @@ class _InputScreenState extends State<InputScreen> {
         SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           title: Text(
-            'Fixed B0 / A0 / A1 experiment',
+            'Compare base, algae, and flavour versions',
             style: algaType(17, weight: 600),
           ),
           subtitle: Text(
-            'spirulina-proof-v1 · engineering assumptions',
+            'Fixed comparison · experimental estimates',
             style: algaType(14, weight: 400, color: AlgaColors.muted),
           ),
           value: fixedProof,
@@ -403,7 +404,7 @@ class _InputScreenState extends State<InputScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              '45 g ingredient input, not finished serving. Spirulina 2% in A0/A1; dates 13.50 g and cocoa 0.90 g in every arm. A1 adds 0.45 g cinnamon by replacing oats. Nutrition targets apply to A1; exclusions apply to every arm.',
+              'Each version uses 45 g of ingredients. The Algae version and Flavour version include 2% spirulina. The Flavour version adds cinnamon while reducing oats. Nutrition targets apply to the Flavour version; exclusions apply to all three. Finished serving size is unknown.',
               style: algaType(15, weight: 400, height: 1.55),
             ),
           ),
@@ -471,7 +472,7 @@ class _InputScreenState extends State<InputScreen> {
         _target('Maximum energy', 'kcal', energy, 1000, positive: true),
         _target('Maximum sugar', 'g', sugar, 50),
         const Text(
-          'Targets use reference ingredient composition, not lab measurements. The check below shows available ranges and any missing data. Total sugar includes sugar naturally present in ingredients.',
+          'Maximum sugar is a cap on total sugar per serving, not sugar to add. Total sugar includes sugar naturally present in ingredients. Targets use reference composition, not lab measurements. Use the suggested limits below; displayed recipe ranges are rounded and do not guarantee a joint match.',
           style: TextStyle(fontSize: 13, color: AlgaColors.muted, height: 1.5),
         ),
         const SizedBox(height: 40),
@@ -599,8 +600,11 @@ class _InputScreenState extends State<InputScreen> {
       messages.add(
         value['min'] == null
             ? '$label: unknown for this configuration.'
-            : '$label: ${(value['min'] as num).toStringAsFixed(4)}–${(value['max'] as num).toStringAsFixed(4)} per serving in current recipes.',
+            : '$label: approximately ${(value['min'] as num).toStringAsFixed(4)}–${(value['max'] as num).toStringAsFixed(4)} per serving across recipes, before combining nutrition targets.',
       );
+      if (value['guidance'] != null) {
+        messages.add('$label: ${value['guidance']}');
+      }
     }
     messages.addAll((feasibility?['notes'] as List? ?? []).map((e) => '$e'));
     return Column(

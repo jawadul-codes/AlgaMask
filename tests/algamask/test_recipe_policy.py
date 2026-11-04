@@ -51,6 +51,29 @@ def test_original_grid_numbers_stay_available(snapshot):
     assert nutrition["sugar_g"] == pytest.approx(7.508205)
 
 
+@pytest.mark.parametrize('inputs,expected', [
+    (dict(algae='chlorella', inclusion_pct=3, serving_g=45, flavour='vanilla', max_sugar_g=7.5082), 7.51),
+    (dict(algae='spirulina', inclusion_pct=5, serving_g=45, flavour='cocoa-spice', min_protein_g=8, max_sugar_g=7.52), 7.53),
+])
+def test_sugar_guidance_is_rounded_safely_and_respects_other_targets(snapshot, inputs, expected):
+    request = RunRequest(**inputs)
+    preview = check_inputs(request, snapshot)
+    assert not preview['can_run']
+    limit = preview['margins']['max_sugar_g']['suggested_limit']
+    assert limit == expected
+    adjusted = request.model_copy(update={'max_sugar_g': limit})
+    assert check_inputs(adjusted, snapshot)['can_run']
+    assert screen(adjusted, snapshot, development=True)[0]
+
+
+def test_sugar_guidance_never_invents_missing_data_or_relaxes_other_targets(snapshot):
+    missing = check_inputs(_request(flavour='citrus', max_sugar_g=10), snapshot)
+    assert missing['margins']['max_sugar_g']['suggested_limit'] is None
+    impossible = check_inputs(_request(min_protein_g=40, max_sugar_g=10), snapshot)
+    assert impossible['margins']['max_sugar_g']['suggested_limit'] is None
+    assert 'Changing only this limit cannot' in impossible['margins']['max_sugar_g']['guidance']
+
+
 def test_whey_recipe_is_outside_the_original_grid(snapshot):
     request = _request(min_protein_g=8, max_energy_kcal=200, max_sugar_g=10)
     assert not screen(request, snapshot, development=True, version=LEGACY_SEARCH_VERSION)[0]

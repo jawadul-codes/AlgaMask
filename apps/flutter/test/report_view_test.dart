@@ -58,6 +58,108 @@ Map<String, dynamic> result(String status) => {
 
 void main() {
   testWidgets(
+    'candidate summary fits a phone and shows missing sugar as unknown',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final data = result('report_ready');
+      data['request'] = {'serving_g': 45};
+      data['interpretation'] = {
+        'ingredient_names': {'IF-OAT-DRY': 'Dry oats'},
+      };
+      data['formulations'] = [
+        {
+          'id': 'S25-1',
+          'total_g': 45,
+          'ingredients': [
+            {'ingredient_id': 'IF-OAT-DRY', 'grams': 45},
+          ],
+        },
+      ];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ReportView(
+                result: data,
+                reportUri: Uri.parse('http://localhost/report'),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Recipe option found'), findsOneWidget);
+      expect(find.text('Total sugar'), findsOneWidget);
+      expect(find.text('Unknown'), findsWidgets);
+      expect(find.textContaining('Dry oats: 45.00 g'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('fixed comparison uses plain names and preserves stored IDs', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final data = result('report_ready');
+    data['request'] = {'experiment': 'spirulina-proof-v1', 'serving_g': 45};
+    data['controls'] = [
+      {'id': 'B0', 'total_g': 45, 'ingredients': []},
+      {'id': 'A0', 'total_g': 45, 'ingredients': []},
+    ];
+    data['formulations'] = [
+      {'id': 'A1', 'total_g': 45, 'ingredients': []},
+    ];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ReportView(
+              result: data,
+              reportUri: Uri.parse('http://localhost/report'),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Recipe option found'), findsOneWidget);
+    expect(find.text('Flavour version'), findsOneWidget);
+    await tester.ensureVisible(find.text('How these recipes were compared'));
+    await tester.tap(find.text('How these recipes were compared'));
+    await tester.pumpAndSettle();
+    expect(find.text('Base recipe'), findsWidgets);
+    expect(find.text('Algae version'), findsWidgets);
+    expect(find.text('B0'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('mock result is marked illustrative', (tester) async {
+    final data = result('report_ready');
+    data['mode'] = 'mock';
+    data['formulations'] = [
+      {'id': 'S25-1', 'total_g': 45, 'ingredients': []},
+    ];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ReportView(
+              result: data,
+              reportUri: Uri.parse('http://localhost/report'),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(find.textContaining('synthetic fixtures'), findsOneWidget);
+    expect(find.text('Recipe option found'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets(
     'candidate report distinguishes controls, precision and background evidence',
     (tester) async {
       final data = result('report_ready');
@@ -106,18 +208,26 @@ void main() {
           ),
         ),
       );
-      expect(find.text('Candidates found'), findsOneWidget);
+      expect(find.text('Recipe option found'), findsOneWidget);
+      expect(find.text('Recipe option 1'), findsOneWidget);
+      expect(find.text('Total sugar'), findsOneWidget);
+      expect(find.text('Unknown'), findsWidgets);
+      expect(find.text('Base recipe'), findsNothing);
+      await tester.ensureVisible(find.text('How these recipes were compared'));
+      await tester.tap(find.text('How these recipes were compared'));
+      await tester.pumpAndSettle();
       expect(
         find.textContaining('targets apply to candidates only'),
         findsOneWidget,
       );
       expect(find.text('Cocoa powder 0.2250 g'), findsOneWidget);
+      await tester.ensureVisible(
+        find.text('Sources and what they can tell us'),
+      );
+      await tester.tap(find.text('Sources and what they can tell us'));
+      await tester.pumpAndSettle();
       expect(find.text('Evidence context and limits'), findsOneWidget);
       expect(find.text('Related-study background'), findsOneWidget);
-      expect(
-        find.textContaining('Selected candidate sugar: unknown'),
-        findsOneWidget,
-      );
       expect(
         find.textContaining('The study does not cover all requested'),
         findsOneWidget,
@@ -153,6 +263,9 @@ void main() {
         ),
       ),
     );
+    await tester.ensureVisible(find.text('Full research details'));
+    await tester.tap(find.text('Full research details'));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Copy run JSON'));
     await tester.tap(find.text('Copy run JSON'));
     await tester.pumpAndSettle();
@@ -185,19 +298,34 @@ void main() {
         ),
       );
       expect(
-        find.textContaining('LOCAL RAG · development data'),
+        find.text(
+          status == 'generation_failed'
+              ? 'We couldn’t verify this result'
+              : 'No recipe met your choices',
+        ),
         findsOneWidget,
       );
+      await tester.ensureVisible(
+        find.text('Sources and what they can tell us'),
+      );
+      await tester.tap(find.text('Sources and what they can tell us'));
+      await tester.pumpAndSettle();
       expect(
         find.text('Source-scoped finding'),
         status == 'generation_failed' ? findsNothing : findsOneWidget,
       );
-      final tile = find.text('S25-1 · composition estimate');
+      await tester.ensureVisible(find.text('Nutrition details'));
+      await tester.tap(find.text('Nutrition details'));
+      await tester.pumpAndSettle();
+      final tile = find.text('S25-1 (S25-1) · composition estimate');
       await tester.ensureVisible(tile);
       await tester.tap(tile);
       await tester.pumpAndSettle();
       expect(find.text('energy_kcal: unknown per serving'), findsOneWidget);
       expect(find.textContaining('IF-CHL-PWD'), findsOneWidget);
+      await tester.ensureVisible(find.text('Screening checks').first);
+      await tester.tap(find.text('Screening checks').first);
+      await tester.pumpAndSettle();
       expect(find.textContaining('Cannot verify energy'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

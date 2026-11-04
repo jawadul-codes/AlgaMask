@@ -10,7 +10,6 @@ import 'input_screen.dart';
 const _sage = Color(0xffbcd2c0);
 const _paper = Color(0xffeceeea);
 const _ink = Color(0xff0f2a1f);
-const _hillDark = Color(0xff23561f);
 const _display = 'Urbanist';
 
 TextStyle _type(
@@ -27,14 +26,6 @@ TextStyle _type(
   letterSpacing: size * tracking,
   height: height,
 );
-
-/// Eased 0..1 progress of [p] through the window [a]..[b].
-double _seg(
-  double p,
-  double a,
-  double b, [
-  Curve curve = Curves.easeInOutCubic,
-]) => curve.transform(((p - a) / (b - a)).clamp(0.0, 1.0));
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -56,7 +47,12 @@ class _LandingScreenState extends State<LandingScreen>
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker(_follow)..start();
+    _ticker = createTicker(_follow);
+    _scroll.addListener(_resumeAnimation);
+  }
+
+  void _resumeAnimation() {
+    if (!_ticker.isActive) _ticker.start();
   }
 
   void _follow(Duration _) {
@@ -68,6 +64,9 @@ class _LandingScreenState extends State<LandingScreen>
       _shown.value += gap * 0.16;
     } else if (gap != 0) {
       _shown.value = target;
+      _ticker.stop();
+    } else {
+      _ticker.stop();
     }
   }
 
@@ -75,6 +74,7 @@ class _LandingScreenState extends State<LandingScreen>
   void dispose() {
     _ticker.dispose();
     _shown.dispose();
+    _scroll.removeListener(_resumeAnimation);
     _scroll.dispose();
     super.dispose();
   }
@@ -175,12 +175,6 @@ class _Hero extends StatelessWidget {
   final VoidCallback onChecks;
   final VoidCallback onEvidence;
 
-  static String _stage(double p) => p < 0.3
-      ? 'Spirulina + chlorella powder'
-      : p < 0.66
-      ? 'Masked with cocoa, vanilla, citrus'
-      : 'Screened protein bar';
-
   @override
   Widget build(BuildContext context) => ClipRRect(
     borderRadius: BorderRadius.circular(narrow ? 22 : 30),
@@ -237,11 +231,7 @@ class _Hero extends StatelessWidget {
                     Text(
                       'Screen spirulina and chlorella bars that hide '
                       'fishy, grassy off-notes, with every claim cited.',
-                      style: _type(
-                        narrow ? 16 : 19,
-                        color: _ink,
-                        height: 1.35,
-                      ),
+                      style: _type(narrow ? 16 : 19, color: _ink, height: 1.35),
                     ),
                     const SizedBox(height: 16),
                     _PillButton(
@@ -373,331 +363,66 @@ class _PillButton extends StatelessWidget {
   }
 }
 
-class _StageChip extends StatelessWidget {
-  const _StageChip({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      AnimatedSwitcher(
-        duration: const Duration(milliseconds: 260),
-        child: Text(label, key: ValueKey(label), style: _type(17, weight: 600)),
-      ),
-    ],
-  );
-}
-
-class _RoundBadge extends StatelessWidget {
-  const _RoundBadge({required this.lines, this.image, this.icon});
-  final String lines;
-  final String? image;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Container(
-        width: image != null ? 52 : 34,
-        height: image != null ? 52 : 34,
-        decoration: const BoxDecoration(
-          color: AlgaColors.forest,
-          shape: BoxShape.circle,
-        ),
-        padding: const EdgeInsets.all(5),
-        child: image != null
-            ? Image.asset(image!)
-            : Icon(icon, color: Colors.white, size: 18),
-      ),
-      const SizedBox(width: 12),
-      Text(lines, style: _type(16, weight: 600, height: 1.25)),
-    ],
-  );
-}
-
-class _MiniCard extends StatelessWidget {
-  const _MiniCard({required this.title, required this.image});
-  final String title;
-  final String image;
-
-  @override
-  Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 0.92,
-    child: Container(
-      decoration: BoxDecoration(
-        color: const Color(0xfff7f8f4),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-      child: Column(
-        children: [
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: _type(16, weight: 600, height: 1.2),
-          ),
-          Expanded(child: Image.asset(image, fit: BoxFit.contain)),
-        ],
-      ),
-    ),
-  );
-}
-
 /// The scroll-driven centrepiece: algae powder, maskers converging, then the bar.
 class _Transition extends StatelessWidget {
-  const _Transition({required this.progress, required this.narrow, required this.room});
+  const _Transition({
+    required this.progress,
+    required this.narrow,
+    required this.room,
+  });
   final double progress;
   final bool narrow;
   final Rect room;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
-    final w = box.maxWidth;
-    final h = box.maxHeight;
-    final bowlSize = math.min(w * (narrow ? .72 : .38), h * .54);
-    final center = Offset(w * (narrow ? .5 : .51), h * (narrow ? .51 : .54));
-    final spread = Curves.easeOutCubic.transform((progress / .72).clamp(0.0, 1.0));
-    final diameter = math.min(math.max(w, h) * .88, math.min(w, h) * 1.05);
-    return Stack(children: [
-      Positioned(left: center.dx - diameter / 2,
-        top: center.dy - diameter / 2,
-        width: diameter, height: diameter,
-        child: IgnorePointer(child: Opacity(opacity: (spread * 3).clamp(0.0, 1.0),
-          child: Transform.scale(scale: .28 + spread * .72,
-            child: Image.asset('assets/ingredients/powder-burst.png',
-              fit: BoxFit.contain, filterQuality: FilterQuality.high))))),
-      Positioned(left: center.dx - bowlSize / 2, top: center.dy - bowlSize / 2,
-        width: bowlSize, height: bowlSize,
-        child: IgnorePointer(child: Image.asset('assets/ingredients/bowl-cutout.png',
-          fit: BoxFit.contain, filterQuality: FilterQuality.high))),
-    ]);
-  });
-}
-
-/// An ingredient cutout, decoded small and faded without a compositing layer.
-class _Cutout extends StatelessWidget {
-  const _Cutout(this.name, this.opacity);
-  final String name;
-  final double opacity;
-
-  @override
-  Widget build(BuildContext context) => Image.asset(
-    'assets/ingredients/$name.png',
-    cacheWidth: 512,
-    filterQuality: FilterQuality.medium,
-    opacity: AlwaysStoppedAnimation(opacity.clamp(0.0, 1.0)),
-    gaplessPlayback: true,
-  );
-}
-
-/// Powder grains drift out from the bowl as scrolling advances.
-class _DustPainter extends CustomPainter {
-  const _DustPainter({required this.center, required this.radius, required this.t});
-  final Offset center;
-  final double radius;
-  final double t;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (t <= 0.001) return;
-    final rnd = math.Random(4817);
-    final paint = Paint();
-    const colors = [Color(0xff063f25), Color(0xff075532), Color(0xff136a3b), Color(0xff217a48), Color(0xff0b4a2b)];
-    // Overlapping irregular deposits, with finer grains around their edges.
-    // Stable seeds keep the same material attached to its scroll trajectory.
-    for (var i = 0; i < 48000; i++) {
-      final a = rnd.nextDouble() * math.pi * 2;
-      final depth = math.pow(rnd.nextDouble(), .72).toDouble();
-      final edge = .82 + .14 * math.sin(a * 3 + .7) + .09 * math.sin(a * 7 - 1.2);
-      final distance = radius * (.43 + depth * 2.05 * t * edge);
-      final p = center + Offset(math.cos(a) * distance,
-        math.sin(a) * distance * .8);
-      final noise = math.sin(p.dx * .065 + math.sin(p.dy * .037)*2) *
-        math.cos(p.dy * .081 + math.sin(p.dx*.043));
-      final grain = rnd.nextDouble();
-      final fade = (1 - depth * depth * .85) * t;
-      if (noise < -.38 && grain > .24) continue;
-      paint.color = colors[rnd.nextInt(colors.length)].withValues(
-        alpha: (.45 + grain * .5) * fade);
-      final r = (.45 + math.pow(grain, 3) * 2.2) * (radius / 150).clamp(.7, 1.5);
-      canvas.drawOval(Rect.fromCenter(center: p, width: r * 1.7, height: r), paint);
-      if (grain > .975 && depth < .83) {
-        final clump = Path()..moveTo(p.dx-r*2,p.dy)
-          ..lineTo(p.dx-r,p.dy-r*1.5)..lineTo(p.dx+r*1.7,p.dy-r)
-          ..lineTo(p.dx+r*2,p.dy+r*.7)..lineTo(p.dx-r*.7,p.dy+r)..close();
-        canvas.drawPath(clump, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DustPainter old) => old.t != t || old.center != center || old.radius != radius;
-}
-
-/// A chocolate-coated algae bar in three-quarter view, cut end showing the
-/// green spirulina interior.
-class _BarPainter extends CustomPainter {
-  const _BarPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final u = size.width;
-    final len = u * 0.78;
-    final hgt = u * 0.17;
-    final dep = u * 0.16;
-    final x0 = (u - len - dep * 0.7) / 2;
-    final y0 = u * 0.44;
-    final skew = Offset(dep * 0.7, -dep * 0.55);
-
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(u * 0.52, y0 + hgt + u * 0.05),
-        width: len * 1.05,
-        height: u * 0.09,
-      ),
-      Paint()
-        ..color = const Color(0x55102a14)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14),
-    );
-
-    final front = RRect.fromRectAndRadius(
-      Rect.fromLTWH(x0, y0, len, hgt),
-      Radius.circular(hgt * 0.22),
-    );
-    final top = Path()
-      ..moveTo(x0 + hgt * 0.1, y0)
-      ..lineTo(x0 + len - hgt * 0.1, y0)
-      ..lineTo(x0 + len - hgt * 0.1 + skew.dx, y0 + skew.dy)
-      ..lineTo(x0 + hgt * 0.1 + skew.dx, y0 + skew.dy)
-      ..close();
-    final end = Path()
-      ..moveTo(x0 + len, y0 + hgt * 0.12)
-      ..lineTo(x0 + len + skew.dx * 0.97, y0 + skew.dy + hgt * 0.08)
-      ..lineTo(x0 + len + skew.dx * 0.97, y0 + skew.dy + hgt * 0.9)
-      ..lineTo(x0 + len, y0 + hgt * 0.97)
-      ..close();
-
-    canvas.drawPath(top, Paint()..color = const Color(0xff5a3826));
-    canvas.drawRRect(front, Paint()..color = const Color(0xff3a2216));
-
-    // Cut end: spirulina-green crumb with crisp and seed flecks.
-    canvas.drawPath(end, Paint()..color = const Color(0xff2d5a35));
-    canvas.save();
-    canvas.clipPath(end);
-    final rnd = math.Random(3);
-    final bounds = end.getBounds();
-    const flecks = [
-      Color(0xff3f7a46),
-      Color(0xffd9c79a),
-      Color(0xff1b3a22),
-      Color(0xff6f9a4a),
-    ];
-    for (var i = 0; i < 70; i++) {
-      canvas.drawCircle(
-        Offset(
-          bounds.left + rnd.nextDouble() * bounds.width,
-          bounds.top + rnd.nextDouble() * bounds.height,
-        ),
-        0.8 + rnd.nextDouble() * hgt * 0.05,
-        Paint()..color = flecks[i % 4],
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final w = box.maxWidth;
+      final h = box.maxHeight;
+      final bowlSize = math.min(w * (narrow ? .72 : .38), h * .54);
+      final center = Offset(w * (narrow ? .5 : .51), h * (narrow ? .51 : .54));
+      final spread = Curves.easeOutCubic.transform(
+        (progress / .72).clamp(0.0, 1.0),
       );
-    }
-    canvas.restore();
-    canvas.drawPath(
-      end,
-      Paint()
-        ..color = const Color(0xff2a170e)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = hgt * 0.06,
-    );
-
-    // Drizzle across the coated top and front.
-    final drizzle = Paint()
-      ..color = const Color(0xff8a5a3c)
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = hgt * 0.06;
-    for (var k = 0; k < 3; k++) {
-      final path = Path();
-      for (var i = 0; i <= 40; i++) {
-        final t = i / 40;
-        final x = x0 + len * (0.04 + t * 0.9) + skew.dx * (0.25 + k * 0.25);
-        final y =
-            y0 +
-            skew.dy * (0.25 + k * 0.25) +
-            math.sin(t * math.pi * 7 + k) * hgt * 0.18 +
-            hgt * 0.12;
-        i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
-      }
-      canvas.drawPath(path, drizzle);
-    }
-
-    // Soft highlight along the front edge.
-    canvas.drawLine(
-      Offset(x0 + hgt * 0.3, y0 + hgt * 0.1),
-      Offset(x0 + len - hgt * 0.3, y0 + hgt * 0.1),
-      Paint()
-        ..color = const Color(0x40ffffff)
-        ..strokeWidth = hgt * 0.05
-        ..strokeCap = StrokeCap.round,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_BarPainter old) => false;
-}
-
-/// Layered rolling hills with a seeded grass texture.
-class _HillsPainter extends CustomPainter {
-  const _HillsPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final layers = [
-      (0.28, const Color(0xff7fb24f), const Color(0xff4f8a32), 0.9),
-      (0.42, const Color(0xff5f9a3c), const Color(0xff346d25), 1.7),
-      (0.6, const Color(0xff3f7f2c), _hillDark, 2.6),
-    ];
-    final rnd = math.Random(11);
-    for (final (rise, light, dark, phase) in layers) {
-      final path = Path()..moveTo(0, h);
-      for (var i = 0; i <= 60; i++) {
-        final x = w * i / 60;
-        final y =
-            h * rise +
-            math.sin(i / 60 * math.pi * 2.2 + phase) * h * 0.13 +
-            math.sin(i / 60 * math.pi * 5.1 + phase * 2) * h * 0.04;
-        path.lineTo(x, y);
-      }
-      path
-        ..lineTo(w, h)
-        ..close();
-      canvas.drawPath(path, Paint()..color = Color.lerp(light, dark, 0.45)!);
-      canvas.save();
-      canvas.clipPath(path);
-      final blade = Paint()
-        ..strokeWidth = 1.1
-        ..strokeCap = StrokeCap.round;
-      for (var i = 0; i < (w * 1.4).round(); i++) {
-        final x = rnd.nextDouble() * w;
-        final y = h * (rise - 0.18) + rnd.nextDouble() * h;
-        blade.color = (rnd.nextBool() ? light : dark).withValues(alpha: 0.55);
-        canvas.drawLine(
-          Offset(x, y),
-          Offset(x + rnd.nextDouble() * 2 - 1, y - 3 - rnd.nextDouble() * 5),
-          blade,
-        );
-      }
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(_HillsPainter old) => false;
+      final diameter = math.min(math.max(w, h) * .88, math.min(w, h) * 1.05);
+      return Stack(
+        children: [
+          Positioned(
+            left: center.dx - diameter / 2,
+            top: center.dy - diameter / 2,
+            width: diameter,
+            height: diameter,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: (spread * 3).clamp(0.0, 1.0),
+                child: Transform.scale(
+                  scale: .28 + spread * .72,
+                  child: Image.asset(
+                    'assets/ingredients/powder-burst.png',
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: center.dx - bowlSize / 2,
+            top: center.dy - bowlSize / 2,
+            width: bowlSize,
+            height: bowlSize,
+            child: IgnorePointer(
+              child: Image.asset(
+                'assets/ingredients/bowl-cutout.png',
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class _Checks extends StatelessWidget {
@@ -753,6 +478,7 @@ class _Checks extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 22),
             child: Flex(
               direction: narrow ? Axis.vertical : Axis.horizontal,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
@@ -802,6 +528,7 @@ class _Close extends StatelessWidget {
     ),
     child: Flex(
       direction: narrow ? Axis.vertical : Axis.horizontal,
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: narrow
           ? CrossAxisAlignment.start
           : CrossAxisAlignment.center,

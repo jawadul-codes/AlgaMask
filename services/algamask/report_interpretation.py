@@ -9,6 +9,21 @@ INGREDIENT_NAMES = {
 }
 
 
+def display_name(result, formula_id):
+    """Human-readable role derived at read time; stored recipe IDs stay stable."""
+    fixed = result.request.experiment == 'spirulina-proof-v1'
+    if formula_id == 'B0':
+        return 'Base recipe'
+    if formula_id == 'A0':
+        return 'Algae version'
+    if fixed and formula_id == 'A1':
+        return 'Flavour version'
+    for index, formula in enumerate(result.formulations, 1):
+        if formula.id == formula_id:
+            return f'Recipe option {index}'
+    return formula_id
+
+
 def evidence_scope(item, request):
     requested = {'spirulina', 'chlorella'} if request.algae.value == 'blend' else {request.algae.value}
     species = set(item.get('species', []))
@@ -63,6 +78,9 @@ def interpret(result):
         for step in result.trace:
             if step.status == 'blocked':
                 reasons.append(step.summary)
+    specific_reasons = [reason for errors in (result.impact.get('screening') or {}).get('verdicts', {}).values()
+                        for reason in errors]
+    primary_blocker = (specific_reasons[0] if specific_reasons else reasons[0] if reasons else reason)
     sensory = 'Sensory effects and flavour masking are unmeasured. No risk score or improvement percentage is available.'
     if any(isinstance(item.get('relative_risk'), (int, float)) for item in result.sensory_map):
         sensory += ' Historical demo scores in the stored record are illustrative only, not measurements.'
@@ -81,11 +99,17 @@ def interpret(result):
             elif record.get('nutrition_id') == 'NUT-CHL-ALGOMED-LABEL':
                 ingredient_names['IF-CHL-PWD'] = 'Algomed chlorella powder (reference)'
     return {'version': 'report-clarity-v1', 'title': title, 'reason': reason,
+            'outcome': ('We couldn’t verify this result' if status == 'generation_failed' else
+                        'Recipe option found' if status == 'report_ready' and result.formulations else
+                        'No recipe met your choices'),
+            'display_names': {formula.id: display_name(result, formula.id)
+                              for formula in result.controls + result.formulations},
             'ingredient_names': ingredient_names,
             'nutrition_notice': nutrition_notice,
             'blocking_reasons': list(dict.fromkeys(reasons)),
+            'primary_blocker': primary_blocker,
             'sensory': sensory,
-            'controls': ('B0 and A0 are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'
+            'controls': ('Base recipe (B0) and Algae version (A0) are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'
                          + (' Flavour and algae are replaced with oats. Beverage whey isolate, when the top candidate uses it, remains in both controls and is a milk ingredient.'
                             if (result.impact.get('screening') or {}).get('search_version') == 'protein-base-grid-v2' else '')),
             'mass_basis': f'Nutrition is estimated per {result.request.serving_g:g} g ingredient input. Finished product yield is unmeasured.',

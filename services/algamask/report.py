@@ -1,14 +1,14 @@
 from html import escape
 
 from .schemas import RunResult
-from .report_interpretation import interpret
+from .report_interpretation import display_name, interpret
 
 
 def render_report(result: RunResult) -> str:
     interpretation = interpret(result)
     ingredient_names = interpretation['ingredient_names']
     controls = {f.id for f in result.controls}
-    rows = "".join(f"<tr><td>{escape(f.id)} ({'comparison control' if f.id in controls else 'candidate'})</td><td>{escape(f.name)}</td><td>{f.total_g:g} g</td><td>{escape(', '.join(f'{ingredient_names.get(i.ingredient_id, i.ingredient_id)} [{i.ingredient_id}]: {i.grams:g} g' for i in f.ingredients))}</td></tr>" for f in result.controls + result.formulations)
+    rows = "".join(f"<tr><td>{escape(display_name(result, f.id))} ({escape(f.id)}; {'comparison control' if f.id in controls else 'candidate'})</td><td>{escape(f.name)}</td><td>{f.total_g:g} g</td><td>{escape(', '.join(f'{ingredient_names.get(i.ingredient_id, i.ingredient_id)} [{i.ingredient_id}]: {i.grams:g} g' for i in f.ingredients))}</td></tr>" for f in result.controls + result.formulations)
     reasons = ''.join(f'<li>{escape(reason)}</li>' for reason in interpretation['blocking_reasons'])
     outcome = (f"<h2>{escape(interpretation['title'])}</h2><p>{escape(interpretation['reason'])}</p><ul>{reasons}</ul>"
                f"<p>{escape(interpretation['sensory'])}</p><p>{escape(interpretation['mass_basis'])}</p>"
@@ -49,6 +49,26 @@ def render_report(result: RunResult) -> str:
     nutrition = ""
     def number(value):
         return "unknown" if value is None else f"{value:.3f}"
+    def summary_number(value):
+        return "Unknown" if value is None else f"{value:.2f}"
+    selected = result.formulations[0] if result.status == 'report_ready' and result.formulations else None
+    summary = ''
+    if selected:
+        values = result.impact.get('nutrition', {}).get(selected.id, {}).get('per_serving', {})
+        amounts = ''.join(f'<li>{escape(ingredient_names.get(item.ingredient_id, item.ingredient_id))}: {item.grams:.2f} g</li>'
+                          for item in selected.ingredients)
+        options = ''.join(f'<li>{escape(display_name(result, item.id))}</li>' for item in result.formulations[1:])
+        summary = (f'<h2>{escape(display_name(result, selected.id))}</h2>'
+                   f'<p>Estimated for {result.request.serving_g:g} g of ingredients before processing.</p>'
+                   f'<p>Protein: {summary_number(values.get("protein_g"))}{" g" if values.get("protein_g") is not None else ""}'
+                   f' &nbsp; Energy: {summary_number(values.get("energy_kcal"))}{" kcal" if values.get("energy_kcal") is not None else ""}'
+                   f' &nbsp; Total sugar: {summary_number(values.get("sugar_g"))}{" g" if values.get("sugar_g") is not None else ""}</p>'
+                   f'<h3>Ingredients in this option</h3><ul>{amounts}</ul>'
+                   + (f'<details><summary>Other options</summary><ul>{options}</ul></details>' if options else '')
+                   + '<p>Next step: review the ingredient estimates and evidence limits before deciding what to investigate further.</p>')
+    else:
+        summary = (f'<p>{escape(interpretation["primary_blocker"])}</p>'
+                   '<p>Next step: adjust your choices and run the check again. Detailed checks below explain what stopped this run.</p>')
     for code, estimate in result.impact.get("nutrition", {}).items():
         nutrient_rows = "".join(f"<tr><td>{escape(key)}</td><td>{number(value)}</td><td>{number(estimate['per_100g'][key])}</td>"
                                 f"<td>{escape(', '.join(estimate['missing'][key]))}</td></tr>"
@@ -66,12 +86,20 @@ def render_report(result: RunResult) -> str:
         screening_html = f"<h2>Screening assumptions and checks</h2><pre>{escape(dumps(screening, indent=2))}</pre>"
     heading = "Demonstration formulations" if result.mode == "mock" else "Experimental formulations — not production eligible"
     return f"""<!doctype html><html lang="en"><meta charset="utf-8"><title>AlgaMask concept report</title>
-<style>body{{font:16px system-ui;max-width:900px;margin:48px auto;padding:24px;color:#183c32}}td,th{{padding:12px;text-align:left;border-bottom:1px solid #ddd}}table{{border-collapse:collapse;width:100%}}li{{margin-bottom:12px}}@media print{{button{{display:none}}}}</style>
-<h1>AlgaMask concept report</h1><p>{label} • {escape(result.status)}</p><p>Run {escape(result.run_id)}</p>{outcome}
-<p>{escape(result.request.algae.value)} · {result.request.inclusion_pct:g}% inclusion · {result.request.serving_g:g} g serving</p>
-{provenance}<h2>Workflow trace</h2><ol>{trace}</ol>{explanation}
-<h2>{heading}</h2><p>{escape(interpretation['controls'])}</p><p>{'No formulations were returned for this run.' if not rows else 'Amounts below retain calculation precision.'}</p><table><tr><th>Code</th><th>Concept</th><th>Mass</th><th>Ingredients</th></tr>{rows}</table>{screening_html}
-<h2>Retrieved context</h2><p>Context does not establish effective or safe ingredient doses for these formulations.</p><ul>{evidence}</ul>
-<h2>Impact comparison</h2><p>{escape(result.impact['explanation'])}</p><p>Estimated protein-density change (%): {number(result.impact.get('nutrition_change_pct'))}. Sensory change: unknown. Panel size: 0.</p>{nutrition}
+<style>body{{font:16px system-ui;max-width:900px;margin:48px auto;padding:24px;color:#183c32}}td,th{{padding:12px;text-align:left;border-bottom:1px solid #ddd}}table{{border-collapse:collapse;width:100%}}li{{margin-bottom:12px}}details{{border-top:1px solid #ddd;padding:14px 0}}summary{{cursor:pointer;font-weight:700}}@media print{{button{{display:none}}details{{display:block}}details>*{{display:block!important}}}}</style>
+<h1>{escape(interpretation['outcome'])}</h1><p>AlgaMask screening result</p>
+<p>Experimental screening only. This does not establish flavour performance, food safety, or approval to make or eat this recipe.</p>
+{('<p>Demo result using synthetic fixtures. These numbers are illustrative.</p>' if result.mode == 'mock' else '')}
+{summary}<p>These are calculations from ingredient records, not measurements of a finished bar. Unknown does not mean zero.</p>
+<details><summary>How these recipes were compared</summary><p>{escape(interpretation['controls'])}</p><table><tr><th>Option</th><th>Concept</th><th>Mass</th><th>Ingredients</th></tr>{rows}</table></details>
+<details><summary>Nutrition details</summary>{nutrition}</details>
+<details><summary>Sources and what they can tell us</summary>{explanation}
+<h2>Retrieved context</h2><p>Context does not establish effective or safe ingredient doses for these formulations.</p><ul>{evidence}</ul></details>
+<details><summary>Screening checks</summary>{screening_html}</details>
+<details><summary>Full research details</summary><p>{label} • {escape(result.status)} • Run {escape(result.run_id)}</p>{outcome}
+<p>{escape(result.request.algae.value)} · {result.request.inclusion_pct:g}% inclusion · {result.request.serving_g:g} g ingredient input</p>
+{provenance}<h2>Workflow trace</h2><ol>{trace}</ol>
+<h2>{heading}</h2><p>{'No formulations were returned for this run.' if not rows else 'Amounts below retain calculation precision.'}</p>
+<h2>Impact comparison</h2><p>{escape(result.impact['explanation'])}</p><p>Estimated protein-density change (%): {number(result.impact.get('nutrition_change_pct'))}. Sensory change: unknown. Panel size: 0.</p>
 <h2>Limitations</h2><ul>{limitations}</ul><p>The JSON run record contains the complete six-agent trace and evidence provenance.</p>
-<button onclick="window.print()">Print / save as PDF</button></html>"""
+<button onclick="document.querySelectorAll('details').forEach(d=>d.open=true);window.print()">Print / save as PDF</button></details></html>"""

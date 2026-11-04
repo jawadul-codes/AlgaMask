@@ -93,13 +93,13 @@ void main() {
     await tester.ensureVisible(find.text('Run screening'));
     await tester.tap(find.text('Run screening'));
     await tester.pumpAndSettle();
-    expect(find.text('Screening report'), findsOneWidget);
+    expect(find.text('No recipe met your choices'), findsOneWidget);
     await tester.tap(find.byTooltip('Experiment history'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('New experiment'));
     await tester.pumpAndSettle(const Duration(milliseconds: 400));
     expect(find.text('Design a better algae bar'), findsOneWidget);
-    expect(find.text('Screening report'), findsNothing);
+    expect(find.text('No recipe met your choices'), findsNothing);
   });
   testWidgets(
     'exclusion modes are explicit, recheck and appear on saved report',
@@ -244,8 +244,14 @@ void main() {
     expect(client.submitted!['min_protein_g'], 5);
     expect(client.submitted!['serving_g'], 45);
     expect(client.submitted!.containsKey('max_sugar_g'), isFalse);
-    expect(find.text('Screening report'), findsOneWidget);
+    expect(find.text('No recipe met your choices'), findsOneWidget);
+    await tester.ensureVisible(find.text('Full research details'));
+    await tester.tap(find.text('Full research details'));
+    await tester.pumpAndSettle();
     expect(find.textContaining('LOCAL RAG · development data'), findsOneWidget);
+    await tester.ensureVisible(find.text('Sources and what they can tell us'));
+    await tester.tap(find.text('Sources and what they can tell us'));
+    await tester.pumpAndSettle();
     expect(find.textContaining('Real source shape'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

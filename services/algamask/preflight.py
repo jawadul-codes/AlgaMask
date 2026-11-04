@@ -6,6 +6,30 @@ from .formulation_engine import ACTIVE_SEARCH_VERSION, check_formula, make_formu
 from .nutrition import estimate_nutrition
 
 
+def _target_guidance(request, estimates, field, nutrient, minimum):
+    """A usable bound while holding every other nutrition target fixed."""
+    targets = (('min_protein_g', 'protein_g', True),
+               ('max_energy_kcal', 'energy_kcal', False),
+               ('max_sugar_g', 'sugar_g', False))
+    compatible = [e for e in estimates.values() if all(
+        other == field or getattr(request, other) is None or
+        (e[key] is not None and (e[key] >= getattr(request, other) - 1e-8
+                                if lower else e[key] <= getattr(request, other) + 1e-8))
+        for other, key, lower in targets)]
+    values = [e[nutrient] for e in compatible if e[nutrient] is not None]
+    if not compatible:
+        return {'suggested_limit': None, 'guidance':
+                'No recipe meets the other selected nutrition targets. Changing only this limit cannot enable screening.'}
+    if not values:
+        return {'suggested_limit': None, 'guidance':
+                'Required composition is unknown in recipes meeting the other targets; no numeric limit can be verified.'}
+    bound = floor(max(values) * 100) / 100 if minimum else ceil(min(values) * 100) / 100
+    direction = 'at most' if minimum else 'at least'
+    return {'suggested_limit': bound, 'guidance':
+            f'Set this limit to {direction} {bound:.2f} with your other nutrition targets unchanged. '
+            'This applies to the currently checked recipes; exclusions and other validation still apply.'}
+
+
 def check_inputs(request, snapshot, *, version=None, candidate_budget=None):
     reference_notes = [f"Chlorella nutrition uses {r.ingredient_name}; supplier-label values apply to this reference product only, not every chlorella powder. Manufacturer reports naturally occurring sulfites; allergy safety is not verified."
                        for r in snapshot.records('ingredient_forms')
@@ -39,6 +63,7 @@ def check_inputs(request, snapshot, *, version=None, candidate_budget=None):
         margins[field] = {'min': min(values) if values else None,
                           'max': max(values) if values else None,
                           'known_candidates': len(values), 'total_candidates': len(eligible)}
+        margins[field].update(_target_guidance(request, estimates, field, nutrient, minimum))
         if target is None:
             continue
         if not values:
@@ -103,6 +128,7 @@ def _proof_inputs(request, snapshot, reference_notes):
         values = [e[nutrient] for e in estimates.values() if e[nutrient] is not None]
         margins[field] = {'min': min(values) if values else None, 'max': max(values) if values else None,
                           'known_candidates': len(values), 'total_candidates': len(eligible)}
+        margins[field].update(_target_guidance(request, estimates, field, nutrient, minimum))
         target = getattr(request, field)
         if target is None:
             continue

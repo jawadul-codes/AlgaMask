@@ -138,6 +138,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   reportUri: widget.client.reportUrl(
                     selected!['run_id'] as String,
                   ),
+                  onAdjust: () => Navigator.of(context).pop(true),
                 ),
               ] else ...[
                 const Text(

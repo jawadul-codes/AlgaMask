@@ -247,6 +247,48 @@ def test_new_reports_do_not_invent_sensory_scores(client):
     assert 'Study material: related matrix.' in html
 
 
+def test_consumer_report_names_and_summary_are_derived_without_changing_ids(client):
+    api, _ = client
+    response = api.post('/runs', json={'algae': 'chlorella', 'flavour': 'vanilla'}).json()
+    assert response['status'] == 'report_ready'
+    assert [item['id'] for item in response['controls']] == ['B0', 'A0']
+    names = response['interpretation']['display_names']
+    assert names['B0'] == 'Base recipe'
+    assert names['A0'] == 'Algae version'
+    assert names[response['formulations'][0]['id']] == 'Recipe option 1'
+    report = api.get(f"/runs/{response['run_id']}/report").text
+    assert '<h1>Recipe option found</h1>' in report
+    assert 'Total sugar:' in report and 'Ingredients in this option' in report
+    assert report.index('Total sugar:') < report.index('Full research details')
+    assert 'Base recipe (B0; comparison control)' in report
+    assert 'Unknown does not mean zero.' in report
+
+    from algamask.schemas import RunResult
+    from algamask.report import render_report
+    blocked = RunResult.model_validate(response).model_copy(
+        update={'status': 'insufficient_data', 'formulations': [], 'controls': []})
+    blocked_report = render_report(blocked)
+    assert '<h1>No recipe met your choices</h1>' in blocked_report
+    assert 'adjust your choices' in blocked_report
+    failed = blocked.model_copy(update={'status': 'generation_failed'})
+    failed_report = render_report(failed)
+    assert '<h1>We couldn’t verify this result</h1>' in failed_report
+    assert 'UNVERIFIED GENERATED SENTENCE' not in failed_report
+
+
+def test_fixed_comparison_print_names_keep_source_ids(client):
+    from algamask.report_interpretation import display_name
+    from algamask.schemas import RunResult, RunRequest
+    api, _ = client
+    result = RunResult.model_validate(api.post('/runs', json={'algae': 'spirulina'}).json())
+    request = RunRequest(experiment='spirulina-proof-v1', algae='spirulina',
+                         inclusion_pct=2, serving_g=45, flavour='cocoa-spice')
+    fixed = result.model_copy(update={'request': request})
+    assert display_name(fixed, 'B0') == 'Base recipe'
+    assert display_name(fixed, 'A0') == 'Algae version'
+    assert display_name(fixed, 'A1') == 'Flavour version'
+
+
 def test_historical_report_gets_clarity_without_rewriting_stored_values(client):
     from algamask.schemas import RunResult
     api, _ = client

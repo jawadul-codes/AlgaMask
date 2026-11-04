@@ -1,6 +1,72 @@
 # AlgaMask implementation progress
 
-Updated: 2026-10-25
+Updated: 2026-11-04
+
+## Consumer result page (2026-11-04)
+
+- Flutter result now leads with a plain outcome, one selected option, ingredient
+  amounts, and estimated protein, energy, and total sugar for ingredient input.
+  Unknown remains explicit. Blocked outcomes show the primary check reason and
+  an Adjust my choices action; saved history also returns to the builder.
+- Other passing options and all comparison, nutrition, source, screening, and
+  six-agent details are expandable. Print and JSON access sit in Full research
+  details. The print report follows the same order and opens details when the
+  print button is used.
+- Fixed comparison display names are Base recipe (B0), Algae version (A0), and
+  Flavour version (A1). Ordinary candidates display as Recipe option 1/2/3.
+  The input toggle uses the plain names too. Stored IDs, API data, calculations,
+  and historical runs were not rewritten; names derive on read.
+- Automated checks cover phone and desktop summaries, unknown sugar, mock,
+  blocked, failed, fixed comparison, history, HTML print names, source limits,
+  and older data. Full local release gate passed after the main implementation:
+  272 backend tests passed, 20 opt-in skipped; Flutter analysis clean, 34 tests
+  passed, web build and real retrieval smoke passed. After adding the final phone
+  candidate regression, the full Flutter suite passed with 35 tests.
+  No live browser/device visual review in this increment. Local changes only;
+  no commit or push performed.
+
+## Sugar-limit guidance fix (2026-11-04)
+
+- Reproduced two misleading-range cases: chlorella 3%, 45 g, vanilla has
+  minimum sugar 7.508205 g, so copying the displayed 7.5082 blocks. Spirulina
+  5%, 45 g, cocoa-spice with minimum protein 8 g cannot meet sugar cap 7.52 g,
+  even though it falls in the overall sugar range; 7.53 g passes.
+- Preflight now supplies a safely rounded suggested limit for each nutrient,
+  calculated only from recipes meeting the other selected nutrition targets.
+  Shared guidance also covers fixed proof. Unknown composition and impossible
+  other targets produce no numeric suggestion. Exact acceptance stays unchanged.
+- Flutter displays that guidance, labels overall ranges as approximate and
+  before combining nutrition targets, and explains that maximum sugar is a
+  total-sugar cap rather than sugar to add. Citrus sugar remains unknown;
+  missing values are not fabricated to enable screening.
+- Regression tests verify both failing configurations pass preflight AND
+  execution with their suggested sugar cap; also cover missing citrus values
+  and impossible protein targets. Backend: 270 passed, 20 opt-in skipped.
+  Flutter analysis clean; 32 widget/client tests passed. No live browser pass
+  in this increment. Local changes only, no commit or push.
+
+## Latest-version runtime audit (2026-11-04)
+
+- Fetched origin; local main matches origin/main at 67b2db9. Preserved the
+  existing untracked release handoff.
+- Reproduced landing-page layout exceptions at 390px: vertical Flex children
+  received unbounded height inside the scroll view. Both responsive sections
+  now shrink-wrap their loose-flex content.
+- Reproduced an idle landing-page ticker that never settled, continually
+  scheduling frames. Start it on scroll changes and stop once interpolation
+  reaches its target. Removed unused landing artwork/helper implementations
+  that caused 11 Flutter analysis warnings; active artwork is preserved.
+- Added landing regressions at 390px and 1440px for layout and idle/after-scroll
+  settling. Previously, all 30 Flutter tests bypassed the landing page.
+- Backend suite: 267 passed, 20 opt-in skipped. Separate real offline RAG suite:
+  20 passed. Updated Flutter suite: 32 passed. Full local release gate passed:
+  clean Flutter analysis, web build, real retrieval workflow smoke checks,
+  and temporary database backup/restore equality. Production remains ineligible.
+- Read-only default database check: integrity OK, all 15 jobs completed,
+  no queued/running/failed jobs. No AlgaMask server was listening during audit;
+  this is a stopped local environment, not evidence of a crashed worker.
+- Widget verification is not a live browser or device pass. Changes local;
+  no commit or push performed.
 
 ## Release Step 5: reliability and local verification (2026-10-26, verified with a recorded browser gap)
 
