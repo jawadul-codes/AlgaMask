@@ -1,10 +1,15 @@
 from pathlib import Path
+from functools import partial
 
 import pytest
 
 from algamask.dataset import load_dataset
 from algamask.formulation_engine import check_formula, impact, screen
 from algamask.schemas import RunRequest
+
+# Preserve the original rc.1/v2 regression contract explicitly.
+screen = partial(screen, version='protein-base-grid-v2')
+check_formula = partial(check_formula, version='protein-base-grid-v2')
 
 
 @pytest.fixture(scope="module")

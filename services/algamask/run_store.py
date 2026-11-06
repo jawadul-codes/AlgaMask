@@ -101,6 +101,8 @@ class RunStore:
 
     def reserve(self, key: str, request: RunRequest, context: dict, validate_new=None):
         values = request.model_dump(mode='json')
+        if values['protein_source'] == 'auto':
+            values.pop('protein_source')
         # Preserve pre-preset submission hashes and same-key retry semantics.
         if values['experiment'] == 'engineering_grid':
             values.pop('experiment')

@@ -45,7 +45,7 @@ def check_inputs(request, snapshot, *, version=None, candidate_budget=None):
     messages = []
     if not eligible:
         messages = sorted({error for errors in audit["verdicts"].values() for error in errors})
-        messages.append('No recipes remain after applying your exclusions. Nutrition targets have not been evaluated.')
+        messages.append('No recipes remain after applying your exclusions and protein source choice. Nutrition targets have not been evaluated.')
         return _result(False, messages, {}, 0, reference_notes + [
             'Review the exclusion requirements. Keep a verified-free-from requirement if you need allergy assurance.'], audit, passing_ids=[])
     nutrition = {f.id: estimate_nutrition(f, snapshot, approved_only=False) for f in eligible}
@@ -150,4 +150,5 @@ def _result(can_run, messages, margins, candidate_count, notes, audit, passing_i
             'search_version': audit['search_version'], 'scope': audit['scope'],
             'enumerated_candidates': audit.get('grid_size') if not audit.get('truncated') else audit.get('candidate_budget'),
             'grid_size': audit.get('grid_size'), 'truncated': audit.get('truncated', False),
-            'passing_ids': [] if passing_ids is None else passing_ids}
+            'passing_ids': [] if passing_ids is None else passing_ids,
+            'selected_ids': audit.get('selected_ids', [] if passing_ids is None else passing_ids[:3])}

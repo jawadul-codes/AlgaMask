@@ -22,12 +22,15 @@ class RunRequest(BaseModel):
     # into recipe preferences. Never silently downgrade a saved allergy request.
     exclusion_mode: Literal['ingredient_preference', 'verified_free_from'] = 'verified_free_from'
     flavour: Literal["cocoa-spice", "vanilla", "citrus"] = "cocoa-spice"
+    protein_source: Literal["auto", "milk", "plant"] = "auto"
     min_protein_g: float | None = Field(default=None, ge=0, le=50)
     max_energy_kcal: float | None = Field(default=None, gt=0, le=1000)
     max_sugar_g: float | None = Field(default=None, ge=0, le=50)
 
     @model_validator(mode="after")
     def fixed_experiment_settings(self):
+        if self.experiment == "spirulina-proof-v1" and self.protein_source != "auto":
+            raise ValueError("spirulina-proof-v1 requires protein_source auto; its ingredient amounts are fixed")
         if self.experiment == "spirulina-proof-v1" and (
             self.algae != Algae.spirulina or self.inclusion_pct != 2
             or self.serving_g != 45 or self.flavour != "cocoa-spice"

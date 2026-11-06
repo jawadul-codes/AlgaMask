@@ -1,6 +1,57 @@
 # AlgaMask implementation progress
 
-Updated: 2026-11-04
+Updated: 2026-11-07
+
+## Always-visible recipe options (2026-11-07)
+
+- Removed the collapsed Other options section. All returned options now show
+  full ingredient and nutrition cards immediately: three columns on wide
+  screens, stacked cards on narrow screens, with no nested or horizontal scroll.
+- HTML/print reports use the same always-visible option cards. Research details
+  remain expandable. Existing backend work is preserved.
+- Verification: Flutter analysis clean; 10 report widget tests passed, including
+  three expanded cards at phone/desktop widths and no nested scroll. All 50
+  targeted backend workflow/report tests passed. Web build and diff check passed.
+
+## Higher-protein screening (2026-11-07)
+
+- Rechecked exact Myprotein unflavoured AU whey and UK pea–fava reference
+  labels: 86 and 81 g protein per 100 g. Whey declares milk and soy; plant
+  label declares a facility handling milk. Label-rounded sugar is not a
+  measured finished-bar value. No scientific approval is being added.
+- Implemented immutable rc.6/dev.5 artifacts, versioned 90-option grid,
+  optional protein_source, diverse passing options, preserved historical
+  policies and submission hashes.
+- Completed dataset increment: 301 records validated; rc.6 hash
+  `fe7f57fed12828e9e1d567a594cd79d067529d5044edbb6f295f17738843929d`.
+  Matching development index dev.5 built with 23 evidence notes. rc.5/dev.4
+  unchanged. Product facts are structured composition records, not new sensory
+  claims. Extraction and migration audit are under data/extractions.
+- Completed backend increment: v3 enumerates 90 options with shared preflight;
+  optional auto/milk/plant selection, alternative-path presentation, actual
+  ingredient exclusions, product names and independent Critic checks. v1/v2
+  preserved. Auto omitted from legacy hashes. Retries now preserve the saved
+  runtime configuration as well as policy instead of adopting current settings.
+- Initial backend regression pass: 307 passed, 30 real-model tests skipped.
+  Further source/retry and boundary tests added. Real offline RAG integration:
+  30 passed across rc.4/dev.3, rc.5/dev.4 and rc.6/dev.5. Flutter analysis clean,
+  all 35 tests passed, web build passed. Dataset: 301 rows / 21 tables, zero
+  errors/warnings. Supplemental extraction and sprint validators passed.
+- Range example: chlorella 3%, 45 g, vanilla, no nutrient limits or exclusions:
+  v2 protein 4.57866–9.22707 g; v3 auto 4.57866–15.01272 g; milk required
+  6.60321–15.01272 g; pea–fava required 7.63191–14.33772 g. Configuration-specific
+  estimates, not promised targets. Zero-sugar caps still fail; citrus sugar
+  stays unknown. Strict free-from remains blocked; soy isolate stays disabled.
+- Added `docs/HIGHER_PROTEIN_SCREENING.md` with API usage, source links,
+  grid/selection details, reproduction and limitations. Working CSVs preserve
+  existing LF endings; immutable artifact bytes are unchanged after publication.
+  No frontend controls were added: existing clients use auto; explicit milk/plant
+  is available through the API. Local changes only; no commit or push.
+- Final backend suite: **332 passed**, 30 opt-in tests skipped in the normal
+  run and **30 passed** in the separate real-RAG run. Final diff whitespace check
+  passed; no changes to rc.5 or dev.4. Tests include source preferences, combined
+  limits, missing protein/energy/sugar, mass boundaries, controls that fail
+  candidate targets, independent Critic rejection, old hashes and saved retries.
 
 ## Consumer result page (2026-11-04)
 

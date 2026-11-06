@@ -6,7 +6,8 @@ from .schemas import Formulation, IngredientAmount
 from .experiments import PROOF_VERSION, proof_amounts
 
 LEGACY_SEARCH_VERSION = "exact-form-grid-v1"
-ACTIVE_SEARCH_VERSION = "protein-base-grid-v2"
+PROTEIN_BASE_SEARCH_VERSION = "protein-base-grid-v2"
+ACTIVE_SEARCH_VERSION = "protein-source-grid-v3"
 SEARCH_VERSION = ACTIVE_SEARCH_VERSION
 MASS_TOLERANCE = 1e-6
 TARGET_TOLERANCE = 1e-8
@@ -15,6 +16,9 @@ ALGAE = {"spirulina": "IF-SPI-PWD", "chlorella": "IF-CHL-PWD"}
 FLAVOURS = {"cocoa-spice": ("IF-COCOA-PWD", "IF-CINN-PWD"),
             "vanilla": ("IF-VAN-EXT",), "citrus": ("IF-ORANGE-PEEL",)}
 PROTEIN_BASE = "IF-WHEY-PWD"
+REFERENCE_WHEY = "IF-MP-WHEY-AU"
+REFERENCE_PLANT = "IF-MP-PEAFAVA-UK"
+PROTEIN_PATHS = {PROTEIN_BASE: "milk", REFERENCE_WHEY: "milk", REFERENCE_PLANT: "plant"}
 ALLERGENS = {"milk": {"ALG-MILK"}, "soy": {"ALG-SOY"}, "peanut": {"ALG-PEANUT"},
              "tree_nut": {"ALG-ALMOND"}, "sesame": {"ALG-SESAME"}}
 EXCLUDED_FORMS = {'oats': {'IF-OAT-DRY'}, 'coconut': {'IF-COCO-OIL'},
@@ -34,7 +38,7 @@ def _policy(version):
         return {**shared, "protein_base_form": None, "protein_base_pct": (0,), "candidate_budget": 9,
                 "scope": "Nine-point engineering grid only; not a global feasibility proof or safety assessment.",
                 "controls_basis": "Only matched to top candidate; flavour then algae replaced by oats. Nutrition targets apply to candidates, not controls."}
-    if version == ACTIVE_SEARCH_VERSION:
+    if version == PROTEIN_BASE_SEARCH_VERSION:
         return {**shared, "protein_base_form": PROTEIN_BASE, "protein_base_pct": (0, 10, 20), "candidate_budget": 27,
                 "scope": ("Twenty-seven-point engineering grid: dried dates at 25/30/35%, flavour ingredients at 1/2/3%, "
                           "and USDA beverage whey-protein powder isolate at 0/10/20% of input mass replacing rolled oats. "
@@ -42,6 +46,14 @@ def _policy(version):
                 "controls_basis": ("Only matched to the top candidate. Flavour mass, then algae mass, is replaced by rolled oats. "
                                    "Whey, when present, stays in the controls because it is part of the matrix, not the flavour or algae. "
                                    "Nutrition targets apply to candidates, not controls.")}
+    if version == ACTIVE_SEARCH_VERSION:
+        return {**shared, "protein_base_form": None, "protein_base_forms": tuple(PROTEIN_PATHS),
+                "protein_base_pct": (0, 10, 20, 30), "candidate_budget": 90,
+                "scope": ("Ninety-point engineering grid: dates at 25/30/35%, flavour at 1/2/3%, "
+                          "with no powder or USDA beverage whey, Myprotein AU unflavoured whey, or Myprotein UK "
+                          "unflavoured pea–fava at 10/20/30% of ingredient input replacing oats. "
+                          "Reference-product development estimates; not a global feasibility proof or validated dose, texture, taste or safe-use limit."),
+                "controls_basis": "Matched to the first selected candidate only. Flavour then algae replaced by oats; protein powder retained. Nutrition targets apply to candidates, not controls."}
     raise ValueError(f"Unsupported search policy: {version}")
 
 
@@ -58,12 +70,18 @@ def grid_points(version):
     policy = _policy(version)
     for dates in policy["date_pct"]:
         for flavour in policy["flavour_pct"]:
+            if version == ACTIVE_SEARCH_VERSION:
+                yield f"S{dates}-{flavour}", dates, flavour, 0, None
+                for form, suffix in ((PROTEIN_BASE, "W"), (REFERENCE_WHEY, "MW"), (REFERENCE_PLANT, "PF")):
+                    for protein in (10, 20, 30):
+                        yield f"S{dates}-{flavour}-{suffix}{protein}", dates, flavour, protein, form
+                continue
             for protein in policy["protein_base_pct"]:
                 code = f"S{dates}-{flavour}" if protein == 0 else f"S{dates}-{flavour}-W{protein}"
-                yield code, dates, flavour, protein
+                yield code, dates, flavour, protein, PROTEIN_BASE if protein else None
 
 
-def candidate(request, code, date_pct, flavour_pct, protein_pct=0):
+def candidate(request, code, date_pct, flavour_pct, protein_pct=0, protein_form=PROTEIN_BASE):
     amounts = {"IF-DATE-DRIED": request.serving_g * date_pct / 100}
     species = list(ALGAE) if request.algae == "blend" else [request.algae.value]
     for species_name in species:
@@ -72,7 +90,7 @@ def candidate(request, code, date_pct, flavour_pct, protein_pct=0):
     for form_id in flavours:
         amounts[form_id] = request.serving_g * flavour_pct / 100 / len(flavours)
     if protein_pct:
-        amounts[PROTEIN_BASE] = request.serving_g * protein_pct / 100
+        amounts[protein_form] = request.serving_g * protein_pct / 100
     amounts["IF-OAT-DRY"] = request.serving_g - sum(amounts.values())
     return make_formula(code, amounts, request.serving_g)
 
@@ -81,10 +99,16 @@ def make_formula(code, amounts, mass):
     warnings = [WARNING, "Dried whole dates, not date paste; raw orange peel, not citrus oil. Manufacturing feasibility is untested."]
     if amounts.get(PROTEIN_BASE, 0) > 0:
         warnings.append("Includes USDA beverage whey-protein powder isolate (FDC 173177; 58.14 g protein, 359 kcal and 1.16 g total sugar per 100 g). This is a milk ingredient, not a named high-protein supplier isolate and not an approved dose.")
+    if amounts.get(REFERENCE_WHEY, 0) > 0:
+        warnings.append("Myprotein Impact Whey Isolate Unflavoured 1 kg AU reference contains milk and soy. Published rounded label, not a confirmed local supplier lot.")
+    if amounts.get(REFERENCE_PLANT, 0) > 0:
+        warnings.append("Myprotein Vegan Protein Blend Unflavoured pea–fava 250 g UK reference: facility also handles milk. Declared 0 g sugar is label-rounded, not proof of zero sugar in a finished bar or verified free-from status.")
+    if any(amounts.get(form, 0) > 0 for form in (REFERENCE_WHEY, REFERENCE_PLANT)):
+        warnings.append("Powder proportions are software search levels; texture, processing, taste and safe use require physical and scientific review.")
     return Formulation(id=code, name=f"Experimental screening {code}", total_g=mass,
         status="computational_screening", warnings=warnings,
         ingredients=[IngredientAmount(ingredient_id=key, grams=value,
-            role="algae" if key in ALGAE.values() else "protein_base" if key == PROTEIN_BASE else "matrix")
+            role="algae" if key in ALGAE.values() else "protein_base" if key in PROTEIN_PATHS else "matrix")
             for key, value in amounts.items() if value > 0])
 
 
@@ -122,8 +146,8 @@ def check_formula(formula, request, snapshot, *, baseline=False, check_targets=T
     elif check_grid:
         policy = _policy(version)
         allowed = {"IF-OAT-DRY", "IF-DATE-DRIED", *ALGAE.values(), *FLAVOURS[request.flavour]}
-        if policy["protein_base_form"]:
-            allowed.add(policy["protein_base_form"])
+        protein_forms = policy.get("protein_base_forms", (policy["protein_base_form"],) if policy["protein_base_form"] else ())
+        allowed.update(protein_forms)
         if set(amounts) - allowed:
             errors.append("Ingredient outside declared engineering grid.")
         if amounts.get("IF-OAT-DRY", 0) <= MASS_TOLERANCE:
@@ -135,10 +159,19 @@ def check_formula(formula, request, snapshot, *, baseline=False, check_targets=T
         pct = sum(flavour_amounts) * 100 / request.serving_g
         if not any(abs(pct - value) < MASS_TOLERANCE for value in policy["flavour_pct"]) or max(flavour_amounts) - min(flavour_amounts) > MASS_TOLERANCE:
             errors.append("Flavour proportion outside declared engineering grid.")
-        if policy["protein_base_form"]:
-            actual = amounts.get(policy["protein_base_form"], 0) * 100 / request.serving_g
+        if protein_forms:
+            if sum(amounts.get(form, 0) > 0 for form in protein_forms) > 1:
+                errors.append("Only one protein powder is allowed per recipe.")
+            actual = sum(amounts.get(form, 0) for form in protein_forms) * 100 / request.serving_g
             if not any(abs(actual - value) < MASS_TOLERANCE for value in policy["protein_base_pct"]):
                 errors.append("Protein-base proportion outside declared engineering grid.")
+    if request.protein_source != "auto":
+        if request.experiment == PROOF_VERSION or version != ACTIVE_SEARCH_VERSION:
+            errors.append("This historical or fixed policy does not support a protein source selection.")
+        elif not any(amounts.get(form, 0) > 0 for form, path in PROTEIN_PATHS.items() if path == request.protein_source):
+            errors.append(f"A {request.protein_source} protein powder is required.")
+        elif any(amounts.get(form, 0) > 0 for form, path in PROTEIN_PATHS.items() if path != request.protein_source):
+            errors.append("Protein powder does not match the requested source.")
     species = list(ALGAE) if request.algae == "blend" else [request.algae.value]
     for species_name, form_id in ALGAE.items():
         expected = request.serving_g * request.inclusion_pct / 100 / len(species) if species_name in species and not baseline else 0
@@ -177,6 +210,23 @@ def _rank(formula, snapshot):
     return (protein is None, -protein if protein is not None else 0, formula.id)
 
 
+def protein_path(formula):
+    return next((PROTEIN_PATHS[i.ingredient_id] for i in formula.ingredients
+                 if i.ingredient_id in PROTEIN_PATHS), "none")
+
+
+def select_options(passing, request, version):
+    if not passing or version != ACTIVE_SEARCH_VERSION or request.protein_source != "auto":
+        return passing[:3]
+    selected = [passing[0]]
+    opposite = {"milk": "plant", "plant": "milk"}.get(protein_path(passing[0]))
+    alternative = next((f for f in passing[1:] if protein_path(f) == opposite), None)
+    if alternative:
+        selected.append(alternative)
+    selected.extend(f for f in passing if f.id not in {item.id for item in selected})
+    return selected[:3]
+
+
 def run_grid(request, snapshot, *, version=None, candidate_budget=None, development=True):
     """One candidate set for preflight and execution."""
     version = version or ACTIVE_SEARCH_VERSION
@@ -204,8 +254,11 @@ def run_grid(request, snapshot, *, version=None, candidate_budget=None, developm
                 "selected": [], "controls": [], "control_errors": []}
     structural = request.model_copy(update={"min_protein_g": None, "max_energy_kcal": None, "max_sugar_g": None})
     generated, eligible, passing = [], [], []
-    for code, dates, flavour, protein in specs[:budget]:
-        formula = candidate(request, code, dates, flavour, protein)
+    if version == ACTIVE_SEARCH_VERSION:
+        audit["assumptions"].update(protein_base_forms=list(PROTEIN_PATHS), protein_source=request.protein_source)
+        audit["selection"] = "Highest estimated protein first; auto reserves the second slot for the other passing protein path when available, then fills by protein and ID."
+    for code, dates, flavour, protein, form in specs[:budget]:
+        formula = candidate(request, code, dates, flavour, protein, form)
         generated.append(formula)
         audit["verdicts"][formula.id] = check_formula(formula, request, snapshot, version=version)
         if not check_formula(formula, structural, snapshot, version=version):
@@ -213,7 +266,7 @@ def run_grid(request, snapshot, *, version=None, candidate_budget=None, developm
         if not audit["verdicts"][formula.id]:
             passing.append(formula)
     passing.sort(key=lambda formula: _rank(formula, snapshot))
-    selected = passing[:3]
+    selected = select_options(passing, request, version)
     controls, control_errors = [], []
     if selected:
         controls = matched_controls(selected[0])

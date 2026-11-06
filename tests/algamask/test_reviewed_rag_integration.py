@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.fixture(scope="module", params=[('0.1.0-rc.4', '0.1.0-dev.3'), ('0.1.0-rc.5', '0.1.0-dev.4')])
+@pytest.fixture(scope="module", params=[('0.1.0-rc.4', '0.1.0-dev.3'), ('0.1.0-rc.5', '0.1.0-dev.4'), ('0.1.0-rc.6', '0.1.0-dev.5')])
 def reviewed_runtime(request):
     runtime = RetrievalRuntime(Settings(
         mode="development",

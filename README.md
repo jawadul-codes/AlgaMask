@@ -10,9 +10,11 @@ formulation screening. It supports source-grounded evidence explanations, exact-
 nutrition estimates, constraint checks, matched controls, reports and saved history.
 Current formulations are computational experiments; manufacturing/sensory validation
 and scientific dataset publication remain incomplete. New screening runs use
-`protein-base-grid-v2` (dates, flavour, and 0/10/20% beverage whey isolate).
-The older nine-recipe grid remains available for saved jobs. See
-`docs/RELEASE_STEP4_RECIPE_SCREENING.md`.
+`protein-source-grid-v3`: 90 options covering no powder, USDA beverage whey,
+Myprotein AU unflavoured whey, and Myprotein UK unflavoured pea–fava.
+Powder levels are 10/20/30% of ingredient input, replacing oats. Older nine-
+and 27-option policies remain available for saved jobs and retries. See
+`docs/HIGHER_PROTEIN_SCREENING.md` for API inputs and product limitations.
 
 ## Start locally
 
@@ -121,8 +123,8 @@ check production gates; the current candidate correctly fails that check.
 
 - `apps/flutter/`: local web client and tests.
 - `services/algamask/`: API, six-agent workflow, retrieval, generation, screening and storage.
-- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.5`.
-- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.4`.
+- `data/candidates/`: immutable data snapshots; current candidate is `0.1.0-rc.6`.
+- `indexes/reviewed_evidence/`: local embedding index, currently `0.1.0-dev.5`.
 - `tools/`: dataset/index operations, database recovery and release verification.
 - `var/`: ignored local databases and verification artifacts.
 - [Implementation progress](docs/IMPLEMENTATION_PROGRESS.md): completed work and remaining gates.

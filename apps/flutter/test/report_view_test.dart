@@ -57,6 +57,49 @@ Map<String, dynamic> result(String status) => {
 };
 
 void main() {
+  for (final width in [390.0, 1200.0]) {
+    testWidgets('all recipe cards are expanded at width $width', (tester) async {
+      tester.view.physicalSize = Size(width, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final data = result('report_ready');
+      data['request'] = {'serving_g': 45};
+      data['formulations'] = [
+        for (final id in ['S25-1', 'S25-2', 'S25-3'])
+          {
+            'id': id,
+            'total_g': 45,
+            'ingredients': [
+              {'ingredient_id': 'IF-OAT-DRY', 'grams': 45},
+            ],
+          },
+      ];
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: ReportView(
+          result: data,
+          reportUri: Uri.parse('http://localhost/report'),
+        ))),
+      ));
+      for (var index = 1; index <= 3; index++) {
+        expect(find.text('Recipe option $index'), findsOneWidget);
+      }
+      expect(find.text('Ingredients in this option'), findsNWidgets(3));
+      expect(find.text('Total sugar'), findsNWidgets(3));
+      expect(find.text('Other options'), findsNothing);
+      expect(find.byType(Scrollable), findsOneWidget);
+      final first = tester.getTopLeft(find.text('Recipe option 1'));
+      final third = tester.getTopLeft(find.text('Recipe option 3'));
+      if (width >= 1050) {
+        expect(third.dy, first.dy);
+        expect(third.dx, greaterThan(first.dx));
+      } else {
+        expect(third.dy, greaterThan(first.dy));
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets(
     'candidate summary fits a phone and shows missing sugar as unknown',
     (tester) async {

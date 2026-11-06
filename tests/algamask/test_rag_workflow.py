@@ -141,11 +141,11 @@ def test_exact_chlorella_preflight_margins_and_adjustment(client):
                    min_protein_g=12, max_energy_kcal=426, max_sugar_g=0)
     result = api.post('/runs/preflight', json=payload).json()
     assert not result['can_run']
-    assert result['search_version'] == 'protein-base-grid-v2'
-    assert result['grid_size'] == 27
+    assert result['search_version'] == 'protein-source-grid-v3'
+    assert result['grid_size'] == 90
     assert result['margins']['min_protein_g']['max'] > 5.17797
-    assert result['margins']['max_sugar_g']['min'] == pytest.approx(7.508205)
-    assert len(result['messages']) == 2
+    assert result['margins']['max_sugar_g']['min'] == pytest.approx(7.374555)
+    assert len(result['messages']) == 1  # Protein is now feasible; zero sugar is not.
     assert 'required data is missing' not in str(result['messages'])
     assert not runtime._search.queries  # Failed arithmetic needs no retrieval.
     assert not app.state.run_store.history()
@@ -154,13 +154,14 @@ def test_exact_chlorella_preflight_margins_and_adjustment(client):
     adjusted = {**payload, 'min_protein_g': 8, 'max_energy_kcal': 200, 'max_sugar_g': 10}
     preview = api.post('/runs/preflight', json=adjusted).json()
     assert preview['can_run'] and preview['candidate_count'] >= 1
-    assert preview['passing_ids'][0] == 'S25-1-W20'
+    assert preview['passing_ids'][0] == 'S25-1-MW30'
     run = api.post('/runs', json=adjusted).json()
     assert run['status'] == 'report_ready'
-    assert run['formulations'][0]['id'] == 'S25-1-W20'
-    assert run['impact']['screening']['search_version'] == 'protein-base-grid-v2'
-    whey = next(item for item in run['formulations'][0]['ingredients'] if item['ingredient_id'] == 'IF-WHEY-PWD')
-    assert whey['grams'] == pytest.approx(9)
+    assert run['formulations'][0]['id'] == 'S25-1-MW30'
+    assert run['impact']['screening']['search_version'] == 'protein-source-grid-v3'
+    whey = next(item for item in run['formulations'][0]['ingredients'] if item['ingredient_id'] == 'IF-MP-WHEY-AU')
+    assert whey['grams'] == pytest.approx(13.5)
+    assert preview['selected_ids'] == [f['id'] for f in run['formulations']]
 
 
 def test_replay_does_not_repeat_preflight(client):
@@ -171,6 +172,53 @@ def test_replay_does_not_repeat_preflight(client):
     runtime._search = SearchDouble(fail=True)
     again = api.post('/runs', json={'algae': 'spirulina'}, headers=headers)
     assert again.json() == first.json()
+
+
+@pytest.mark.parametrize('source', ['auto', 'milk', 'plant'])
+def test_source_selection_reports_and_critic(client, source):
+    api, _ = client
+    result = api.post('/runs', json={'protein_source': source, 'min_protein_g': 10}).json()
+    assert result['status'] == 'report_ready'
+    accepted = next(step for step in result['trace'] if step['agent'] == 'Critic')['output']
+    assert accepted['accepted_ids'] == [f['id'] for f in result['formulations']]
+    assert set(accepted['verdicts']) == set(accepted['accepted_ids'])
+    report = api.get(f"/runs/{result['run_id']}/report").text
+    assert 'Myprotein' in report
+    assert 'reference' in report and 'not measurements' in report
+    assert api.get(f"/runs/{result['run_id']}").json() == result
+
+
+def test_retry_keeps_saved_policy_dataset_and_historical_report(client, monkeypatch):
+    import algamask.api as module
+    from algamask.dataset import load_dataset
+    from algamask.schemas import RunRequest
+    api, current = client
+    historical = RetrievalRuntime(Settings(mode='development',
+        dataset_path=Settings().dataset_path.parent / '0.1.0-rc.5',
+        index_path=Settings().index_path.parent / '0.1.0-dev.4'))
+    historical._search = SearchDouble()
+    historical._search.snapshot = load_dataset(historical.settings.dataset_path / 'reviewed')
+    context = {**historical.settings.model_dump(mode='json'), 'search_version': 'protein-base-grid-v2'}
+    store = app.state.run_store
+    job, token = store.reserve('historical-policy-retry', RunRequest(algae='chlorella', inclusion_pct=3, flavour='vanilla'), context)
+    store.start(job['job_id'], token)
+    store.finish(job['job_id'], token, None, 'run_failed')
+    created_settings = []
+    def saved_runtime(settings):
+        created_settings.append(settings)
+        assert settings == historical.settings
+        return historical
+    monkeypatch.setattr(module, 'RetrievalRuntime', saved_runtime)
+    response = api.post(f"/jobs/{job['job_id']}/retry", json={'expected_attempt': 1})
+    assert response.status_code == 200
+    result = response.json()
+    assert result['impact']['screening']['search_version'] == 'protein-base-grid-v2'
+    assert result['formulations'][0]['id'] == 'S25-1-W20'
+    assert created_settings and not current._search.queries
+    assert store.job(job['job_id'])['context'] == context
+    assert all(a['context'] == context for a in store.job(job['job_id'])['attempts'])
+    assert 'protein-base grid' in api.get(f"/runs/{job['job_id']}/report").text
+    assert api.post(f"/jobs/{job['job_id']}/retry", json={'expected_attempt': 1}).json() == result
 
 
 def test_preflight_exclusion_and_fixed_controls(client):

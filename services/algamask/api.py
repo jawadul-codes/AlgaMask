@@ -90,6 +90,13 @@ def execution_context(request):
     return context
 
 
+def job_runtime(context, request):
+    """Retries use the saved dataset, index and generation settings as well as policy."""
+    current = request.app.state.retrieval_runtime
+    settings = Settings.model_validate(context) if context else current.settings
+    return current if settings == current.settings else RetrievalRuntime(settings)
+
+
 def existing_job_response(job, request):
     if job['state'] == 'completed':
         return get_run(job['job_id'], request)
@@ -99,11 +106,11 @@ def existing_job_response(job, request):
         'message': 'Execution did not complete. Inspect this attempt in history and retry explicitly.', 'job': job}})
 
 
-def execute(job, token, request):
+def execute(job, token, request, runtime=None):
     if token is None:
         return existing_job_response(job, request)
     store = request.app.state.run_store
-    runtime = request.app.state.retrieval_runtime
+    runtime = runtime or job_runtime(job['context'], request)
     job_id = job['job_id']
     stopped = Event()
 
@@ -121,7 +128,7 @@ def execute(job, token, request):
         worker = Thread(target=renew, daemon=True)
         worker.start()
         payload = RunRequest.model_validate(job['request'])
-        search = None if runtime.settings.mode == 'mock' else configured_search(request)
+        search = None if runtime.settings.mode == 'mock' else runtime.get_search()
         result = run_workflow(payload, search, runtime.generation_provider() if search else None,
                               formulation_engine.bound_search_version(job["context"]))
         result = result.model_copy(update={'run_id': job_id, 'created_at': job['created_at']})
@@ -145,12 +152,18 @@ def execute(job, token, request):
 
 @app.post('/runs/preflight')
 def preflight(payload: RunRequest, request: Request):
-    runtime = request.app.state.retrieval_runtime
+    return preflight_with_runtime(payload, request.app.state.retrieval_runtime)
+
+
+def preflight_with_runtime(payload, runtime, version=None):
     if runtime.settings.mode != 'development':
         return {'can_run': False, 'messages': ['Select the development backend to check real ingredient data.'],
                 'margins': {}, 'notes': [], 'candidate_count': 0}
-    search = configured_search(request)
-    result = check_inputs(payload, search.snapshot)
+    try:
+        search = runtime.get_search()
+    except RetrievalUnavailable as exc:
+        raise HTTPException(503, detail={'code': 'retrieval_unavailable', 'message': str(exc)}) from exc
+    result = check_inputs(payload, search.snapshot, version=version)
     result['dataset_hash'] = search.manifest['dataset_hash']
     if result['can_run']:
         from .agents.retrieve import run as retrieve
@@ -164,11 +177,14 @@ def preflight(payload: RunRequest, request: Request):
     return result
 
 
-def require_feasible(payload, request):
+def require_feasible(payload, request, runtime=None, version=None):
+    runtime = runtime or request.app.state.retrieval_runtime
     # Legacy mock API remains available for fixture tests; the UI preflight blocks it.
-    if request.app.state.retrieval_runtime.settings.mode == 'mock':
+    if runtime.settings.mode == 'mock':
+        if payload.protein_source != 'auto':
+            raise HTTPException(422, detail={'code': 'configuration_blocked', 'message': 'Protein source selection requires development retrieval.'})
         return
-    result = preflight(payload, request)
+    result = preflight_with_runtime(payload, runtime, version)
     if not result['can_run']:
         raise HTTPException(422, detail={'code': 'configuration_blocked', 'preflight': result})
 
@@ -198,11 +214,17 @@ class RetryRequest(BaseModel):
 
 @app.post('/jobs/{job_id}/retry', response_model=RunResult)
 def retry_job(job_id: str, payload: RetryRequest, request: Request):
-    job, token = storage(request.app.state.run_store.retry, job_id, payload.expected_attempt, execution_context(request),
-                         lambda original: require_feasible(original, request))
+    saved = storage(request.app.state.run_store.job, job_id)
+    if saved is None:
+        raise HTTPException(404, 'Execution not found.')
+    context = saved['context']
+    runtime = job_runtime(context, request)
+    version = formulation_engine.bound_search_version(context)
+    job, token = storage(request.app.state.run_store.retry, job_id, payload.expected_attempt, context,
+                         lambda original: require_feasible(original, request, runtime, version))
     if job is None:
         raise HTTPException(404, 'Execution not found.')
-    return execute(job, token, request)
+    return execute(job, token, request, runtime=runtime)
 
 
 @app.get('/storage/ready')

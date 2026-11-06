@@ -1,0 +1,13 @@
+row_id,formulation_id,ingredient_form_id,amount_pct_ww,amount_g_per_batch,ingredient_role,bound_id,record_version,review_status,reviewer,reviewed_at,source_id,source_location,evidence_status,notes
+RLN-0001,FRM-B0,IF-COCOA-PWD,2,0.9,flavour_modulator,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0002,FRM-B0,IF-DATE-DRIED,30,13.5,sweetener,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0003,FRM-B0,IF-OAT-DRY,68,30.6,filler,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0004,FRM-A0,IF-SPI-PWD,2.5,1.125,algae_base,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0005,FRM-A0,IF-CHL-PWD,2.5,1.125,algae_base,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0006,FRM-A0,IF-DATE-DRIED,30,13.5,sweetener,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0007,FRM-A0,IF-OAT-DRY,65,29.25,filler,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0008,FRM-A1,IF-SPI-PWD,2.5,1.125,algae_base,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0009,FRM-A1,IF-CHL-PWD,2.5,1.125,algae_base,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0010,FRM-A1,IF-COCOA-PWD,2,0.9,flavour_modulator,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0011,FRM-A1,IF-DATE-DRIED,30,13.5,sweetener,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.
+RLN-0012,FRM-A1,IF-OAT-DRY,63,28.35,filler,,1,extracted,,,,,assumed_for_demo,PENDING HUMAN REVIEW. Not approved. Demonstration line. No screening bound is attached.

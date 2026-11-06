@@ -1,0 +1,40 @@
+{
+  "retrieved_at": "2026-11-07",
+  "scientific_approval": false,
+  "rights": "Manufacturer factual label extraction only; no full page or marketing copy redistributed.",
+  "limitations": "Published reference products, not confirmed local supplier lots. Rounded label values are development inputs, not measurements of a finished bar. Unreported nutrients remain unknown.",
+  "products": [
+    {
+      "ingredient_form_id": "IF-MP-WHEY-AU",
+      "source_id": "SRC-MYPROTEIN-WHEY-AU-2026",
+      "name": "Myprotein Impact Whey Isolate Unflavoured 1 kg AU (reference)",
+      "supplier": "Myprotein",
+      "product_code": "15370280; Unflavoured; 1 kg; AU Localised",
+      "url": "https://nz.myprotein.com/p/sports-nutrition/myprotein-impact-whey-isolate-unflavoured-1kg-au-localised/15370280/",
+      "source_location": "Unflavoured AU Localised product; Nutritional Information per 100 g; Ingredients; Allergen Information",
+      "basis": "per_100g",
+      "values": {"protein_g": "86.0", "energy_kcal": "369", "fat_g": "0.9", "carbohydrate_g": "2.8", "sugar_g": "1.7"},
+      "other_label_facts": {"energy_kj_per_100g": 1540, "saturated_fat_g_per_100g": 0.4, "sodium_mg_per_100g": 272, "serving_g": 30},
+      "ingredients": "Whey protein isolate (milk); emulsifiers: sunflower lecithin and soy lecithin.",
+      "allergen_statement": "Contains milk and soy.",
+      "allergens": {"ALG-MILK": "contains", "ALG-SOY": "contains"},
+      "notes": "Exact AU-localised unflavoured reference; do not substitute another market or flavour. Fibre, iron and total omega-3 are not declared. Page package-serving count is inconsistent with 1 kg/30 g; only the per-100 g column is used."
+    },
+    {
+      "ingredient_form_id": "IF-MP-PEAFAVA-UK",
+      "source_id": "SRC-MYPROTEIN-PEAFAVA-UK-2026",
+      "name": "Myprotein Vegan Protein Blend Unflavoured pea–fava 250 g UK (reference)",
+      "supplier": "Myprotein",
+      "product_code": "12007121; Unflavoured; 250 g; UK",
+      "url": "https://www.myprotein.com/p/sports-nutrition/vegan-protein-blend-250g/12007121/",
+      "source_location": "Nutritional Information explicitly based on Unflavoured, per 100 g; Unflavoured Ingredients; Allergen Information",
+      "basis": "per_100g",
+      "values": {"protein_g": "81", "energy_kcal": "340", "fat_g": "0.9", "carbohydrate_g": "1.8", "sugar_g": "0", "fibre_g": "1.5"},
+      "other_label_facts": {"energy_kj_per_100g": 1423, "saturated_fat_g_per_100g": 0, "salt_g_per_100g": 1.60, "serving_g": 30},
+      "ingredients": "Protein blend (100%): pea protein isolate and fava bean isolate.",
+      "allergen_statement": "Produced in a facility which also handles milk.",
+      "allergens": {"ALG-MILK": "may_contain"},
+      "notes": "Facility statement is recorded conservatively as possible cross-contact, not an intentional milk ingredient or a supplier free-from guarantee. The declared 0 g total sugar is label-rounded, not an assumed zero or proof of zero sugar in a finished bar. Iron and total omega-3 are not declared."
+    }
+  ]
+}

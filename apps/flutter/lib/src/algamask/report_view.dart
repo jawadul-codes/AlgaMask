@@ -239,6 +239,22 @@ class ReportView extends StatelessWidget {
     ),
   );
 
+  Widget _recipeOptions(List candidates) => LayoutBuilder(
+    builder: (context, constraints) {
+      final options = candidates.whereType<Map>().toList();
+      final columns = constraints.maxWidth >= 1050 ? 3 : 1;
+      final width = (constraints.maxWidth - 16 * (columns - 1)) / columns;
+      return Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        children: [
+          for (final option in options)
+            SizedBox(width: width, child: _selectedCard(option)),
+        ],
+      );
+    },
+  );
+
   @override
   Widget build(BuildContext context) {
     final selected = _selectedFormula();
@@ -282,7 +298,7 @@ class ReportView extends StatelessWidget {
           text: 'Experimental screening only. This does not establish flavour performance, food safety, or approval to make or eat this recipe.',
         ),
         const SizedBox(height: 16),
-        if (selected != null) _selectedCard(selected),
+        if (selected != null) _recipeOptions(candidates),
         if (selected == null)
           AlgaCard(
             child: Column(
@@ -314,17 +330,6 @@ class ReportView extends StatelessWidget {
               'Next step: review the ingredient estimates and evidence limits before deciding what to investigate further.',
             ),
           ),
-        if (candidates.length > 1)
-          _detailGroup('Other options', [
-            for (var i = 1; i < candidates.length; i++)
-              if (candidates[i] is Map)
-                ListTile(
-                  title: Text(displayName('${candidates[i]['id']}')),
-                  subtitle: Text(
-                    'Protein: ${number(((nutrition[candidates[i]['id']] as Map?)?['per_serving'] as Map?)?['protein_g'], decimals: 2)} g · Total sugar: ${number(((nutrition[candidates[i]['id']] as Map?)?['per_serving'] as Map?)?['sugar_g'], decimals: 2)} g',
-                  ),
-                ),
-          ]),
         _detailGroup('How these recipes were compared', [_candidates()]),
         _detailGroup('Nutrition details', [_nutrition()]),
         _detailGroup('Sources and what they can tell us', [_evidence(context)]),

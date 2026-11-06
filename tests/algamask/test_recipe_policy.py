@@ -1,10 +1,11 @@
 """Policy expansion, historical grid, and preflight/execution agreement."""
 from pathlib import Path
+from functools import partial
 
 import pytest
 
 from algamask.formulation_engine import (
-    ACTIVE_SEARCH_VERSION, LEGACY_SEARCH_VERSION, bound_search_version, check_formula,
+    PROTEIN_BASE_SEARCH_VERSION as ACTIVE_SEARCH_VERSION, LEGACY_SEARCH_VERSION, bound_search_version, check_formula,
     make_formula, run_grid, screen,
 )
 from algamask.nutrition import estimate_nutrition
@@ -14,6 +15,11 @@ from algamask.schemas import RunRequest, RunResult
 
 
 ROOT = Path(__file__).resolve().parents[2]
+# These are historical rc.5/v2 numerical regressions. New policy coverage lives
+# in test_protein_sources.py; keep the original expectations unchanged here.
+check_inputs = partial(check_inputs, version=ACTIVE_SEARCH_VERSION)
+screen = partial(screen, version=ACTIVE_SEARCH_VERSION)
+check_formula = partial(check_formula, version=ACTIVE_SEARCH_VERSION)
 
 
 @pytest.fixture(scope="module")

@@ -54,18 +54,19 @@ def render_report(result: RunResult) -> str:
     selected = result.formulations[0] if result.status == 'report_ready' and result.formulations else None
     summary = ''
     if selected:
-        values = result.impact.get('nutrition', {}).get(selected.id, {}).get('per_serving', {})
-        amounts = ''.join(f'<li>{escape(ingredient_names.get(item.ingredient_id, item.ingredient_id))}: {item.grams:.2f} g</li>'
-                          for item in selected.ingredients)
-        options = ''.join(f'<li>{escape(display_name(result, item.id))}</li>' for item in result.formulations[1:])
-        summary = (f'<h2>{escape(display_name(result, selected.id))}</h2>'
+        cards = []
+        for option in result.formulations:
+            values = result.impact.get('nutrition', {}).get(option.id, {}).get('per_serving', {})
+            amounts = ''.join(f'<li>{escape(ingredient_names.get(item.ingredient_id, item.ingredient_id))}: {item.grams:.2f} g</li>'
+                              for item in option.ingredients)
+            cards.append(f'<section class="recipe-option"><h2>{escape(display_name(result, option.id))}</h2>'
                    f'<p>Estimated for {result.request.serving_g:g} g of ingredients before processing.</p>'
                    f'<p>Protein: {summary_number(values.get("protein_g"))}{" g" if values.get("protein_g") is not None else ""}'
                    f' &nbsp; Energy: {summary_number(values.get("energy_kcal"))}{" kcal" if values.get("energy_kcal") is not None else ""}'
                    f' &nbsp; Total sugar: {summary_number(values.get("sugar_g"))}{" g" if values.get("sugar_g") is not None else ""}</p>'
-                   f'<h3>Ingredients in this option</h3><ul>{amounts}</ul>'
-                   + (f'<details><summary>Other options</summary><ul>{options}</ul></details>' if options else '')
-                   + '<p>Next step: review the ingredient estimates and evidence limits before deciding what to investigate further.</p>')
+                   f'<h3>Ingredients in this option</h3><ul>{amounts}</ul></section>')
+        summary = ('<div class="recipe-options">' + ''.join(cards) + '</div>'
+                   '<p>Next step: review the ingredient estimates and evidence limits before deciding what to investigate further.</p>')
     else:
         summary = (f'<p>{escape(interpretation["primary_blocker"])}</p>'
                    '<p>Next step: adjust your choices and run the check again. Detailed checks below explain what stopped this run.</p>')
@@ -87,6 +88,7 @@ def render_report(result: RunResult) -> str:
     heading = "Demonstration formulations" if result.mode == "mock" else "Experimental formulations — not production eligible"
     return f"""<!doctype html><html lang="en"><meta charset="utf-8"><title>AlgaMask concept report</title>
 <style>body{{font:16px system-ui;max-width:900px;margin:48px auto;padding:24px;color:#183c32}}td,th{{padding:12px;text-align:left;border-bottom:1px solid #ddd}}table{{border-collapse:collapse;width:100%}}li{{margin-bottom:12px}}details{{border-top:1px solid #ddd;padding:14px 0}}summary{{cursor:pointer;font-weight:700}}@media print{{button{{display:none}}details{{display:block}}details>*{{display:block!important}}}}</style>
+<style>.recipe-options{{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px}}.recipe-option{{padding:16px;border:1px solid #ddd;border-radius:16px;overflow-wrap:anywhere;break-inside:avoid}}@media print{{.recipe-options{{display:block}}.recipe-option{{margin-bottom:16px}}}}</style>
 <h1>{escape(interpretation['outcome'])}</h1><p>AlgaMask screening result</p>
 <p>Experimental screening only. This does not establish flavour performance, food safety, or approval to make or eat this recipe.</p>
 {('<p>Demo result using synthetic fixtures. These numbers are illustrative.</p>' if result.mode == 'mock' else '')}

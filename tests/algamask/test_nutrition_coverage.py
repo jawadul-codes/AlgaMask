@@ -4,6 +4,7 @@ import hashlib
 import json
 import shutil
 import runpy
+from functools import partial
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,7 @@ from algamask.schemas import Formulation, IngredientAmount, RunRequest
 
 ROOT = Path(__file__).resolve().parents[2]
 NEW = ROOT / 'data/candidates/0.1.0-rc.5'
+check_inputs = partial(check_inputs, version='protein-base-grid-v2')
 
 
 @pytest.fixture(scope='module')

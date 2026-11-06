@@ -61,6 +61,10 @@ def interpret(result):
         version = screening.get('search_version')
         if result.request.experiment == 'spirulina-proof-v1':
             reason = 'Fixed ingredient amounts were checked against the requested targets.'
+        elif version == 'protein-source-grid-v3':
+            reason = ('The first option has the highest estimated protein among passing recipes. In auto mode, '
+                      'a passing option from the other protein path appears next when available, followed by the next ranked option. '
+                      'Values apply to named reference products. This is not a sensory ranking.')
         elif version == 'protein-base-grid-v2':
             reason = ('Candidates from the protein-base grid (dates, flavour, and beverage whey isolate at 0/10/20% of input, replacing oats) '
                       'are ordered by estimated protein, then candidate ID. This is not a sensory ranking.')
@@ -111,6 +115,8 @@ def interpret(result):
             'sensory': sensory,
             'controls': ('Base recipe (B0) and Algae version (A0) are comparison controls. Nutrition targets apply to candidates only; controls may exceed those limits.'
                          + (' Flavour and algae are replaced with oats. Beverage whey isolate, when the top candidate uses it, remains in both controls and is a milk ingredient.'
-                            if (result.impact.get('screening') or {}).get('search_version') == 'protein-base-grid-v2' else '')),
+                            if (result.impact.get('screening') or {}).get('search_version') == 'protein-base-grid-v2' else
+                            ' Flavour and algae are replaced with oats; the selected protein powder remains in both controls.'
+                            if (result.impact.get('screening') or {}).get('search_version') == 'protein-source-grid-v3' else '')),
             'mass_basis': f'Nutrition is estimated per {result.request.serving_g:g} g ingredient input. Finished product yield is unmeasured.',
             'evidence': {e['chunk_id']: evidence_scope(e, result.request) for e in result.evidence}}

@@ -1,0 +1,102 @@
+{
+  "base_dataset_hash": "b05a800077d53b3bce3c63bdb527d30bf5b48f5c47e7182a0744f4c1c3f02076",
+  "changed_tables": {
+    "ingredient_allergens": "19c72013f0187af006917760f5394179e2d230dd4824069642848e8fe8ac67c7",
+    "ingredient_forms": "e2aac7a8e5430307fbcadeef43cbe69e4def5eabe0bfbca210e5d2809023dda9",
+    "ingredient_nutrition": "3f7c3cac3991c1a89528f5fccfd5ebc7bdd6f14f45e3daabf9a00af29c3896b7",
+    "sources": "91c8819538eb777cf7de19e1cfd24732892b45f80ed8878fdc3a739f2367d3f4"
+  },
+  "extraction": {
+    "limitations": "Published reference products, not confirmed local supplier lots. Rounded label values are development inputs, not measurements of a finished bar. Unreported nutrients remain unknown.",
+    "products": [
+      {
+        "allergen_statement": "Contains milk and soy.",
+        "allergens": {
+          "ALG-MILK": "contains",
+          "ALG-SOY": "contains"
+        },
+        "basis": "per_100g",
+        "ingredient_form_id": "IF-MP-WHEY-AU",
+        "ingredients": "Whey protein isolate (milk); emulsifiers: sunflower lecithin and soy lecithin.",
+        "name": "Myprotein Impact Whey Isolate Unflavoured 1 kg AU (reference)",
+        "notes": "Exact AU-localised unflavoured reference; do not substitute another market or flavour. Fibre, iron and total omega-3 are not declared. Page package-serving count is inconsistent with 1 kg/30 g; only the per-100 g column is used.",
+        "other_label_facts": {
+          "energy_kj_per_100g": 1540,
+          "saturated_fat_g_per_100g": 0.4,
+          "serving_g": 30,
+          "sodium_mg_per_100g": 272
+        },
+        "product_code": "15370280; Unflavoured; 1 kg; AU Localised",
+        "source_id": "SRC-MYPROTEIN-WHEY-AU-2026",
+        "source_location": "Unflavoured AU Localised product; Nutritional Information per 100 g; Ingredients; Allergen Information",
+        "supplier": "Myprotein",
+        "url": "https://nz.myprotein.com/p/sports-nutrition/myprotein-impact-whey-isolate-unflavoured-1kg-au-localised/15370280/",
+        "values": {
+          "carbohydrate_g": "2.8",
+          "energy_kcal": "369",
+          "fat_g": "0.9",
+          "protein_g": "86.0",
+          "sugar_g": "1.7"
+        }
+      },
+      {
+        "allergen_statement": "Produced in a facility which also handles milk.",
+        "allergens": {
+          "ALG-MILK": "may_contain"
+        },
+        "basis": "per_100g",
+        "ingredient_form_id": "IF-MP-PEAFAVA-UK",
+        "ingredients": "Protein blend (100%): pea protein isolate and fava bean isolate.",
+        "name": "Myprotein Vegan Protein Blend Unflavoured pea–fava 250 g UK (reference)",
+        "notes": "Facility statement is recorded conservatively as possible cross-contact, not an intentional milk ingredient or a supplier free-from guarantee. The declared 0 g total sugar is label-rounded, not an assumed zero or proof of zero sugar in a finished bar. Iron and total omega-3 are not declared.",
+        "other_label_facts": {
+          "energy_kj_per_100g": 1423,
+          "salt_g_per_100g": 1.6,
+          "saturated_fat_g_per_100g": 0,
+          "serving_g": 30
+        },
+        "product_code": "12007121; Unflavoured; 250 g; UK",
+        "source_id": "SRC-MYPROTEIN-PEAFAVA-UK-2026",
+        "source_location": "Nutritional Information explicitly based on Unflavoured, per 100 g; Unflavoured Ingredients; Allergen Information",
+        "supplier": "Myprotein",
+        "url": "https://www.myprotein.com/p/sports-nutrition/vegan-protein-blend-250g/12007121/",
+        "values": {
+          "carbohydrate_g": "1.8",
+          "energy_kcal": "340",
+          "fat_g": "0.9",
+          "fibre_g": "1.5",
+          "protein_g": "81",
+          "sugar_g": "0"
+        }
+      }
+    ],
+    "retrieved_at": "2026-11-07",
+    "rights": "Manufacturer factual label extraction only; no full page or marketing copy redistributed.",
+    "scientific_approval": false
+  },
+  "extraction_sha256": "c82246cd9642f9b4fd1dc86f10681ad721f6f00b4255445622b4e12378017e59",
+  "row_counts": {
+    "algae_compound_observations": 45,
+    "algae_materials": 7,
+    "allergens": 10,
+    "compound_features": 30,
+    "compound_sensory_links": 40,
+    "compounds": 30,
+    "dataset_versions": 0,
+    "evidence_chunks": 23,
+    "formulation_ingredients": 12,
+    "formulations": 3,
+    "ingredient_allergens": 8,
+    "ingredient_forms": 22,
+    "ingredient_nutrition": 21,
+    "metric_definitions": 2,
+    "prototype_processes": 0,
+    "retrieval_evaluations": 8,
+    "screening_bounds": 1,
+    "sensory_descriptors": 25,
+    "sensory_summaries": 0,
+    "sensory_trials": 0,
+    "sources": 14
+  },
+  "scientific_approval": false
+}

@@ -1,0 +1,432 @@
+[
+  {
+    "chunk_id": "CHK-AEDA-POTENT",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "GC-O of one spirulina supplement suspension reported 2-ethyl-3,5-dimethylpyrazine at FD 2048 and beta-ionone and acetic acid at FD 1024. These are dilution ranks for that suspension, not concentrations and not a protein-bar result.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina supplement aqueous suspension",
+    "review_status": "extracted",
+    "source_id": "SRC-IJMS-2025-6767",
+    "source_location": "Table 2 odorants 5/8/24",
+    "source_review_status": "extracted",
+    "source_title": "Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis",
+    "source_url": "https://doi.org/10.3390/ijms26146767",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "GC-O of one spirulina supplement suspension reported 2-ethyl-3,5-dimethylpyrazine at FD 2048 and beta-ionone and acetic acid at FD 1024. These are dilution ranks for that suspension, not concentrations and not a protein-bar result.\nSource: Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis\nLocation: Table 2 odorants 5/8/24\nMatrix: spirulina supplement aqueous suspension\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-AEDA-THIOL",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Static headspace above the spirulina supplement suspension detected methanethiol, sulfuric and cabbage-like, at an FD factor of at least 32.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "headspace above spirulina supplement suspension",
+    "review_status": "extracted",
+    "source_id": "SRC-IJMS-2025-6767",
+    "source_location": "Static headspace paragraph",
+    "source_review_status": "extracted",
+    "source_title": "Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis",
+    "source_url": "https://doi.org/10.3390/ijms26146767",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "Static headspace above the spirulina supplement suspension detected methanethiol, sulfuric and cabbage-like, at an FD factor of at least 32.\nSource: Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis\nLocation: Static headspace paragraph\nMatrix: headspace above spirulina supplement suspension\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-ALLERGEN-IDENTITY",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Milk, soy, peanut, almond and sesame contains-links are identity matches to the FDA major-allergen list. They are not assays of a lot. Coconut oil is not linked as a tree nut under the 2025 FAQ used here. No ingredient is marked free-from.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "database_identity",
+    "matrix": "ingredient identity",
+    "review_status": "extracted",
+    "source_id": "SRC-FDA-ALLERGEN",
+    "source_location": "FDA major-allergen list and 2025 coconut FAQ",
+    "source_review_status": "extracted",
+    "source_title": "FDA food allergen labeling guidance, edition 5, and 2025 FAQ",
+    "source_url": "https://www.fda.gov/food/food-allergensgluten-free-guidance-documents-regulatory-information/frequently-asked-questions-food-allergen-labeling-guidance-industry",
+    "species": [],
+    "support_class": "direct",
+    "text": "Milk, soy, peanut, almond and sesame contains-links are identity matches to the FDA major-allergen list. They are not assays of a lot. Coconut oil is not linked as a tree nut under the 2025 FAQ used here. No ingredient is marked free-from.\nSource: FDA food allergen labeling guidance, edition 5, and 2025 FAQ\nLocation: FDA major-allergen list and 2025 coconut FAQ\nMatrix: ingredient identity\nSpecies: "
+  },
+  {
+    "chunk_id": "CHK-BISCUIT-FLOUR",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Gluten-free biscuits were made with spirulina at 0, 0.5, 1 and 5 percent of the rice flour. The 0.5 percent flour replacement was most preferred, and higher rates lowered sensory scores. Those percentages are not the share of the whole biscuit.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "related_food_matrix",
+    "matrix": "gluten-free biscuit",
+    "review_status": "extracted",
+    "source_id": "SRC-CJAFS-2024-135",
+    "source_location": "Abstract and methods: rates of rice flour",
+    "source_review_status": "extracted",
+    "source_title": "Effect of Spirulina platensis on Textural, Sensory and Some Physicochemical Characteristics in Gluten-free Functional Biscuit Production",
+    "source_url": "https://doi.org/10.36846/cjafs.2024.135",
+    "species": [],
+    "support_class": "indirect",
+    "text": "Gluten-free biscuits were made with spirulina at 0, 0.5, 1 and 5 percent of the rice flour. The 0.5 percent flour replacement was most preferred, and higher rates lowered sensory scores. Those percentages are not the share of the whole biscuit.\nSource: Effect of Spirulina platensis on Textural, Sensory and Some Physicochemical Characteristics in Gluten-free Functional Biscuit Production\nLocation: Abstract and methods: rates of rice flour\nMatrix: gluten-free biscuit\nSpecies: "
+  },
+  {
+    "chunk_id": "CHK-BOUND-LIMIT",
+    "chunk_tag": "intervention",
+    "claim_summary": "Table 1 labels quantities g/100 g but lists an unchanged 100 g base plus 0/2/3/4/5 g spirulina. Summed input masses are 100/102/103/104/105 g. Therefore treatment labels cannot be treated as confirmed finished-bar mass percentages or safety limits.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "related_food_matrix",
+    "matrix": "snack bar",
+    "review_status": "extracted",
+    "source_id": "SRC-ITEPA-2024",
+    "source_location": "Table 1 p.827; totals calculated from listed quantities",
+    "source_review_status": "extracted",
+    "source_title": "Pengaruh Penambahan Spirulina Terhadap Sifat Fisikokimia, Sensoris, dan Aktivitas Antioksidan Snack Bar",
+    "source_url": "https://ojs.unud.ac.id/index.php/itepa/article/view/123629",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "indirect",
+    "text": "Table 1 labels quantities g/100 g but lists an unchanged 100 g base plus 0/2/3/4/5 g spirulina. Summed input masses are 100/102/103/104/105 g. Therefore treatment labels cannot be treated as confirmed finished-bar mass percentages or safety limits.\nSource: Pengaruh Penambahan Spirulina Terhadap Sifat Fisikokimia, Sensoris, dan Aktivitas Antioksidan Snack Bar\nLocation: Table 1 p.827; totals calculated from listed quantities\nMatrix: snack bar\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-CHL-GRACIO",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "A second study reports Chlorella vulgaris volatiles as percent of normalized TIC area, including hexanal at 4.40 percent and beta-ionone at 0.49 percent. Those means must not be averaged with the 2021 culture percentages.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "Chlorella vulgaris biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-2174",
+    "source_location": "Table 3, C. vulgaris column",
+    "source_review_status": "extracted",
+    "source_title": "The Volatile Composition and the Potential Health Benefits of Different Microalgae Strains",
+    "source_url": "https://doi.org/10.3390/foods13142174",
+    "species": [
+      "chlorella"
+    ],
+    "support_class": "indirect",
+    "text": "A second study reports Chlorella vulgaris volatiles as percent of normalized TIC area, including hexanal at 4.40 percent and beta-ionone at 0.49 percent. Those means must not be averaged with the 2021 culture percentages.\nSource: The Volatile Composition and the Potential Health Benefits of Different Microalgae Strains\nLocation: Table 3, C. vulgaris column\nMatrix: Chlorella vulgaris biomass\nSpecies: chlorella"
+  },
+  {
+    "chunk_id": "CHK-CHL-HEXANAL",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "In a phototrophic Chlorella vulgaris culture, hexanal was 20.21 percent of relative VOC area, with table descriptors grass, tallow and fat. That is not a dried-powder concentration and not a bar result.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "Chlorella vulgaris phototrophic culture",
+    "review_status": "extracted",
+    "source_id": "SRC-BJDV-2021-662",
+    "source_location": "Table 2",
+    "source_review_status": "extracted",
+    "source_title": "Study of the volatile profile of the microalgal biomass of Chlorella vulgaris",
+    "source_url": "https://doi.org/10.34117/bjdv7n5-662",
+    "species": [
+      "chlorella"
+    ],
+    "support_class": "indirect",
+    "text": "In a phototrophic Chlorella vulgaris culture, hexanal was 20.21 percent of relative VOC area, with table descriptors grass, tallow and fat. That is not a dried-powder concentration and not a bar result.\nSource: Study of the volatile profile of the microalgal biomass of Chlorella vulgaris\nLocation: Table 2\nMatrix: Chlorella vulgaris phototrophic culture\nSpecies: chlorella"
+  },
+  {
+    "chunk_id": "CHK-CHL-MUSHROOM",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "The same culture table reports oct-3-en-2-ol at 9.41 percent and 1-octen-3-ol at 6.63 percent of relative area, both with a mushroom descriptor.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "Chlorella vulgaris phototrophic culture",
+    "review_status": "extracted",
+    "source_id": "SRC-BJDV-2021-662",
+    "source_location": "Table 2",
+    "source_review_status": "extracted",
+    "source_title": "Study of the volatile profile of the microalgal biomass of Chlorella vulgaris",
+    "source_url": "https://doi.org/10.34117/bjdv7n5-662",
+    "species": [
+      "chlorella"
+    ],
+    "support_class": "indirect",
+    "text": "The same culture table reports oct-3-en-2-ol at 9.41 percent and 1-octen-3-ol at 6.63 percent of relative area, both with a mushroom descriptor.\nSource: Study of the volatile profile of the microalgal biomass of Chlorella vulgaris\nLocation: Table 2\nMatrix: Chlorella vulgaris phototrophic culture\nSpecies: chlorella"
+  },
+  {
+    "chunk_id": "CHK-CHL-SEAWEED",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "2,4-Decadienal is listed at 0.13 percent of relative area in the chlorella culture, with the descriptor seaweed. The isomer is not specified, so this is a weak association.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "Chlorella vulgaris phototrophic culture",
+    "review_status": "extracted",
+    "source_id": "SRC-BJDV-2021-662",
+    "source_location": "Table 2",
+    "source_review_status": "extracted",
+    "source_title": "Study of the volatile profile of the microalgal biomass of Chlorella vulgaris",
+    "source_url": "https://doi.org/10.34117/bjdv7n5-662",
+    "species": [
+      "chlorella"
+    ],
+    "support_class": "indirect",
+    "text": "2,4-Decadienal is listed at 0.13 percent of relative area in the chlorella culture, with the descriptor seaweed. The isomer is not specified, so this is a weak association.\nSource: Study of the volatile profile of the microalgal biomass of Chlorella vulgaris\nLocation: Table 2\nMatrix: Chlorella vulgaris phototrophic culture\nSpecies: chlorella"
+  },
+  {
+    "chunk_id": "CHK-CIN-OTHER-FOODS",
+    "chunk_tag": "intervention",
+    "claim_summary": "Cinnamon powder was tested in spirulina-enriched cookies, flakes and dried noodles. Selected additions were 10%, 2.5% and 2.5% respectively. Methods report 9.5% dried spirulina and 0/2.5/5/7.5/10% cinnamon by weight. Complete recipe masses and finished yield are not established here; this does not validate 1% cinnamon in our bar.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "related_food_matrix",
+    "matrix": "cookies/flakes/dried noodles",
+    "review_status": "extracted",
+    "source_id": "SRC-JFS-2018-35546",
+    "source_location": "pp.96-97 methods; p.99 selection",
+    "source_review_status": "extracted",
+    "source_title": "The Capability of Cinnamon as an Off-Flavor Masking Agent for Spirulina platensis enriched Food Product",
+    "source_url": "https://journal.ugm.ac.id/jfs/article/view/35546",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "indirect",
+    "text": "Cinnamon powder was tested in spirulina-enriched cookies, flakes and dried noodles. Selected additions were 10%, 2.5% and 2.5% respectively. Methods report 9.5% dried spirulina and 0/2.5/5/7.5/10% cinnamon by weight. Complete recipe masses and finished yield are not established here; this does not validate 1% cinnamon in our bar.\nSource: The Capability of Cinnamon as an Off-Flavor Masking Agent for Spirulina platensis enriched Food Product\nLocation: pp.96-97 methods; p.99 selection\nMatrix: cookies/flakes/dried noodles\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-DATE-FORM",
+    "chunk_tag": "intervention",
+    "claim_summary": "The dried-date nutrition row must not be used as date paste. The plan forbids combining nutrients across ingredient forms without an explicit transformation, and none is recorded.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "review",
+    "matrix": "protein bar",
+    "review_status": "extracted",
+    "source_id": "SRC-USDA-FDC",
+    "source_location": "Form note on IF-DATE-DRIED",
+    "source_review_status": "extracted",
+    "source_title": "USDA FoodData Central",
+    "source_url": "https://fdc.nal.usda.gov/",
+    "species": [],
+    "support_class": "hypothesis",
+    "text": "The dried-date nutrition row must not be used as date paste. The plan forbids combining nutrients across ingredient forms without an explicit transformation, and none is recorded.\nSource: USDA FoodData Central\nLocation: Form note on IF-DATE-DRIED\nMatrix: protein bar\nSpecies: "
+  },
+  {
+    "chunk_id": "CHK-GEOSMIN-GAP",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "GC-O identified geosmin in the spirulina supplement suspension at FD factor 64, with odor words musty, earthy and beetroot. That factor is not a concentration. 2-methylisoborneol was not in the odorant table; this does not establish its absence from the sample.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina supplement aqueous suspension",
+    "review_status": "extracted",
+    "source_id": "SRC-IJMS-2025-6767",
+    "source_location": "Table 2, odorant 22",
+    "source_review_status": "extracted",
+    "source_title": "Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis",
+    "source_url": "https://doi.org/10.3390/ijms26146767",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "GC-O identified geosmin in the spirulina supplement suspension at FD factor 64, with odor words musty, earthy and beetroot. That factor is not a concentration. 2-methylisoborneol was not in the odorant table; this does not establish its absence from the sample.\nSource: Deciphering Important Odorants in a Spirulina (Arthrospira platensis) Dietary Supplement by Aroma Extract Dilution Analysis\nLocation: Table 2, odorant 22\nMatrix: spirulina supplement aqueous suspension\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-NO-MASK",
+    "chunk_tag": "intervention",
+    "claim_summary": "This extract does not contain a trial showing that cocoa, cinnamon, vanilla or citrus reduces a named algae off-note in a protein bar. Those ingredient forms are search-space candidates only.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "review",
+    "matrix": "protein bar",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Absence noted against the formulation candidate list",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [],
+    "support_class": "hypothesis",
+    "text": "This extract does not contain a trial showing that cocoa, cinnamon, vanilla or citrus reduces a named algae off-note in a protein bar. Those ingredient forms are search-space candidates only.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Absence noted against the formulation candidate list\nMatrix: protein bar\nSpecies: "
+  },
+  {
+    "chunk_id": "CHK-NOT-A-BAR",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "A detected peak and an odor word in a GC-MS table do not show that the compound causes that note in a protein bar. None of the analytical rows in this extract were measured in the project's oat and date matrix.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "review",
+    "matrix": "protein bar",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Scope of Foods 2024 versus a protein bar",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "chlorella",
+      "spirulina"
+    ],
+    "support_class": "hypothesis",
+    "text": "A detected peak and an odor word in a GC-MS table do not show that the compound causes that note in a protein bar. None of the analytical rows in this extract were measured in the project's oat and date matrix.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Scope of Foods 2024 versus a protein bar\nMatrix: protein bar\nSpecies: chlorella, spirulina"
+  },
+  {
+    "chunk_id": "CHK-NUTRITION-GAP",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "USDA spirulina and other ingredient rows are generic FoodData Central foods. They are not the composition of the 17 spirulina samples, the AEDA product, or a chosen supplier lot. An empty nutrient is unknown, not zero.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "database_identity",
+    "matrix": "generic food",
+    "review_status": "extracted",
+    "source_id": "SRC-USDA-FDC",
+    "source_location": "FDC food records cited on each nutrition row",
+    "source_review_status": "extracted",
+    "source_title": "USDA FoodData Central",
+    "source_url": "https://fdc.nal.usda.gov/",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "indirect",
+    "text": "USDA spirulina and other ingredient rows are generic FoodData Central foods. They are not the composition of the 17 spirulina samples, the AEDA product, or a chosen supplier lot. An empty nutrient is unknown, not zero.\nSource: USDA FoodData Central\nLocation: FDC food records cited on each nutrition row\nMatrix: generic food\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SNACK-RANGE",
+    "chunk_tag": "intervention",
+    "claim_summary": "The snack-bar paper labels treatments 0/2/3/4/5% spirulina. Table 5 reports 20 panelists and a seven-point liking scale. Overall acceptance shares the same significance letter across treatments; aroma letters differ despite the narrative reporting no significant aroma effect. This inconsistency needs review; no named off-note reduction was measured.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "related_food_matrix",
+    "matrix": "snack bar",
+    "review_status": "extracted",
+    "source_id": "SRC-ITEPA-2024",
+    "source_location": "Table 5 p.832; aroma narrative p.831",
+    "source_review_status": "extracted",
+    "source_title": "Pengaruh Penambahan Spirulina Terhadap Sifat Fisikokimia, Sensoris, dan Aktivitas Antioksidan Snack Bar",
+    "source_url": "https://ojs.unud.ac.id/index.php/itepa/article/view/123629",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "indirect",
+    "text": "The snack-bar paper labels treatments 0/2/3/4/5% spirulina. Table 5 reports 20 panelists and a seven-point liking scale. Overall acceptance shares the same significance letter across treatments; aroma letters differ despite the narrative reporting no significant aroma effect. This inconsistency needs review; no named off-note reduction was measured.\nSource: Pengaruh Penambahan Spirulina Terhadap Sifat Fisikokimia, Sensoris, dan Aktivitas Antioksidan Snack Bar\nLocation: Table 5 p.832; aroma narrative p.831\nMatrix: snack bar\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SPI-CYCLO",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Beta-cyclocitral was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 1.2 to 4.2 percent of identified VOC area, with the odor word minty. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina products and raw biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Table 3",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "Beta-cyclocitral was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 1.2 to 4.2 percent of identified VOC area, with the odor word minty. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Table 3\nMatrix: spirulina products and raw biomass\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SPI-HEXANAL",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Hexanal was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 1.2 to 8.7 percent of identified VOC area, with the odor words green and grassy. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina products and raw biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Table 3",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "Hexanal was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 1.2 to 8.7 percent of identified VOC area, with the odor words green and grassy. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Table 3\nMatrix: spirulina products and raw biomass\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SPI-HYDROCARBON",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Heptadecane was the most abundant hydrocarbon in the 17 spirulina samples, at 10.5 to 48.7 percent of identified VOC area. The table's odor word is alkane. A large relative area is not evidence that it drives an off-note. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina products and raw biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Table 3 and alkanes paragraph",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "Heptadecane was the most abundant hydrocarbon in the 17 spirulina samples, at 10.5 to 48.7 percent of identified VOC area. The table's odor word is alkane. A large relative area is not evidence that it drives an off-note. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Table 3 and alkanes paragraph\nMatrix: spirulina products and raw biomass\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SPI-IONONE",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Beta-ionone was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 7.0 to 21.1 percent of identified VOC area, with the odor word floral. That range is not an odor-activity value. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina products and raw biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Table 3",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "Beta-ionone was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 7.0 to 21.1 percent of identified VOC area, with the odor word floral. That range is not an odor-activity value. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Table 3\nMatrix: spirulina products and raw biomass\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SPI-OCTENOL",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "1-Octen-3-ol was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 2.2 to 8.6 percent of identified VOC area, with the odor word mushroom-like. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina products and raw biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Table 3",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "1-Octen-3-ol was reported in all 17 spirulina samples (16 commercial products and one raw biomass), at 2.2 to 8.6 percent of identified VOC area, with the odor word mushroom-like. Odor descriptors are reference labels cited by Table 3; they were not measured sensory responses in these samples.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Table 3\nMatrix: spirulina products and raw biomass\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-SPI-PROFILE",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Seventeen spirulina samples (16 commercial products and one raw biomass) contained 128 identified VOCs by HS-SPME-GC-MS. The largest classes were alkanes, ketones, aldehydes and alcohols. The figures are relative areas, not concentrations, and they vary by product.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "analytical_detection",
+    "matrix": "spirulina products and raw biomass",
+    "review_status": "extracted",
+    "source_id": "SRC-FOODS-2024-1257",
+    "source_location": "Methods section 2.1; Results and Table 3",
+    "source_review_status": "extracted",
+    "source_title": "Volatile Profiling of Spirulina Food Supplements",
+    "source_url": "https://doi.org/10.3390/foods13081257",
+    "species": [
+      "spirulina"
+    ],
+    "support_class": "direct",
+    "text": "Seventeen spirulina samples (16 commercial products and one raw biomass) contained 128 identified VOCs by HS-SPME-GC-MS. The largest classes were alkanes, ketones, aldehydes and alcohols. The figures are relative areas, not concentrations, and they vary by product.\nSource: Volatile Profiling of Spirulina Food Supplements\nLocation: Methods section 2.1; Results and Table 3\nMatrix: spirulina products and raw biomass\nSpecies: spirulina"
+  },
+  {
+    "chunk_id": "CHK-TWO-CHLORELLA",
+    "chunk_tag": "diagnosis",
+    "claim_summary": "Chlorella observations come from two materials: a 2021 phototrophic culture and a 2024 biomass profile. A formulator should not treat either profile as the sensory identity of an unnamed commercial powder.",
+    "evidence_status": "literature_derived",
+    "evidence_type": "review",
+    "matrix": "Chlorella vulgaris",
+    "review_status": "extracted",
+    "source_id": "SRC-BJDV-2021-662",
+    "source_location": "Table 2 compared with Foods 2024 Table 3",
+    "source_review_status": "extracted",
+    "source_title": "Study of the volatile profile of the microalgal biomass of Chlorella vulgaris",
+    "source_url": "https://doi.org/10.34117/bjdv7n5-662",
+    "species": [
+      "chlorella"
+    ],
+    "support_class": "indirect",
+    "text": "Chlorella observations come from two materials: a 2021 phototrophic culture and a 2024 biomass profile. A formulator should not treat either profile as the sensory identity of an unnamed commercial powder.\nSource: Study of the volatile profile of the microalgal biomass of Chlorella vulgaris\nLocation: Table 2 compared with Foods 2024 Table 3\nMatrix: Chlorella vulgaris\nSpecies: chlorella"
+  }
+]

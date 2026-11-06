@@ -14,6 +14,8 @@ def run_workflow(request: RunRequest, search=None, generation_provider=None, sea
 
 
 def _run_workflow(request: RunRequest, search=None, generation_provider=None, search_version=None) -> RunResult:
+    if search is None and request.protein_source != 'auto':
+        raise ValueError("Protein source selection requires development retrieval; mock execution is not supported.")
     if request.experiment != "engineering_grid" and search is None:
         raise ValueError("Fixed experiment requires development retrieval; mock execution is not supported.")
     trace = []
@@ -95,7 +97,7 @@ def _run_workflow(request: RunRequest, search=None, generation_provider=None, se
             raise ValueError("Independent formulation check failed")
         for control in controls:
             control_errors = formulation_engine.check_formula(
-                control, request, search.snapshot, baseline=control.id == "B0", check_targets=False, check_grid=False)
+                control, request, search.snapshot, baseline=control.id == "B0", check_targets=False, check_grid=False, version=policy_version)
             if control_errors:
                 raise ValueError(f"Independent control check failed: {control_errors}")
         record("Critic", "SCREENING_PASSED" if accepted else "REJECTED",
