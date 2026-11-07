@@ -62,6 +62,9 @@ flutter:
   assets:
     - assets/ingredients/
   fonts:
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk.ttf
     - family: Urbanist
       fonts:
         - asset: assets/fonts/Urbanist.ttf

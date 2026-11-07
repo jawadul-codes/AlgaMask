@@ -186,7 +186,7 @@ class _Hero extends StatelessWidget {
           final h = box.maxHeight;
           final word = math.min(w * (narrow ? 0.145 : 0.155), h * 0.24);
           final pad = narrow ? 20.0 : 36.0;
-          final wordStyle = _type(word, tracking: -0.04, height: 1);
+          final wordStyle = _type(word, weight: 600, tracking: -0.04, height: 1, color: const Color(0xff294536)).copyWith(fontFamily: 'SpaceGrotesk');
           final maskWidth = (TextPainter(
             text: TextSpan(text: 'MASK', style: wordStyle),
             textDirection: TextDirection.ltr,
@@ -212,13 +212,13 @@ class _Hero extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: pad - word * 0.05,
+                left: narrow ? pad - word * 0.05 : w * .09,
                 top: h * 0.12,
                 child: Text('ALGAE', style: wordStyle),
               ),
               Positioned(
-                right: pad,
-                top: h * 0.12 + (narrow ? 0 : word),
+                right: narrow ? pad : w * .09,
+                top: h * 0.12 + (narrow ? 0 : word * .72),
                 child: Text('MASK', style: wordStyle),
               ),
               Positioned(
@@ -379,12 +379,12 @@ class _Transition extends StatelessWidget {
     builder: (context, box) {
       final w = box.maxWidth;
       final h = box.maxHeight;
-      final bowlSize = math.min(w * (narrow ? .72 : .38), h * .54);
+      final bowlSize = math.min(w * (narrow ? .72 : .38), h * .54) * 1.12;
       final center = Offset(w * (narrow ? .5 : .51), h * (narrow ? .51 : .54));
       final spread = Curves.easeOutCubic.transform(
         (progress / .72).clamp(0.0, 1.0),
       );
-      final diameter = math.min(math.max(w, h) * .88, math.min(w, h) * 1.05);
+      final diameter = math.min(math.max(w, h) * .88, math.min(w, h) * 1.05) * 1.12;
       return Stack(
         children: [
           Positioned(
