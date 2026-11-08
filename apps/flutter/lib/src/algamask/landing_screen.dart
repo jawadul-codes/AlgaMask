@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'design.dart';
 import 'input_screen.dart';
@@ -291,7 +292,7 @@ class _Nav extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _link('What it checks', onChecks),
+                _link('Meet the algae', onChecks),
                 _link('Evidence', onEvidence),
               ],
             ),
@@ -429,86 +430,148 @@ class _Checks extends StatelessWidget {
   const _Checks({required this.narrow});
   final bool narrow;
 
-  static const _rows = [
-    (
-      'Off-note masking',
-      'Sensory compounds behind spirulina and chlorella off-notes are linked to '
-          'masking ingredients through reviewed sensory evidence.',
-    ),
-    (
-      'Exact-form nutrition',
-      'Protein, energy and allergens are computed for the exact ingredient form '
-          'you choose, powder or extract, not generic values.',
-    ),
-    (
-      'Cited evidence',
-      'Every explanation is drawn from a reviewed dataset and evidence index, '
-          'and its citations are checked before the report shows them.',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      color: AlgaColors.deep,
+      color: _paper,
       borderRadius: BorderRadius.circular(narrow ? 22 : 30),
     ),
     padding: EdgeInsets.symmetric(
-      horizontal: narrow ? 22 : 56,
-      vertical: narrow ? 40 : 80,
+      horizontal: narrow ? 24 : 56,
+      vertical: narrow ? 36 : 64,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 760),
-          child: Text(
-            'What every screening run checks',
-            style: _type(
-              narrow ? 34 : 56,
-              color: Colors.white,
-              tracking: -0.03,
-              height: 1.05,
-            ),
-          ),
+        Text('MEET THE INGREDIENTS',
+            style: _type(12, weight: 700, tracking: .14,
+                color: const Color(0xff52705a))),
+        const SizedBox(height: 24),
+        _IngredientStory(
+          narrow: narrow,
+          number: '01',
+          title: 'What is algae?',
+          body: 'Algae are a diverse group of organisms that use sunlight to grow. '
+              'Edible varieties range from seaweeds such as nori and wakame to '
+              'tiny freshwater algae such as chlorella. In food, they bring '
+              'distinctive colour, flavour and nutrients.',
+          image: 'assets/ingredients/sea-lettuce.jpg',
+          photo: true,
+          caption: 'SEA LETTUCE / EDIBLE GREEN ALGAE',
+          background: const Color(0xffdce4d3),
         ),
-        SizedBox(height: narrow ? 28 : 48),
-        for (final (title, body) in _rows)
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 22),
-            child: Flex(
-              direction: narrow ? Axis.vertical : Axis.horizontal,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: narrow ? null : 340,
-                  child: Text(
-                    title,
-                    style: _type(28, color: AlgaColors.lime, weight: 600),
-                  ),
-                ),
-                SizedBox(height: narrow ? 8 : 0),
-                Flexible(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 620),
-                    child: Text(
-                      body,
-                      style: _type(
-                        18,
-                        color: Colors.white,
-                        weight: 400,
-                        height: 1.55,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: narrow ? 32 : 48),
+          child: const Divider(color: Color(0xffc7d0c4), height: 1),
+        ),
+        _IngredientStory(
+          narrow: narrow,
+          number: '02',
+          title: 'What is spirulina?',
+          body: 'Spirulina is a microscopic cyanobacterium, commonly called '
+              'blue-green algae, cultivated for food. Dried into a deep-green '
+              'powder, it adds protein and colour to foods such as smoothies '
+              'and snack bars. Its distinctive earthy flavour is one reason '
+              'ingredient pairing matters.',
+          image: 'assets/ingredients/spirulina-provided.png',
+          photo: true,
+          photoCredit: '',
+          photoSource: '',
+          caption: 'SPIRULINA / DRIED GREEN POWDER',
+          background: const Color(0xffd0ded5),
+          reverse: true,
+        ),
       ],
     ),
   );
+}
+
+class _IngredientStory extends StatelessWidget {
+  const _IngredientStory({
+    required this.narrow,
+    required this.number,
+    required this.title,
+    required this.body,
+    required this.image,
+    required this.caption,
+    required this.background,
+    this.reverse = false,
+    this.photo = false,
+    this.photoCredit = 'Photo: Holger Krisp / CC BY 3.0',
+    this.photoSource = 'https://commons.wikimedia.org/wiki/File:Meersalat-Ulva-lactuca.jpg',
+  });
+
+  final bool narrow;
+  final String number, title, body, image, caption;
+  final Color background;
+  final bool reverse;
+  final bool photo;
+  final String photoCredit, photoSource;
+
+  @override
+  Widget build(BuildContext context) {
+    final picture = Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(
+            height: narrow ? 230 : 460,
+            width: double.infinity,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.asset(
+                image,
+                fit: photo && narrow ? BoxFit.cover : BoxFit.contain,
+                semanticLabel: caption,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          caption,
+          textAlign: TextAlign.center,
+          style: _type(11, tracking: .10, weight: 600,
+              color: const Color(0xff47624f)),
+        ),
+        if (photo && photoCredit.isNotEmpty)
+          TextButton(
+            onPressed: () => launchUrl(Uri.parse(photoSource)),
+            child: Text(photoCredit,
+                style: _type(11, color: const Color(0xff47624f))),
+          ),
+      ],
+    );
+    final copy = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(number, style: _type(14, weight: 600,
+            color: const Color(0xff62806a))),
+        const SizedBox(height: 16),
+        Text(title, style: _type(narrow ? 36 : 48,
+            tracking: -.035, height: 1.1)),
+        const SizedBox(height: 20),
+        Text(body, style: _type(narrow ? 17 : 19, weight: 400,
+            height: 1.6, color: const Color(0xff42594a))),
+      ],
+    );
+    if (narrow) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start,
+          children: [copy, const SizedBox(height: 24), picture]);
+    }
+    return Row(
+      children: [
+        Expanded(child: reverse ? copy : picture),
+        const SizedBox(width: 64),
+        Expanded(child: reverse ? picture : copy),
+      ],
+    );
+  }
 }
 
 class _Close extends StatelessWidget {
